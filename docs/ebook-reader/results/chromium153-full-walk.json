@@ -1,0 +1,594 @@
+{
+ "browser": "153.0.8010.12",
+ "flags": [],
+ "cases": [
+  {
+   "name": "A-vertical-2col",
+   "mode": "A",
+   "columnsSetting": 2,
+   "vertical": true,
+   "supportsColumnWrap": true,
+   "frames": 1,
+   "timings": {
+    "loadMs": 70.89999999990687,
+    "layoutMs": 503.20000000018626
+   },
+   "totalChars": 5829,
+   "layoutColumns": 32,
+   "spreads": 16,
+   "monotonicViolations": 0,
+   "straddles": 0,
+   "inlineOverflow": 0,
+   "noRect": 0,
+   "overhang": 30,
+   "columnCountFromScroll": 32,
+   "walk": {
+    "visibleCharsCounted": 5829,
+    "missing": 0,
+    "duplicated": 0,
+    "outOfOrder": 0,
+    "partiallyVisible": 0
+   },
+   "firstSpreads": [
+    [
+     [
+      0,
+      186,
+      187
+     ],
+     [
+      187,
+      384,
+      198
+     ]
+    ],
+    [
+     [
+      385,
+      576,
+      192
+     ],
+     [
+      577,
+      774,
+      198
+     ]
+    ],
+    [
+     [
+      775,
+      959,
+      185
+     ],
+     [
+      960,
+      1144,
+      185
+     ]
+    ]
+   ],
+   "frameInfo": [
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "vertical-rl",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    }
+   ],
+   "bookScriptMessages": [],
+   "externalRequests": [],
+   "consoleErrors": [
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked."
+   ],
+   "footnoteLinkHit": {
+    "tag": "a",
+    "href": "#note1"
+   }
+  },
+  {
+   "name": "B-vertical-2col",
+   "mode": "B",
+   "columnsSetting": 2,
+   "vertical": true,
+   "supportsColumnWrap": true,
+   "frames": 2,
+   "timings": {
+    "loadMs": 80.60000000009313,
+    "layoutMs": 711.7999999998137
+   },
+   "totalChars": 5829,
+   "layoutColumns": 32,
+   "spreads": 16,
+   "monotonicViolations": 0,
+   "straddles": 0,
+   "inlineOverflow": 0,
+   "noRect": 0,
+   "overhang": 30,
+   "columnCountFromScroll": 32,
+   "walk": {
+    "visibleCharsCounted": 5829,
+    "missing": 0,
+    "duplicated": 0,
+    "outOfOrder": 0,
+    "partiallyVisible": 0
+   },
+   "firstSpreads": [
+    [
+     [
+      0,
+      186,
+      187
+     ],
+     [
+      187,
+      384,
+      198
+     ]
+    ],
+    [
+     [
+      385,
+      576,
+      192
+     ],
+     [
+      577,
+      774,
+      198
+     ]
+    ],
+    [
+     [
+      775,
+      959,
+      185
+     ],
+     [
+      960,
+      1144,
+      185
+     ]
+    ]
+   ],
+   "frameInfo": [
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "vertical-rl",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    },
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "vertical-rl",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    }
+   ],
+   "bookScriptMessages": [],
+   "externalRequests": [],
+   "consoleErrors": [
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked."
+   ],
+   "footnoteLinkHit": {
+    "tag": "a",
+    "href": "#note1"
+   }
+  },
+  {
+   "name": "B-vertical-1col",
+   "mode": "B",
+   "columnsSetting": 1,
+   "vertical": true,
+   "supportsColumnWrap": true,
+   "frames": 1,
+   "timings": {
+    "loadMs": 30.59999999962747,
+    "layoutMs": 475
+   },
+   "totalChars": 5829,
+   "layoutColumns": 15,
+   "spreads": 15,
+   "monotonicViolations": 0,
+   "straddles": 0,
+   "inlineOverflow": 0,
+   "noRect": 0,
+   "overhang": 5,
+   "columnCountFromScroll": 15,
+   "walk": {
+    "visibleCharsCounted": 5829,
+    "missing": 0,
+    "duplicated": 0,
+    "outOfOrder": 0,
+    "partiallyVisible": 0
+   },
+   "firstSpreads": [
+    [
+     [
+      0,
+      412,
+      413
+     ]
+    ],
+    [
+     [
+      413,
+      817,
+      405
+     ]
+    ],
+    [
+     [
+      818,
+      1249,
+      432
+     ]
+    ]
+   ],
+   "frameInfo": [
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "vertical-rl",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    }
+   ],
+   "bookScriptMessages": [],
+   "externalRequests": [],
+   "consoleErrors": [
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked."
+   ],
+   "footnoteLinkHit": {
+    "tag": "a",
+    "href": "#note1"
+   }
+  },
+  {
+   "name": "A-vertical-1col",
+   "mode": "A",
+   "columnsSetting": 1,
+   "vertical": true,
+   "supportsColumnWrap": true,
+   "frames": 1,
+   "timings": {
+    "loadMs": 51,
+    "layoutMs": 562.8999999999069
+   },
+   "totalChars": 5829,
+   "layoutColumns": 15,
+   "spreads": 15,
+   "monotonicViolations": 0,
+   "straddles": 0,
+   "inlineOverflow": 0,
+   "noRect": 0,
+   "overhang": 5,
+   "columnCountFromScroll": 15,
+   "walk": {
+    "visibleCharsCounted": 5829,
+    "missing": 0,
+    "duplicated": 0,
+    "outOfOrder": 0,
+    "partiallyVisible": 0
+   },
+   "firstSpreads": [
+    [
+     [
+      0,
+      412,
+      413
+     ]
+    ],
+    [
+     [
+      413,
+      817,
+      405
+     ]
+    ],
+    [
+     [
+      818,
+      1249,
+      432
+     ]
+    ]
+   ],
+   "frameInfo": [
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "vertical-rl",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    }
+   ],
+   "bookScriptMessages": [],
+   "externalRequests": [],
+   "consoleErrors": [
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked."
+   ],
+   "footnoteLinkHit": {
+    "tag": "a",
+    "href": "#note1"
+   }
+  },
+  {
+   "name": "H-horizontal-2col",
+   "mode": "H",
+   "columnsSetting": 2,
+   "vertical": false,
+   "supportsColumnWrap": true,
+   "frames": 1,
+   "timings": {
+    "loadMs": 49.1999999997206,
+    "layoutMs": 492.39999999990687
+   },
+   "totalChars": 5829,
+   "layoutColumns": 27,
+   "spreads": 14,
+   "monotonicViolations": 0,
+   "straddles": 0,
+   "inlineOverflow": 0,
+   "noRect": 0,
+   "overhang": 0,
+   "columnCountFromScroll": 28,
+   "walk": {
+    "visibleCharsCounted": 5829,
+    "missing": 0,
+    "duplicated": 0,
+    "outOfOrder": 0,
+    "partiallyVisible": 0
+   },
+   "firstSpreads": [
+    [
+     [
+      0,
+      186,
+      187
+     ],
+     [
+      187,
+      421,
+      235
+     ]
+    ],
+    [
+     [
+      422,
+      662,
+      241
+     ],
+     [
+      663,
+      903,
+      241
+     ]
+    ],
+    [
+     [
+      904,
+      1144,
+      241
+     ],
+     [
+      1145,
+      1385,
+      241
+     ]
+    ]
+   ],
+   "frameInfo": [
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "horizontal-tb",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    }
+   ],
+   "bookScriptMessages": [],
+   "externalRequests": [],
+   "consoleErrors": [
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked."
+   ],
+   "footnoteLinkHit": {
+    "tag": "a",
+    "href": "#note1"
+   }
+  },
+  {
+   "name": "H-horizontal-1col",
+   "mode": "H",
+   "columnsSetting": 1,
+   "vertical": false,
+   "supportsColumnWrap": true,
+   "frames": 1,
+   "timings": {
+    "loadMs": 30.300000000279397,
+    "layoutMs": 463.59999999962747
+   },
+   "totalChars": 5829,
+   "layoutColumns": 18,
+   "spreads": 18,
+   "monotonicViolations": 0,
+   "straddles": 0,
+   "inlineOverflow": 0,
+   "noRect": 0,
+   "overhang": 30,
+   "columnCountFromScroll": 18,
+   "walk": {
+    "visibleCharsCounted": 5829,
+    "missing": 0,
+    "duplicated": 0,
+    "outOfOrder": 0,
+    "partiallyVisible": 0
+   },
+   "firstSpreads": [
+    [
+     [
+      0,
+      295,
+      296
+     ]
+    ],
+    [
+     [
+      296,
+      662,
+      367
+     ]
+    ],
+    [
+     [
+      663,
+      1015,
+      353
+     ]
+    ]
+   ],
+   "frameInfo": [
+    {
+     "title": "第一章　直排測試",
+     "writingMode": "horizontal-tb",
+     "fontFamily": "ReaderImported, \"Noto Sans CJK TC\", serif",
+     "importedFontLoaded": true,
+     "fontFaces": [
+      "ReaderImported:loaded"
+     ]
+    }
+   ],
+   "bookScriptMessages": [],
+   "externalRequests": [],
+   "consoleErrors": [
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Blocked script execution in 'http://127.0.0.1:8765/book/zh.xhtml' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.",
+    "Loading the image 'https://example.com/track.png' violates the following Content Security Policy directive: \"img-src 'self' data:\". The action has been blocked."
+   ],
+   "footnoteLinkHit": {
+    "tag": "a",
+    "href": "#note1"
+   }
+  }
+ ],
+ "location": [
+  {
+   "name": "loc-B",
+   "startSpread": 5,
+   "locationCharIndex": 1683,
+   "steps": [
+    {
+     "change": "fontSize 20→26",
+     "spread": 6,
+     "locVisible": true,
+     "newFirstChar": 1480,
+     "relayoutMs": 502
+    },
+    {
+     "change": "lineHeight 1.8→2.2",
+     "spread": 8,
+     "locVisible": true,
+     "newFirstChar": 1683,
+     "relayoutMs": 566
+    },
+    {
+     "change": "margins wider",
+     "spread": 9,
+     "locVisible": true,
+     "newFirstChar": 1627,
+     "relayoutMs": 524
+    },
+    {
+     "change": "back to defaults",
+     "spread": 5,
+     "locVisible": true,
+     "newFirstChar": 1683,
+     "relayoutMs": 626
+    }
+   ]
+  },
+  {
+   "name": "loc-A",
+   "startSpread": 5,
+   "locationCharIndex": 1683,
+   "steps": [
+    {
+     "change": "fontSize 20→26",
+     "spread": 6,
+     "locVisible": true,
+     "newFirstChar": 1480,
+     "relayoutMs": 443
+    },
+    {
+     "change": "letterSpacing 0.05→0.2",
+     "spread": 7,
+     "locVisible": true,
+     "newFirstChar": 1571,
+     "relayoutMs": 576
+    },
+    {
+     "change": "back to defaults",
+     "spread": 5,
+     "locVisible": true,
+     "newFirstChar": 1683,
+     "relayoutMs": 465
+    }
+   ]
+  },
+  {
+   "name": "loc-H",
+   "startSpread": 5,
+   "locationCharIndex": 1966,
+   "steps": [
+    {
+     "change": "fontSize 20→26",
+     "spread": 7,
+     "locVisible": true,
+     "newFirstChar": 1739,
+     "relayoutMs": 422
+    },
+    {
+     "change": "indent 1→2, paraSpacing 0.5→1.5",
+     "spread": 9,
+     "locVisible": true,
+     "newFirstChar": 1924,
+     "relayoutMs": 451
+    },
+    {
+     "change": "back to defaults",
+     "spread": 5,
+     "locVisible": true,
+     "newFirstChar": 1966,
+     "relayoutMs": 528
+    }
+   ]
+  }
+ ]
+}

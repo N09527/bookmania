@@ -1,0 +1,11 @@
+import { createRequire } from 'node:module'; import { spawn, spawnSync } from 'node:child_process'; import path from 'node:path';
+const { chromium } = createRequire(import.meta.url)('/opt/node-tools/node_modules/playwright/index.js');
+const here = path.dirname(new URL(import.meta.url).pathname);
+const server = spawn(process.execPath, [path.join(here, 'server.mjs'), '8776'], { stdio: ['ignore', 'pipe', 'inherit'] });
+await new Promise(r => server.stdout.once('data', r));
+const b = await chromium.launch({ args: ['--remote-debugging-port=9444'] });
+const page = await (await b.newContext({ viewport: { width: 1000, height: 600 } })).newPage();
+await page.goto('http://127.0.0.1:8776/reader/reader.html');
+const r = spawnSync(process.execPath, [path.join(here, 'cdp-fast.mjs'), '9444', path.join(here, 'out-desktop-cdp'), 'desktop153'], { encoding: 'utf-8', timeout: 240000 });
+console.log(r.stdout.split('\n').filter(l => /result|location step|UA|done|Error/.test(l)).map(l => l.slice(0, 330)).join('\n'), r.stderr.slice(0, 500));
+await b.close(); server.kill();

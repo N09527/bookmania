@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reader-shell</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #fbf8f1; }
+  #stage { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+  /* Book frames are passive: all input is handled by the shell / native layer. */
+  #stage iframe { position: absolute; border: 0; background: transparent; pointer-events: none; }
+  .guide { position: absolute; outline: 1px dashed rgba(200, 60, 60, .35); pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script src="reader.js"></script>
+</body>
+</html>

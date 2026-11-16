@@ -1,0 +1,281 @@
+{
+  "label": "api26-wv69",
+  "userAgent": "Mozilla/5.0 (Linux; Android 8.0.0; Android SDK built for x86_64 Build/OSR1.180418.026; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/69.0.3497.100 Mobile Safari/537.36",
+  "viewport": [
+    684,
+    412,
+    2.625
+  ],
+  "supportsColumnWrap": false,
+  "cases": [
+    {
+      "name": "B-vertical-2col",
+      "mode": "B",
+      "timings": {
+        "loadMs": 4816.200000000208,
+        "layoutMs": 4079.4999999998254
+      },
+      "verify": {
+        "totalChars": 5829,
+        "columns": 66,
+        "columnCountFromScroll": 66,
+        "spreads": 33,
+        "monotonicViolations": 0,
+        "straddles": 0,
+        "clipped": 0,
+        "overhang": 0,
+        "noRect": 0,
+        "boundaryChecks": 258,
+        "failCount": 0,
+        "fails": [],
+        "firstSpread": [
+          [
+            0,
+            96
+          ],
+          [
+            97,
+            177
+          ]
+        ]
+      },
+      "footnoteHit": {
+        "tag": "a",
+        "href": "#note1"
+      },
+      "frames": [
+        {
+          "title": "第一章　直排測試",
+          "writingMode": "vertical-rl",
+          "fontFaces": [
+            "ReaderImported:loaded"
+          ]
+        },
+        {
+          "title": "第一章　直排測試",
+          "writingMode": "vertical-rl",
+          "fontFaces": [
+            "ReaderImported:loaded"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "A-vertical-2col",
+      "mode": "A",
+      "timings": {
+        "loadMs": 1838.600000000035,
+        "layoutMs": 3251.800000000003
+      },
+      "verify": {
+        "totalChars": 5829,
+        "columns": 53,
+        "columnCountFromScroll": 53,
+        "spreads": 27,
+        "monotonicViolations": 0,
+        "straddles": 925,
+        "clipped": 0,
+        "overhang": 236,
+        "noRect": 0,
+        "boundaryChecks": 158,
+        "failCount": 62,
+        "fails": [
+          {
+            "k": 0,
+            "c": 1,
+            "i": 215,
+            "why": "boundary hidden"
+          },
+          {
+            "k": 1,
+            "c": 2,
+            "i": 331,
+            "why": "wrong side"
+          },
+          {
+            "k": 1,
+            "c": 2,
+            "i": 215,
+            "why": "previous char partial"
+          },
+          {
+            "k": 1,
+            "c": 3,
+            "i": 421,
+            "why": "boundary partial"
+          },
+          {
+            "k": 2,
+            "c": 4,
+            "i": 551,
+            "why": "wrong side"
+          },
+          {
+            "k": 2,
+            "c": 5,
+            "i": 652,
+            "why": "boundary partial"
+          },
+          {
+            "k": 3,
+            "c": 6,
+            "i": 774,
+            "why": "wrong side"
+          },
+          {
+            "k": 3,
+            "c": 7,
+            "i": 891,
+            "why": "boundary partial"
+          },
+          {
+            "k": 4,
+            "c": 8,
+            "i": 1001,
+            "why": "wrong side"
+          },
+          {
+            "k": 4,
+            "c": 9,
+            "i": 1117,
+            "why": "boundary partial"
+          },
+          {
+            "k": 5,
+            "c": 10,
+            "i": 1117,
+            "why": "previous char partial"
+          },
+          {
+            "k": 5,
+            "c": 11,
+            "i": 1343,
+            "why": "boundary hidden"
+          }
+        ],
+        "firstSpread": [
+          [
+            0,
+            102
+          ],
+          [
+            103,
+            215
+          ]
+        ]
+      },
+      "footnoteHit": null,
+      "frames": [
+        {
+          "title": "第一章　直排測試",
+          "writingMode": "vertical-rl",
+          "fontFaces": [
+            "ReaderImported:loaded"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "H-horizontal-2col",
+      "mode": "H",
+      "timings": {
+        "loadMs": 611.8999999998778,
+        "layoutMs": 2215.9000000001397
+      },
+      "verify": {
+        "totalChars": 5829,
+        "columns": 66,
+        "columnCountFromScroll": 66,
+        "spreads": 33,
+        "monotonicViolations": 5,
+        "straddles": 0,
+        "clipped": 0,
+        "overhang": 5,
+        "noRect": 0,
+        "boundaryChecks": 196,
+        "failCount": 0,
+        "fails": [],
+        "firstSpread": [
+          [
+            0,
+            60
+          ],
+          [
+            61,
+            153
+          ]
+        ]
+      },
+      "footnoteHit": {
+        "tag": "a",
+        "href": "#note1"
+      },
+      "frames": [
+        {
+          "title": "第一章　直排測試",
+          "writingMode": "horizontal-tb",
+          "fontFaces": [
+            "ReaderImported:loaded"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "B-vertical-1col",
+      "mode": "B",
+      "timings": {
+        "loadMs": 1702.899999999776,
+        "layoutMs": 2686.4000000000524
+      },
+      "verify": {
+        "totalChars": 5829,
+        "columns": 30,
+        "columnCountFromScroll": 30,
+        "spreads": 30,
+        "monotonicViolations": 15,
+        "straddles": 0,
+        "clipped": 0,
+        "overhang": 15,
+        "noRect": 0,
+        "boundaryChecks": 118,
+        "failCount": 0,
+        "fails": [],
+        "firstSpread": [
+          [
+            0,
+            186
+          ]
+        ]
+      },
+      "footnoteHit": {
+        "tag": "a",
+        "href": "#note1"
+      },
+      "frames": [
+        {
+          "title": "第一章　直排測試",
+          "writingMode": "vertical-rl",
+          "fontFaces": [
+            "ReaderImported:loaded"
+          ]
+        }
+      ]
+    }
+  ],
+  "location": {
+    "startSpread": 5,
+    "loc": 904,
+    "steps": [
+      {
+        "change": "fontSize 20→26",
+        "spread": 8,
+        "locVisible": true
+      },
+      {
+        "change": "back to defaults",
+        "spread": 5,
+        "locVisible": true
+      }
+    ]
+  }
+}
