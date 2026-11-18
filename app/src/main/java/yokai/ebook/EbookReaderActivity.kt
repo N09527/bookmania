@@ -137,7 +137,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    if (menuVisible) setMenuVisible(false) else finish()
+                    // On the error screen the toolbar stays visible; back always leaves.
+                    if (menuVisible && !binding.errorPanel.isVisible) setMenuVisible(false) else finish()
                 }
             },
         )
