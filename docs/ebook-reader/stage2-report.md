@@ -197,7 +197,7 @@ kotlin.UninitializedPropertyAccessException: lateinit property chapterSort has n
 
 ## 7. 需要你處理或決定的事
 
-1. **推送到 GitHub**：N09527/bookmania 仍回應 403（「Claude doesn't have GitHub access to N09527/bookmania」）。請在 https://github.com/apps/claude/installations/select_target 把 Claude GitHub App 安裝到這個存放庫，或從 claude.ai 的設定重新連結 GitHub。之前的提交都保留在本機分支 `ebook-reader/stage1-design`。
+1. **推送到 GitHub**：N09527/bookmania 仍回應 403（「Claude doesn't have GitHub access to N09527/bookmania」）。請到 https://claude.ai/connect-github 連結（或重新連結）GitHub 帳號，並在同一頁把 Claude GitHub App 安裝到這個存放庫。之前的提交都保留在本機分支 `ebook-reader/stage1-design`。
 2. **APK 簽章（第 10 題）**：尚未選擇（a 我產生新金鑰交給你／b 你提供 keystore／c debug 簽章）。
 3. **套件名稱**：你回覆「可以？」，我目前使用 `io.github.n09527.bookmania`。若要改，請告訴我。
 4. **App 圖示**（新問題）：目前沿用 Yōkai 的圖示。Apache-2.0 第 6 條不授權使用上游的商標與產品名稱；圖示是否算在內我無法確定。要換成新圖示嗎？若要，請提供圖檔，或告訴我可以先用簡單的文字圖示代替。
