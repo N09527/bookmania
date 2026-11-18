@@ -197,6 +197,11 @@
         <activity
             android:name=".ui.webview.WebViewActivity"
             android:configChanges="uiMode|orientation|screenSize"/>
+        <!-- Bookmania text reader (yokai.ebook) -->
+        <activity
+            android:name="yokai.ebook.EbookReaderActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:exported="false" />
         <activity
             android:name=".ui.security.BiometricActivity" />
         <activity

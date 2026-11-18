@@ -154,6 +154,8 @@ object EpubParser {
             identifier = uniqueId,
             description = md?.descendantsNamed("description")?.firstOrNull()?.text()?.trim()?.ifEmpty { null },
             coverHref = cover,
+            publisher = md?.descendantsNamed("publisher")?.firstOrNull()?.text()?.trim()?.ifEmpty { null },
+            date = md?.descendantsNamed("date")?.firstOrNull()?.text()?.trim()?.ifEmpty { null },
         )
         val writingMode = detectWritingMode(zip, items, spine, metaName("primary-writing-mode"), direction, languages)
 

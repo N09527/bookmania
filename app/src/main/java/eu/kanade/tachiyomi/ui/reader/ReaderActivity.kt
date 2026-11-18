@@ -173,6 +173,7 @@ import uy.kohesive.injekt.injectLazy
 import yokai.domain.base.BasePreferences
 import yokai.domain.ui.settings.ReaderPreferences
 import yokai.domain.ui.settings.ReaderPreferences.LandscapeCutoutBehaviour
+import yokai.ebook.EbookRouter
 import yokai.i18n.MR
 import yokai.util.lang.getString
 import android.R as AR
@@ -265,6 +266,7 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
 
         fun newIntent(context: Context, manga: Manga, chapter: Chapter): Intent {
             MainActivity.chapterIdToExitTo = 0L
+            EbookRouter.intentFor(context, manga, chapter)?.let { return it }
             val intent = Intent(context, ReaderActivity::class.java)
             intent.putExtra("manga", manga.id)
             intent.putExtra("chapter", chapter.id)
@@ -274,6 +276,7 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
 
         fun newIntentWithTransitionOptions(activity: Activity, manga: Manga, chapter: Chapter, sharedElement: View): Pair<Intent, Bundle?> {
             MainActivity.chapterIdToExitTo = 0L
+            EbookRouter.intentFor(activity, manga, chapter)?.let { return it to null }
             val intent = newIntent(activity, manga, chapter)
             intent.putExtra(TRANSITION_NAME, sharedElement.transitionName)
             val activityOptions = ActivityOptions.makeSceneTransitionAnimation(
@@ -444,6 +447,9 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
                     }
                     is ReaderViewModel.Event.ShareTrackingError -> {
                         showTrackingError(event.errors)
+                    }
+                    is ReaderViewModel.Event.OpenTextBook -> {
+                        EbookRouter.handOff(this, viewModel.manga?.id, event.chapterId)
                     }
                 }
             }
@@ -1433,6 +1439,7 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
      * this case the activity is closed and a toast is shown to the user.
      */
     private fun setInitialChapterError(error: Throwable) {
+        if (EbookRouter.handOffOnError(this, error)) return
         Logger.e(error)
         finish()
         toast(error.message)

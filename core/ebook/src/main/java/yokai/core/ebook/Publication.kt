@@ -22,6 +22,9 @@ data class BookMetadata(
     val description: String?,
     /** Container path of the cover image, if the book declares one. */
     val coverHref: String?,
+    val publisher: String? = null,
+    /** Publication date as written in the book (EPUB `dc:date`, MOBI EXTH 106). */
+    val date: String? = null,
 )
 
 data class SpineItem(

@@ -87,6 +87,7 @@ import yokai.domain.manga.interactor.UpdateManga
 import yokai.domain.manga.models.MangaUpdate
 import yokai.domain.storage.StorageManager
 import yokai.domain.track.interactor.GetTrack
+import yokai.ebook.TextBookException
 import yokai.i18n.MR
 import yokai.util.lang.getString
 
@@ -382,6 +383,10 @@ class ReaderViewModel(
                 if (e is CancellationException) {
                     throw e
                 }
+                if (e is TextBookException) {
+                    chapter.chapter.id?.let { eventChannel.send(Event.OpenTextBook(it)) }
+                    return@launchIO
+                }
                 Logger.e(e) { "Unable to load new chapter" }
             }
         }
@@ -433,6 +438,9 @@ class ReaderViewModel(
         } catch (e: Throwable) {
             if (e is CancellationException) {
                 throw e
+            }
+            if (e is TextBookException) {
+                chapter.chapter.id?.let { eventChannel.send(Event.OpenTextBook(it)) }
             }
             Logger.e(e) { "Unable to load adjacent chapter" }
             lastPage = null
@@ -1071,5 +1079,8 @@ class ReaderViewModel(
         data class SavedImage(val result: SaveImageResult) : Event()
         data class ShareImage(val file: UniFile, val page: ReaderPage, val extraPage: ReaderPage? = null) : Event()
         data class ShareTrackingError(val errors: List<Pair<TrackService, String?>>) : Event()
+
+        /** The chapter is a text book (yokai.ebook): switch to the text reader. */
+        data class OpenTextBook(val chapterId: Long) : Event()
     }
 }

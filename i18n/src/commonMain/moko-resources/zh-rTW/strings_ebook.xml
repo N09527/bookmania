@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ebook_opens_in_text_reader">此章節是文字書，會以文字閱讀器開啟</string>
+    <string name="ebook_drm_title">此書受 DRM 保護</string>
+    <string name="ebook_drm_message">保護方式：%s\n\nBookmania 只能開啟沒有 DRM 的書，也不會移除 DRM。請改用沒有 DRM 的版本。</string>
+    <string name="ebook_cannot_open_title">無法開啟這本書</string>
+    <string name="ebook_corrupt_message">檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。</string>
+    <string name="ebook_kfx_message">不支援 KFX 格式。Bookmania 可讀取沒有 DRM 的 EPUB、MOBI 與 AZW3。</string>
+    <string name="ebook_no_content">這本書沒有可閱讀的內容。</string>
+    <string name="ebook_end_of_book">已到本書結尾</string>
+    <string name="ebook_start_of_book">已在本書開頭</string>
+    <string name="ebook_open_external_link">要用瀏覽器開啟這個連結嗎？</string>
+    <string name="ebook_link_not_found">書中找不到這個連結的位置</string>
+</resources>

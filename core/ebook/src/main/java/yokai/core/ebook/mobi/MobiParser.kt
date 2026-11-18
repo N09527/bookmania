@@ -61,6 +61,8 @@ internal abstract class MobiPublicationBase(
             identifier = h.exthString(104) ?: h.exthString(113) ?: h.uid.toString(),
             description = h.exthString(103),
             coverHref = coverOffset?.let { resourcePath(it.toInt() + 1) },
+            publisher = h.exthString(101),
+            date = h.exthString(106),
         )
     }
 

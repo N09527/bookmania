@@ -41,6 +41,7 @@ import yokai.core.metadata.toComicInfo
 import yokai.domain.chapter.services.ChapterRecognition
 import yokai.domain.source.SourcePreferences
 import yokai.domain.storage.StorageManager
+import yokai.ebook.LocalEbooks
 import yokai.i18n.MR
 import yokai.util.fillMetadata
 import yokai.util.lang.getString
@@ -353,7 +354,10 @@ class LocalSource(private val context: Context) : CatalogueSource, UnmeteredSour
         // 2. Distinct by name to merge duplicates (prioritizing based on directory order in base dirs)
         val validFiles = dirs.asSequence()
             .flatMap { it.listFiles().orEmpty().asSequence() }
-            .filter { it.isDirectory || isSupportedArchive(it.extension.orEmpty()) || it.extension.equals("epub", true) }
+            .filter {
+                it.isDirectory || isSupportedArchive(it.extension.orEmpty()) || it.extension.equals("epub", true) ||
+                    LocalEbooks.isTextOnly(it)
+            }
             .distinctBy { it.name }
             .toList()
 
@@ -421,6 +425,7 @@ class LocalSource(private val context: Context) : CatalogueSource, UnmeteredSour
             isDirectory -> Format.Directory(this)
             isSupportedArchive(extension) -> Format.Archive(this)
             extension.equals("epub", true) -> Format.Epub(this)
+            LocalEbooks.isTextOnly(this) -> Format.Ebook(this)
             else -> throw Exception(context.getString(MR.strings.local_invalid_format))
         }
     }
@@ -453,6 +458,11 @@ class LocalSource(private val context: Context) : CatalogueSource, UnmeteredSour
                         entry?.let { updateCover(manga, epub.getInputStream(it)!!, context) }
                     }
                 }
+                is Format.Ebook -> {
+                    LocalEbooks.open(format.file, context).use { book ->
+                        LocalEbooks.coverStream(book)?.let { updateCover(manga, it, context) }
+                    }
+                }
             }
         } catch (e: Throwable) {
             Logger.e(e) { "Error updating cover for ${manga.title}" }
@@ -481,6 +491,10 @@ class LocalSource(private val context: Context) : CatalogueSource, UnmeteredSour
                         true
                     } ?: false
                 }
+                is Format.Ebook -> {
+                    LocalEbooks.open(format.file, context).use { LocalEbooks.fillMetadata(it, chapter, manga) }
+                    true
+                }
             }
         } catch (e: Throwable) {
             Logger.e(e) { "Error updating a metadata" }
@@ -503,6 +517,9 @@ class LocalSource(private val context: Context) : CatalogueSource, UnmeteredSour
         data class Directory(val file: UniFile) : Format()
         data class Archive(val file: UniFile) : Format()
         data class Epub(val file: UniFile) : Format()
+
+        /** MOBI / AZW3: read only by the text reader (yokai.ebook). */
+        data class Ebook(val file: UniFile) : Format()
     }
 }
 

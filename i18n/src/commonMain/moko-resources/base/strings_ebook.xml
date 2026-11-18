@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bookmania text reader (yokai.ebook). Kept in its own file to ease merging upstream changes. -->
+<resources>
+    <string name="ebook_opens_in_text_reader">This chapter is a text book and opens in the text reader</string>
+    <string name="ebook_drm_title">This book is protected by DRM</string>
+    <string name="ebook_drm_message">Protection: %s\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.</string>
+    <string name="ebook_cannot_open_title">Cannot open this book</string>
+    <string name="ebook_corrupt_message">The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.</string>
+    <string name="ebook_kfx_message">KFX books are not supported. Bookmania reads EPUB, MOBI and AZW3 books without DRM.</string>
+    <string name="ebook_no_content">This book has no readable content.</string>
+    <string name="ebook_end_of_book">End of the book</string>
+    <string name="ebook_start_of_book">Beginning of the book</string>
+    <string name="ebook_open_external_link">Open this link in the browser?</string>
+    <string name="ebook_link_not_found">The link target was not found in this book</string>
+</resources>

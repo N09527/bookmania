@@ -134,6 +134,11 @@ android {
             resourceConfigurations.add("en")
             dimension = "default"
         }
+        // Bookmania (fork): no Firebase configuration, no self-updater, all languages.
+        // Its application id is set in androidComponents below.
+        create("bookmania") {
+            dimension = "default"
+        }
     }
 
     lint {
@@ -147,6 +152,7 @@ android {
 
 dependencies {
     implementation(projects.core.archive)
+    implementation(projects.core.ebook)
     implementation(projects.core.main)
     implementation(projects.data)
     implementation(projects.domain)
@@ -263,6 +269,17 @@ dependencies {
     // REF: https://square.github.io/leakcanary/
     debugImplementation(libs.leakcanary.android)
     implementation(libs.leakcanary.plumber)
+}
+
+// Bookmania uses its own application id, without Yōkai's build-type suffixes (".yokai", ".debugYokai" …).
+androidComponents {
+    onVariants(selector().withFlavor("default" to "bookmania")) { variant ->
+        val suffix = when (variant.buildType) {
+            "release" -> ""
+            else -> ".${variant.buildType}"
+        }
+        variant.applicationId.set("io.github.n09527.bookmania$suffix")
+    }
 }
 
 tasks {
