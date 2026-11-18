@@ -1,0 +1,15 @@
+{
+  "uniqueId": "johnfactotum:foliate-js",
+  "name": "foliate-js",
+  "description": "Bookmania's MOBI / KF8 (AZW3) reader (core:ebook) is a Kotlin port of parts of foliate-js mobi.js.",
+  "website": "https://github.com/johnfactotum/foliate-js",
+  "developers": [
+    {
+      "name": "John Factotum",
+      "organisationUrl": "https://github.com/johnfactotum"
+    }
+  ],
+  "licenses": [
+    "foliate-js-mit"
+  ]
+}

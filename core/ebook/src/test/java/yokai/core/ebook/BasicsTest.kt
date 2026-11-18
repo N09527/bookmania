@@ -111,6 +111,18 @@ class XhtmlSanitizerTest {
     }
 
     @Test
+    fun `HTML documents (MOBI 6) are parsed as HTML`() {
+        val html = """<html><head><guide><reference type="toc" title="x" filepos=0000000012 /></guide></head>
+            <body><p width="1em">一<br>二<img src="../images/00001.jpg" width=500>三<p>四&nbsp;五</body></html>"""
+        val out = XhtmlSanitizer.sanitize(html.toByteArray(), isHtml = true).text
+        out shouldContain "一<br>二<img src=\"../images/00001.jpg\" width=\"500\">三</p><p>四\u00A0五</p>"
+        out shouldNotContain "</br>"
+        out shouldNotContain "</img>"
+        // The same markup parsed as XML would nest everything inside <br> and <img>.
+        XhtmlSanitizer.sanitize(html.toByteArray()).text shouldContain "</img>"
+    }
+
+    @Test
     fun `object is unwrapped to its fallback and SVG documents stay SVG`() {
         clean("""<html><body><object data="x.svg" type="image/svg+xml"><img src="x.png"/></object></body></html>""") shouldContain "<img src=\"x.png\">"
         val svg = XhtmlSanitizer.sanitize(

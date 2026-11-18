@@ -1,5 +1,8 @@
 package yokai.core.ebook.mobi
 
+// Kotlin port of parts of foliate-js mobi.js (MIT License, Copyright (c) 2022 John Factotum);
+// see core/ebook/NOTICE-foliate-js.txt.
+
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -365,6 +368,9 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
         out.write(raw, prev, end - prev)
         var html = out.toByteArray().toString(charset)
         html = PAGEBREAK.replace(html, "")
+        // The text is re-encoded as UTF-8, so any declared charset is wrong now.
+        html = META_CHARSET.replace(html, "")
+        html = BLOCK_TAG.replace(html) { m -> mobiBlockStyle(m.value) }
         html = A_TAG.replace(html) { m ->
             val tag = m.value
             val pos = FILEPOS_ATTR.find(tag)?.groupValues?.get(1)?.toIntOrNull() ?: return@replace tag
@@ -403,6 +409,42 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
         private val REFERENCE_TAG = Regex("""<reference\b[^<>]*>""", RegexOption.IGNORE_CASE)
         private val TOC_TYPE = Regex("""type\s*=\s*['"]?[^'">]*\btoc\b""", RegexOption.IGNORE_CASE)
         private val SECTION_PATH = Regex("""text/section(\d{4})\.html""")
+        private val META_CHARSET = Regex("""<meta\b[^<>]*charset[^<>]*>""", RegexOption.IGNORE_CASE)
+        private val BLOCK_TAG = Regex("""<(?:p|div)\b[^<>]*>""", RegexOption.IGNORE_CASE)
+        private val WIDTH_ATTR = Regex("""\swidth\s*=\s*['"]?(-?\d+(?:\.\d+)?(?:em|pt|px|%))['"]?""", RegexOption.IGNORE_CASE)
+        private val HEIGHT_ATTR = Regex("""\sheight\s*=\s*['"]?(\d+(?:\.\d+)?(?:em|pt|px|%))['"]?""", RegexOption.IGNORE_CASE)
+        private val STYLE_ATTR = Regex("""\sstyle\s*=\s*(['"])(.*?)\1""", RegexOption.IGNORE_CASE)
+
+        /**
+         * MOBI 6 paragraph attributes: `width` is the first-line indent (negative: hanging indent)
+         * and `height` the space before the block. Values without a unit are left alone.
+         * Logical properties keep the meaning in vertical text; the -webkit- forms are for old WebViews.
+         */
+        internal fun mobiBlockStyle(tag: String): String {
+            val width = WIDTH_ATTR.find(tag)?.groupValues?.get(1)
+            val height = HEIGHT_ATTR.find(tag)?.groupValues?.get(1)
+            if (width == null && height == null) return tag
+            val css = StringBuilder()
+            if (width != null) {
+                css.append("text-indent: ").append(width).append(';')
+                if (width.startsWith("-")) {
+                    val w = width.removePrefix("-")
+                    css.append(" -webkit-margin-start: ").append(w).append("; margin-inline-start: ").append(w).append(';')
+                }
+            }
+            if (height != null && !height.matches(Regex("""0+(?:\.0+)?\D*"""))) {
+                css.append(" -webkit-margin-before: ").append(height).append("; margin-block-start: ").append(height).append(';')
+            }
+            var out = WIDTH_ATTR.replace(tag, "")
+            out = HEIGHT_ATTR.replace(out, "")
+            val existing = STYLE_ATTR.find(out)
+            return if (existing != null) {
+                out.replaceRange(existing.range, " style=\"${css.toString().trim()} ${existing.groupValues[2].replace("\"", "'")}\"")
+            } else {
+                val close = if (out.endsWith("/>")) out.length - 2 else out.length - 1
+                out.substring(0, close) + " style=\"${css.toString().trim()}\"" + out.substring(close)
+            }
+        }
     }
 }
 

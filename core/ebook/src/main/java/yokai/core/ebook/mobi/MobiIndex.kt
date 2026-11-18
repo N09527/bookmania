@@ -1,5 +1,8 @@
 package yokai.core.ebook.mobi
 
+// Kotlin port of parts of foliate-js mobi.js (MIT License, Copyright (c) 2022 John Factotum);
+// see core/ebook/NOTICE-foliate-js.txt.
+
 import java.nio.charset.Charset
 import yokai.core.ebook.CorruptBookException
 

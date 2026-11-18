@@ -12,9 +12,10 @@ import org.jsoup.parser.Parser
 /**
  * Turns a book document into safe markup for the reader's WebView.
  *
- * The document is parsed as XML, which keeps the structure of XHTML (self-closing elements,
- * CDATA, named entities), cleaned, and written out as HTML5 (`<!DOCTYPE html>`, served as
- * text/html). The writer emits explicit end tags, so `<title/>` or `<a id="x"/>` keep their
+ * XHTML documents are parsed as XML, which keeps their structure (self-closing elements,
+ * CDATA, named entities); `text/html` documents (MOBI 6 sections) are parsed as HTML, which
+ * understands `<br>` and `<img>` without a closing slash. Both are cleaned and written out as
+ * HTML5 (`<!DOCTYPE html>`, served as text/html). The writer emits explicit end tags, so `<title/>` or `<a id="x"/>` keep their
  * meaning, and malformed XHTML never ends up as an XML error page.
  *
  * Scripts can never run in the reader (sandboxed frames and a strict CSP); removing them here
@@ -44,8 +45,9 @@ object XhtmlSanitizer {
 
     private val BAD_URL = Regex("^(?:javascript|vbscript|livescript|data:(?:text/html|application/(?:x-)?(?:xhtml|javascript|ecmascript)))", RegexOption.IGNORE_CASE)
 
-    fun sanitize(bytes: ByteArray): Result {
-        val doc = Jsoup.parse(ByteArrayInputStream(bytes), null, "", Parser.xmlParser())
+    fun sanitize(bytes: ByteArray, isHtml: Boolean = false): Result {
+        val parser = if (isHtml) Parser.htmlParser() else Parser.xmlParser()
+        val doc = Jsoup.parse(ByteArrayInputStream(bytes), null, "", parser)
         val root = doc.children().firstOrNull() ?: return Result(EMPTY, "text/html")
         clean(root)
         return if (root.local() == "svg") {

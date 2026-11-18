@@ -271,6 +271,13 @@ dependencies {
     implementation(libs.leakcanary.plumber)
 }
 
+// Code ported from other projects (not a Gradle dependency) is listed from these definitions.
+aboutLibraries {
+    collect {
+        configPath = file("aboutlibraries")
+    }
+}
+
 // Bookmania uses its own application id, without Yōkai's build-type suffixes (".yokai", ".debugYokai" …).
 androidComponents {
     onVariants(selector().withFlavor("default" to "bookmania")) { variant ->

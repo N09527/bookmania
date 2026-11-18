@@ -4,7 +4,8 @@ import java.io.ByteArrayOutputStream
 import yokai.core.ebook.CorruptBookException
 
 // Format knowledge: MobileRead wiki ("MOBI", "PalmDOC", "KF8") and foliate-js `mobi.js`
-// (MIT License, Copyright (c) 2022 John Factotum), which this implementation follows.
+// (MIT License, Copyright (c) 2022 John Factotum), which this implementation follows;
+// see core/ebook/NOTICE-foliate-js.txt.
 
 internal fun be16(b: ByteArray, i: Int): Int {
     if (i < 0 || i + 2 > b.size) throw CorruptBookException("Read outside a record")

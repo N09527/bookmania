@@ -151,6 +151,13 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         lifecycleScope.launch { load(mangaId, chapterId) }
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        // Re-apply after dialogs and when the window is first shown (hiding in onCreate is not
+        // always honoured on older Android versions).
+        if (hasFocus) applySystemBars()
+    }
+
     override fun onDestroy() {
         waitJob?.cancel()
         webView?.let {
@@ -245,6 +252,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         wv.isHorizontalScrollBarEnabled = false
         wv.overScrollMode = View.OVER_SCROLL_NEVER
         wv.isLongClickable = false
+        wv.isFocusable = false
+        wv.isFocusableInTouchMode = false
         wv.isHapticFeedbackEnabled = false
         wv.setBackgroundColor(backgroundColor)
         wv.webViewClient = ReaderWebViewClient()
@@ -463,46 +472,25 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
     }
 
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+    /**
+     * Page keys are handled before the view hierarchy: a focused WebView would otherwise consume
+     * DPAD and PAGE keys. Volume keys turn pages only when the existing reader option is on.
+     */
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         val volumeKeys = preferences.readWithVolumeKeys().get()
         val inverted = preferences.readWithVolumeKeysInverted().get()
-        when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_DOWN -> if (volumeKeys) {
-                if (inverted) previousPage() else nextPage()
-                return true
-            }
-            KeyEvent.KEYCODE_VOLUME_UP -> if (volumeKeys) {
-                if (inverted) nextPage() else previousPage()
-                return true
-            }
-            KeyEvent.KEYCODE_PAGE_DOWN, KeyEvent.KEYCODE_SPACE -> {
-                nextPage()
-                return true
-            }
-            KeyEvent.KEYCODE_PAGE_UP -> {
-                previousPage()
-                return true
-            }
-            KeyEvent.KEYCODE_DPAD_LEFT -> {
-                if (vertical) nextPage() else previousPage()
-                return true
-            }
-            KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                if (vertical) previousPage() else nextPage()
-                return true
-            }
+        val action: (() -> Unit)? = when (event.keyCode) {
+            KeyEvent.KEYCODE_VOLUME_DOWN -> if (!volumeKeys) null else if (inverted) ::previousPage else ::nextPage
+            KeyEvent.KEYCODE_VOLUME_UP -> if (!volumeKeys) null else if (inverted) ::nextPage else ::previousPage
+            KeyEvent.KEYCODE_PAGE_DOWN, KeyEvent.KEYCODE_SPACE -> ::nextPage
+            KeyEvent.KEYCODE_PAGE_UP -> ::previousPage
+            KeyEvent.KEYCODE_DPAD_LEFT -> if (vertical) ::nextPage else ::previousPage
+            KeyEvent.KEYCODE_DPAD_RIGHT -> if (vertical) ::previousPage else ::nextPage
+            else -> null
         }
-        return super.onKeyDown(keyCode, event)
-    }
-
-    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        // Swallow the matching key-up so the volume is not changed.
-        if ((keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) &&
-            preferences.readWithVolumeKeys().get()
-        ) {
-            return true
-        }
-        return super.onKeyUp(keyCode, event)
+        if (action == null || menuVisible || binding.errorPanel.isVisible) return super.dispatchKeyEvent(event)
+        if (event.action == KeyEvent.ACTION_DOWN) action()
+        return true
     }
 
     // endregion
@@ -513,7 +501,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         menuVisible = visible
         binding.toolbar.isVisible = visible
         binding.pageInfo.isVisible = visible && webView != null && publication != null
-        if (visible || !preferences.fullscreen().get()) {
+        applySystemBars()
+    }
+
+    private fun applySystemBars() {
+        if (menuVisible || !preferences.fullscreen().get()) {
             insetsController.show(WindowInsetsCompat.Type.systemBars())
         } else {
             insetsController.hide(WindowInsetsCompat.Type.systemBars())

@@ -51,7 +51,7 @@ internal class EbookRequestHandler(private val assets: AssetManager) {
             val type = pub.mediaType(path) ?: mediaTypeFromName(path) ?: "application/octet-stream"
             val input = pub.open(path) ?: return error(404)
             if (type == "application/xhtml+xml" || type == "text/html") {
-                val result = input.use { XhtmlSanitizer.sanitize(it.readBytes()) }
+                val result = input.use { XhtmlSanitizer.sanitize(it.readBytes(), isHtml = type == "text/html") }
                 val headers = HashMap(NO_STORE)
                 headers["Content-Security-Policy"] = BOOK_CSP
                 WebResourceResponse(

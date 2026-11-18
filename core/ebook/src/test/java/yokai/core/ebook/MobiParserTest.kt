@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import yokai.core.ebook.mobi.Mobi6Publication
 
 class MobiParserTest {
 
@@ -86,6 +87,20 @@ class MobiParserTest {
                 val bytes = pub.open(src)!!.readBytes()
                 (bytes.size > 100) shouldBe true
             }
+        }
+    }
+
+    @Test
+    fun `MOBI 6 paragraph width and height become CSS`() {
+        Mobi6Publication.mobiBlockStyle("""<p height="11pt" width="1em">""") shouldBe
+            """<p style="text-indent: 1em; -webkit-margin-before: 11pt; margin-block-start: 11pt;">"""
+        Mobi6Publication.mobiBlockStyle("""<p height="0pt" width="-2em" style="color:red">""") shouldBe
+            """<p style="text-indent: -2em; -webkit-margin-start: 2em; margin-inline-start: 2em; color:red">"""
+        Mobi6Publication.mobiBlockStyle("""<div width="20">""") shouldBe """<div width="20">"""
+        open("zh-horizontal-mobi6.mobi").use { pub ->
+            val html = pub.open(pub.spine[1].href)!!.readBytes().toString(Charsets.UTF_8)
+            ("text-indent: 1em" in html) shouldBe true
+            Regex("""<p[^>]*\swidth=""").containsMatchIn(html) shouldBe false
         }
     }
 
