@@ -330,7 +330,8 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
         val iso = String(raw, Charsets.ISO_8859_1) // one char per byte: regex offsets are byte offsets
         val breaks = PAGEBREAK.findAll(iso).map { it.range.first }.toList()
         val bounds = (listOf(0) + breaks + raw.size).distinct()
-        sections = bounds.zipWithNext().filter { (a, b) -> b > a }
+        // Sections without text or images (typically after the last page break) would show as blank pages.
+        sections = bounds.zipWithNext().filter { (a, b) -> b > a && hasContent(iso, a, b) }.ifEmpty { listOf(0 to raw.size) }
         fileposList = FILEPOS_IN_TAG.findAll(iso).mapNotNull { it.groupValues[1].toIntOrNull() }
             .filter { it in 0 until raw.size }.toSortedSet().toList()
     }
@@ -386,7 +387,8 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
     }
 
     private fun readToc(): List<TocEntry> {
-        val first = String(raw, sections.first().first, sections.first().second - sections.first().first, Charsets.ISO_8859_1)
+        // The guide is in the <head> at the start of the text.
+        val first = String(raw, 0, minOf(raw.size, GUIDE_SEARCH_BYTES), Charsets.ISO_8859_1)
         val reference = REFERENCE_TAG.findAll(first).firstOrNull { TOC_TYPE.containsMatchIn(it.value) } ?: return emptyList()
         val pos = FILEPOS_ATTR.find(reference.value)?.groupValues?.get(1)?.toIntOrNull() ?: return emptyList()
         val i = sectionOf(pos)
@@ -409,6 +411,16 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
         private val REFERENCE_TAG = Regex("""<reference\b[^<>]*>""", RegexOption.IGNORE_CASE)
         private val TOC_TYPE = Regex("""type\s*=\s*['"]?[^'">]*\btoc\b""", RegexOption.IGNORE_CASE)
         private val SECTION_PATH = Regex("""text/section(\d{4})\.html""")
+        private const val GUIDE_SEARCH_BYTES = 128 * 1024
+        private val ANY_TAG = Regex("""<[^<>]*>""")
+
+        /** [iso] has one char per byte; non-ASCII bytes count as text. */
+        private fun hasContent(iso: String, start: Int, end: Int): Boolean {
+            val chunk = iso.substring(start, end)
+            if (IMG_TAG.containsMatchIn(chunk)) return true
+            return ANY_TAG.replace(chunk, "").any { !it.isWhitespace() && it != '\u00A0' }
+        }
+
         private val META_CHARSET = Regex("""<meta\b[^<>]*charset[^<>]*>""", RegexOption.IGNORE_CASE)
         private val BLOCK_TAG = Regex("""<(?:p|div)\b[^<>]*>""", RegexOption.IGNORE_CASE)
         private val WIDTH_ATTR = Regex("""\swidth\s*=\s*['"]?(-?\d+(?:\.\d+)?(?:em|pt|px|%))['"]?""", RegexOption.IGNORE_CASE)

@@ -78,6 +78,18 @@ class MobiParserTest {
     }
 
     @Test
+    fun `MOBI 6 has no blank sections`() {
+        for (name in listOf("zh-horizontal-mobi6.mobi", "text-with-images-mobi6.mobi")) {
+            open(name).use { pub ->
+                for (item in pub.spine) {
+                    val doc = Jsoup.parse(pub.open(item.href)!!.readBytes().toString(Charsets.UTF_8))
+                    (doc.text().isNotBlank() || doc.select("img").isNotEmpty()) shouldBe true
+                }
+            }
+        }
+    }
+
+    @Test
     fun `MOBI 6 images are rewritten to book paths`() {
         open("text-with-images-mobi6.mobi").use { pub ->
             val html = pub.spine.joinToString("") { pub.open(it.href)!!.readBytes().toString(Charsets.UTF_8) }
