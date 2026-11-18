@@ -86,7 +86,7 @@
 ### 3.1 Local Source【已查證】
 
 - Local Source 列出 15 個測試作品資料夾，包含只有 `.mobi`／`.azw3` 的資料夾（截圖 `screenshots/stage2/02-local-source.png`）。
-- MOBI／AZW3 的章節名稱取自書內書名（例：`zh-vertical-joint.mobi` → 「直排測試書」），作者「Bookmania 測試」顯示在章節列，日期取自 EXTH 106。封面檔 `cover.jpg` 已寫入作品資料夾（與既有「從第一章取封面」機制相同，詳細頁要重新整理才顯示）。
+- MOBI／AZW3 的章節名稱取自書內書名（例：`zh-vertical-joint.mobi` → 「直排測試書」）；章節列上的「Bookmania 測試」是書內作者（與既有 EPUB 的處理相同，放在章節的 scanlator 欄位），日期取自 EXTH 106（截圖 `03-joint-mobi-details.png`）。封面檔 `cover.jpg` 已寫入作品資料夾（與既有「從第一章取封面」機制相同，詳細頁要重新整理才顯示）。
 - 受 DRM 保護的 `drm-flagged.mobi`、損毀的 EPUB 保留檔名作章節名稱，列表正常、沒有當機。
 
 ### 3.2 文字書：開啟並翻到最後一頁，逐字檢查【已查證】
@@ -101,14 +101,14 @@
 | ja-vertical.epub | EPUB 3（日文） | 直排、右開 | 2 | 12（6＋6） | 全部相同 | （日文書沒有此標記） |
 | zh-horizontal.epub | EPUB 3 | 橫排、左開 | 3 | 23（8＋7＋8） | 全部相同 | 第１～１２０段依序 |
 | zh-horizontal.azw3 | KF8 | 橫排、左開 | 3 | 24（8＋8＋8） | 全部相同 | 第１～１２０段依序 |
-| zh-horizontal-mobi6.mobi | MOBI 6 | 橫排、左開 | <!-- M6A --> | <!-- M6B --> | 全部相同 | 第１～１２０段依序 |
+| zh-horizontal-mobi6.mobi | MOBI 6 | 橫排、左開 | 3 | 27（9＋9＋9） | 全部相同 | 第１～１２０段依序 |
 | text-with-images.epub | EPUB 3（圖文） | 橫排、左開 | 2 | 15（9＋6） | 全部相同 | 第１～６０段依序 |
-| text-with-images-mobi6.mobi | MOBI 6（圖文） | 橫排、左開 | <!-- M6C --> | <!-- M6D --> | 全部相同 | 第１～６０段依序 |
+| text-with-images-mobi6.mobi | MOBI 6（圖文） | 橫排、左開 | 2 | 17（10＋7） | 全部相同 | 第１～６０段依序 |
 | epub2-ncx.epub | EPUB 2 | 橫排、左開 | 2 | 4（2＋2） | 全部相同 | 第１～２０段依序 |
 
 - 直排三種格式（EPUB、AZW3、合併式 MOBI）的頁數與各檔字數完全相同（1840／1807／1832 字），表示 KF8 重建出的內容與原 EPUB 一致。
 - 直排第 1 頁左半留白：下一個元素是插圖，放不進剩下的空間（插圖設為不可跨頁），所以移到第 2 頁（截圖 `04-vertical-first-page.png`、`05-vertical-figure-page.png`，拍攝時系統列隱藏的修正還沒加入）。屬預期行為。
-- 表中 EPUB、AZW3、合併式 MOBI 的結果，是在第 4 節第 4、7、8、9 項修正之前的版本取得；這幾項只影響 MOBI 6 的空白段落、重新排版、工具列與說明畫面。最終版本另外重跑了兩本 MOBI 6 與直排 EPUB（表中 MOBI 6 兩列即最終版本的結果<!-- V2NOTE -->）。
+- 表中 EPUB、AZW3、合併式 MOBI 的結果，是在第 4 節第 4、7、8、9 項修正之前的版本取得；這幾項只影響 MOBI 6 的空白段落、重新排版、工具列與說明畫面。最終版本另外重跑了兩本 MOBI 6 與直排 EPUB（表中 MOBI 6 兩列即最終版本的結果；直排 EPUB 在最終版本的結果與先前相同：3 個章節檔、28 頁、全部相同）。修正前的 MOBI 6 多一個 0 字的空白頁（橫排書 28 頁、圖文書 18 頁）。
 - 每本書翻到最後一頁後再按「下一頁」，位置不再前進（App 顯示「已到本書結尾」提示；提示文字本身沒有自動擷取）。
 
 ### 3.3 其他情境
