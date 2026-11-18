@@ -1,0 +1,9 @@
+# Test books and fonts are binary; the root rule "* text eol=lf" would corrupt them.
+*.epub binary
+*.mobi binary
+*.azw binary
+*.azw3 binary
+*.kfx binary
+*.otf binary
+*.ttf binary
+*.woff2 binary
