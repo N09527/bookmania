@@ -16,6 +16,7 @@ import yokai.core.ebook.Publication
 import yokai.core.ebook.ReadingDirection
 import yokai.core.ebook.SpineItem
 import yokai.core.ebook.TocEntry
+import yokai.core.ebook.WritingModeDetector
 import yokai.core.ebook.WritingModeHint
 import yokai.core.ebook.io.RandomAccessSource
 import yokai.core.ebook.io.ZipReader
@@ -61,10 +62,6 @@ object EpubParser {
     private const val CONTAINER = "META-INF/container.xml"
     private const val APPLE_OPTIONS = "META-INF/com.apple.ibooks.display-options.xml"
     private const val CSS_BUDGET = 4L shl 20
-
-    private val VERTICAL_DECL = Regex("""(?:-epub-|-webkit-)?writing-mode\s*:\s*(?:vertical-rl|vertical-lr|tb-rl)\b""", RegexOption.IGNORE_CASE)
-    private val CSS_RULE = Regex("""([^{}@;]+)\{([^{}]*)\}""")
-    private val CSS_COMMENT = Regex("""/\*.*?\*/""", RegexOption.DOT_MATCHES_ALL)
 
     /** Parses an EPUB. The source is owned by the result (closed with it), or closed on failure. */
     fun parse(source: RandomAccessSource): EpubPublication {
@@ -247,11 +244,6 @@ object EpubParser {
         TocEntry(title.ifEmpty { "…" }, src, parseNavPoints(np, base))
     }
 
-    /**
-     * "Follow the book" needs to know whether the book is set vertically. Evidence, in order:
-     * the `primary-writing-mode` meta, a vertical `writing-mode` that applies to `html`/`body`
-     * of the first documents (inline style, or a CSS rule whose selector matches them).
-     */
     private fun detectWritingMode(
         zip: ZipReader,
         items: List<Item>,
@@ -260,48 +252,14 @@ object EpubParser {
         direction: ReadingDirection,
         languages: List<String>,
     ): WritingModeHint {
-        primaryWritingMode?.let {
-            if (it.contains("vertical", ignoreCase = true)) return WritingModeHint.VERTICAL
-            if (it.contains("horizontal", ignoreCase = true)) return WritingModeHint.HORIZONTAL
-        }
-        val verticalSelectors = ArrayList<String>()
         var budget = CSS_BUDGET
-        for (item in items) {
-            if (item.mediaType != "text/css") continue
-            val entry = zip.find(item.path) ?: continue
-            if (entry.size > budget) break
-            budget -= entry.size
-            zip.readText(entry.name)?.let { collectVerticalSelectors(it, verticalSelectors) }
-        }
-        for (s in spine.filter { it.linear }.take(3)) {
-            val doc = runCatching { parseXml(zip.readBytes(s.href) ?: return@runCatching null) }.getOrNull() ?: continue
-            doc.descendantsNamed("style").forEach { collectVerticalSelectors(it.data(), verticalSelectors) }
-            for (el in doc.descendantsNamed("html") + doc.descendantsNamed("body")) {
-                if (VERTICAL_DECL.containsMatchIn(el.attr("style"))) return WritingModeHint.VERTICAL
-                if (verticalSelectors.any { sel -> matches(el, sel) }) return WritingModeHint.VERTICAL
-            }
-        }
-        val cjk = languages.any { it.lowercase().startsWith("ja") || it.lowercase().startsWith("zh") }
-        return if (direction == ReadingDirection.RTL && cjk && verticalSelectors.isNotEmpty()) {
-            WritingModeHint.VERTICAL
-        } else {
-            WritingModeHint.HORIZONTAL
-        }
-    }
-
-    private fun collectVerticalSelectors(css: String, out: MutableList<String>) {
-        val text = CSS_COMMENT.replace(css, " ")
-        for (m in CSS_RULE.findAll(text)) {
-            if (VERTICAL_DECL.containsMatchIn(m.groupValues[2])) {
-                m.groupValues[1].split(',').map { it.trim() }.filter { it.isNotEmpty() }.forEach(out::add)
-            }
-        }
-    }
-
-    private fun matches(el: Element, selector: String): Boolean = try {
-        el.`is`(selector)
-    } catch (_: Exception) {
-        false
+        val stylesheets = items.asSequence()
+            .filter { it.mediaType == "text/css" }
+            .mapNotNull { zip.find(it.path) }
+            .takeWhile { entry -> (entry.size <= budget).also { if (it) budget -= entry.size } }
+            .mapNotNull { zip.readText(it.name) }
+        val documents = spine.asSequence().filter { it.linear }.take(3).mapNotNull { zip.readBytes(it.href) }
+        return WritingModeDetector.detect(stylesheets, documents, primaryWritingMode, direction, languages)
     }
 
     internal fun parseXml(bytes: ByteArray): Document =
