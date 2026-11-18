@@ -13,7 +13,9 @@
   var stage = document.getElementById('stage');
   var P = 8;        // overflow allowance around the page box (ruby, glyph overhang)
   var GAP = 24;     // invisible gap between consecutive pages, must be > 2 * P
-  var S = { frame: null, mode: 'H', settings: null, geo: null, page: 0, pages: 1, ready: false, error: null, seq: 0 };
+  // anchor: first character of the page the reader navigated to. Relayouts (rotation, settings) keep
+  // returning to it, so repeated relayouts do not drift; any navigation clears it.
+  var S = { frame: null, mode: 'H', settings: null, geo: null, page: 0, pages: 1, ready: false, error: null, seq: 0, anchor: null };
 
   function setImp(el, props) {
     Object.keys(props).forEach(function (k) { el.style.setProperty(k, props[k], 'important'); });
@@ -204,6 +206,7 @@
   function open(src, settings, target) {
     var seq = ++S.seq;
     S.ready = false; S.error = null; S.page = 0; S.pages = 1;
+    S.anchor = target && target.location ? target.location : null;
     S.settings = settings; S.mode = settings.vertical ? 'V' : 'H';
     document.body.style.background = settings.background;
     while (stage.firstChild) stage.removeChild(stage.firstChild);
@@ -228,7 +231,8 @@
 
   function relayout(settings) {
     if (!S.frame || !S.ready || S.error) return false;
-    var seq = ++S.seq, loc = locate();
+    var seq = ++S.seq, loc = S.anchor || locate();
+    S.anchor = loc;
     S.ready = false;
     if (settings) S.settings = settings;
     S.mode = S.settings.vertical ? 'V' : 'H';
@@ -246,6 +250,7 @@
     if (!S.ready || S.error) return 'busy';
     if (S.page >= S.pages - 1) return 'end';
     goPage(S.page + 1);
+    S.anchor = null;
     return 'ok';
   }
 
@@ -253,6 +258,7 @@
     if (!S.ready || S.error) return 'busy';
     if (S.page <= 0) return 'start';
     goPage(S.page - 1);
+    S.anchor = null;
     return 'ok';
   }
 
@@ -261,6 +267,7 @@
     var el = findFragment(S.frame.contentDocument, id);
     if (!el) return false;
     goPage(pageOfElement(el));
+    S.anchor = null;
     return true;
   }
 
@@ -284,6 +291,13 @@
     resizeTimer = setTimeout(function () { resizeTimer = null; relayout(null); }, 120);
   });
 
-  window.__reader = { open: open, relayout: relayout, next: next, prev: prev, goPage: goPage, goFragment: goFragment,
+  function goToPage(k) {
+    if (!S.ready || S.error) return false;
+    goPage(k);
+    S.anchor = null;
+    return true;
+  }
+
+  window.__reader = { open: open, relayout: relayout, next: next, prev: prev, goPage: goToPage, goFragment: goFragment,
     hit: hit, status: status };
 })();

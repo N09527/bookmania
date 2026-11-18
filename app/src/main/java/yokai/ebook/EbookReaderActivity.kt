@@ -124,6 +124,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         binding.errorBack.setOnClickListener { finish() }
 
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
+        binding.toolbar.setNavigationIconTint(getResourceColor(R.attr.colorOnSurface))
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         gestures = GestureDetector(this, TouchListener())
