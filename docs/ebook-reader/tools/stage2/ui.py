@@ -25,6 +25,9 @@ def nodes():
 
 def find(sub):
     for n in nodes():
+        x1, y1, x2, y2 = n['b']
+        if x2 <= x1 or y2 <= y1:
+            continue  # off-screen nodes (e.g. text of other pages in the WebView) cannot be tapped
         if sub in n['text'] or sub in n['desc'] or (sub.startswith('id:') and n['res'].endswith(sub[3:])):
             return n
     return None

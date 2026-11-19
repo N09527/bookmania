@@ -4,14 +4,20 @@ import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
+import android.util.TypedValue
 import android.view.GestureDetector
+import android.view.Gravity
 import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.webkit.ConsoleMessage
 import android.webkit.RenderProcessGoneDetail
@@ -21,13 +27,20 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebSettingsCompat
@@ -63,11 +76,21 @@ import yokai.core.ebook.UnsupportedBookException
 import yokai.core.ebook.WritingModeHint
 import yokai.domain.chapter.interactor.GetChapter
 import yokai.domain.manga.interactor.GetManga
+import yokai.ebook.settings.BookKey
+import yokai.ebook.settings.EbookSettings
+import yokai.ebook.settings.EbookSettingsPanel
+import yokai.ebook.settings.EbookSettingsStore
+import yokai.ebook.settings.EbookSettingsUiState
+import yokai.ebook.settings.FontStore
+import yokai.ebook.settings.ImportedFont
+import yokai.ebook.settings.SettingsScope
 import yokai.i18n.MR
+import yokai.presentation.theme.YokaiTheme
 import yokai.util.lang.getString
 
 /**
- * Text reader for Local Source EPUB, MOBI and AZW3 books (stage 2: one column, default typography).
+ * Text reader for Local Source EPUB, MOBI and AZW3 books (one column; typesetting settings in three
+ * levels, see [EbookSettingsStore]).
  *
  * The book is rendered by the shell (assets/ebook) in a WebView that can only reach the virtual
  * origin served by [EbookRequestHandler]. All input is handled here; the shell is driven with
@@ -80,6 +103,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private val sourceManager: SourceManager by injectLazy()
 
     private val requestHandler by lazy { EbookRequestHandler(assets) }
+    private val settingsStore by lazy { EbookSettingsStore(preferences.preferenceStore) }
+    private val fontStore by lazy { FontStore(this, preferences.preferenceStore) }
     private var webView: WebView? = null
     private var shellLoaded = false
 
@@ -87,7 +112,17 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private var manga: Manga? = null
     private var chapter: Chapter? = null
     private var spineIndex = 0
+    private var bookKey: BookKey? = null
+    private var settings = EbookSettings.DEFAULTS
+    /** The book's own writing mode, used while the setting is "依書籍". */
+    private var bookVertical = false
+    /** Resolved writing mode of the page. */
     private var vertical = false
+    /** Whether the next page is on the left (taps, swipes and arrow keys follow it). */
+    private var rtl = false
+    /** Settings the shell currently lays out with; a change re-lays out the open document. */
+    private var appliedJson: String? = null
+    private var pendingRelayout = false
     private var page = 0
     private var pages = 1
 
@@ -100,6 +135,12 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private var backgroundColor = Color.WHITE
     private var textColor = Color.BLACK
 
+    /** The settings panel, or null when it is closed. */
+    private var panel by mutableStateOf<EbookSettingsUiState?>(null)
+    private val fontPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) onFontPicked(uri)
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,8 +152,25 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         insetsController = WindowCompat.getInsetsController(window, window.decorView)
         insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         if (preferences.keepScreenOn().get()) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        // With the status bar padding the toolbar must also grow, or its subtitle is cut off.
+        val actionBarSize = TypedValue().let {
+            if (theme.resolveAttribute(android.R.attr.actionBarSize, it, true)) {
+                TypedValue.complexToDimensionPixelSize(it.data, resources.displayMetrics)
+            } else {
+                binding.toolbar.minimumHeight
+            }
+        }
         ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, insets ->
-            v.updatePadding(top = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top)
+            val top = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
+            v.updatePadding(top = top)
+            v.minimumHeight = actionBarSize + top
+            insets
+        }
+        val pageInfoMargin = (binding.pageInfo.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+        ViewCompat.setOnApplyWindowInsetsListener(binding.pageInfo) { v, insets ->
+            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = pageInfoMargin + insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            }
             insets
         }
 
@@ -126,6 +184,38 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
         binding.toolbar.setNavigationIconTint(getResourceColor(R.attr.colorOnSurface))
         binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, getString(MR.strings.ebook_settings)).apply {
+            setIcon(R.drawable.ic_tune_24dp)
+            iconTintList = ColorStateList.valueOf(getResourceColor(R.attr.colorOnSurface))
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            isVisible = false // until a book is open
+        }
+        binding.toolbar.setOnMenuItemClickListener { item ->
+            if (item.itemId == MENU_SETTINGS) openSettings()
+            item.itemId == MENU_SETTINGS
+        }
+        binding.root.addView(
+            ComposeView(this).apply {
+                layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM)
+                elevation = resources.displayMetrics.density * 16 // above the toolbar and the page number
+                setContent {
+                    YokaiTheme {
+                        panel?.let { state ->
+                            EbookSettingsPanel(
+                                state = state,
+                                onScopeChange = ::showPanel,
+                                onSet = ::onSettingChanged,
+                                onResetScope = ::resetScope,
+                                onImportFont = ::importFont,
+                                onDeleteFont = ::confirmDeleteFont,
+                                onClose = { panel = null },
+                            )
+                        }
+                    }
+                }
+            },
+        )
+        requestHandler.fontFile = { id -> fontStore.file(id) }
 
         gestures = GestureDetector(this, TouchListener())
         binding.touchLayer.setOnTouchListener { _, event ->
@@ -138,7 +228,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     // On the error screen the toolbar stays visible; back always leaves.
-                    if (menuVisible && !binding.errorPanel.isVisible) setMenuVisible(false) else finish()
+                    when {
+                        panel != null -> panel = null
+                        menuVisible && !binding.errorPanel.isVisible -> setMenuVisible(false)
+                        else -> finish()
+                    }
                 }
             },
         )
@@ -208,9 +302,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             showError(getString(MR.strings.ebook_cannot_open_title), getString(MR.strings.ebook_no_content))
             return
         }
-        vertical = pub.writingModeHint == WritingModeHint.VERTICAL
+        val key = BookKey(manga.source, manga.url, chapter.url)
+        bookKey = key
+        settings = settingsStore.effective(key)
+        bookVertical = pub.writingModeHint == WritingModeHint.VERTICAL
+        resolveMode()
         binding.toolbar.title = pub.metadata.title ?: chapter.name
         binding.toolbar.subtitle = manga.title
+        binding.toolbar.menu.findItem(MENU_SETTINGS)?.isVisible = true
         requestHandler.publication = pub
         createWebView()
     }
@@ -317,8 +416,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         val item = spine.getOrNull(index) ?: return
         spineIndex = index
         busy = true
+        pendingRelayout = false
         val url = EbookRequestHandler.bookUrl(item.href)
-        wv.evaluateJavascript("window.__reader.open(${JSONObject.quote(url)}, ${settingsJson()}, $target)", null)
+        val json = settingsJson()
+        appliedJson = json
+        wv.evaluateJavascript("window.__reader.open(${JSONObject.quote(url)}, $json, $target)", null)
         awaitLayout()
     }
 
@@ -340,6 +442,10 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                         page = status.optInt("page")
                         pages = status.optInt("pages", 1)
                         updatePageInfo()
+                        if (pendingRelayout) {
+                            pendingRelayout = false
+                            applySettings()
+                        }
                     }
                     return@launch
                 }
@@ -440,15 +546,20 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             val start = e1 ?: return false
             val dx = e2.x - start.x
             val dy = e2.y - start.y
+            if (panel != null) return true
             if (abs(dx) < abs(dy) || abs(dx) < resources.displayMetrics.density * 48) return false
-            // The page on the left comes next in right-to-left (vertical) books.
+            // Swiping right brings in the page on the left, which comes next when pages turn right-to-left.
             val towardsLeftPage = dx > 0
-            if (towardsLeftPage == vertical) nextPage() else previousPage()
+            if (towardsLeftPage == rtl) nextPage() else previousPage()
             return true
         }
     }
 
     private fun onTap(x: Float, y: Float) {
+        if (panel != null) {
+            panel = null
+            return
+        }
         if (menuVisible) {
             setMenuVisible(false)
             return
@@ -467,8 +578,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             }
             val third = binding.root.width / 3f
             when {
-                x < third -> if (vertical) nextPage() else previousPage()
-                x > third * 2 -> if (vertical) previousPage() else nextPage()
+                x < third -> if (rtl) nextPage() else previousPage()
+                x > third * 2 -> if (rtl) previousPage() else nextPage()
                 else -> setMenuVisible(true)
             }
         }
@@ -486,11 +597,13 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             KeyEvent.KEYCODE_VOLUME_UP -> if (!volumeKeys) null else if (inverted) ::nextPage else ::previousPage
             KeyEvent.KEYCODE_PAGE_DOWN, KeyEvent.KEYCODE_SPACE -> ::nextPage
             KeyEvent.KEYCODE_PAGE_UP -> ::previousPage
-            KeyEvent.KEYCODE_DPAD_LEFT -> if (vertical) ::nextPage else ::previousPage
-            KeyEvent.KEYCODE_DPAD_RIGHT -> if (vertical) ::previousPage else ::nextPage
+            KeyEvent.KEYCODE_DPAD_LEFT -> if (rtl) ::nextPage else ::previousPage
+            KeyEvent.KEYCODE_DPAD_RIGHT -> if (rtl) ::previousPage else ::nextPage
             else -> null
         }
-        if (action == null || menuVisible || binding.errorPanel.isVisible) return super.dispatchKeyEvent(event)
+        if (action == null || menuVisible || panel != null || binding.errorPanel.isVisible) {
+            return super.dispatchKeyEvent(event)
+        }
         if (event.action == KeyEvent.ACTION_DOWN) action()
         return true
     }
@@ -541,6 +654,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     }
 
     private fun showError(title: String, message: String) {
+        panel = null
+        binding.toolbar.menu.findItem(MENU_SETTINGS)?.isVisible = false
         binding.progress.isVisible = false
         binding.errorTitle.text = title
         binding.errorMessage.text = message
@@ -574,19 +689,33 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
     }
 
+    /** What the shell lays out with; "依書籍" values are null, so the book's own styles stay. */
     private fun settingsJson(): String {
+        val s = settings
         val dark = ColorUtils.calculateLuminance(backgroundColor) < 0.5
+        val font: Any = when (s.font) {
+            EbookSettings.FONT_SANS, EbookSettings.FONT_SERIF -> JSONObject().put("kind", s.font)
+            EbookSettings.FONT_BOOK -> JSONObject.NULL
+            // A font that was deleted (or not restored with a backup) falls back to the book's.
+            else -> fontStore.find(s.font)
+                ?.let { JSONObject().put("kind", "imported").put("url", EbookRequestHandler.fontUrl(it.id)) }
+                ?: JSONObject.NULL
+        }
         return JSONObject()
             .put("vertical", vertical)
-            .put("fontSize", DEFAULT_FONT_SIZE)
-            .put("lineHeight", DEFAULT_LINE_HEIGHT)
+            .put("font", font)
+            .put("fontSize", s.fontSize)
+            .put("lineHeight", cssNumber(s.lineHeight))
+            .put("letterSpacing", cssNumber(s.letterSpacing))
+            .put("indent", s.indent?.let(::cssNumber) ?: JSONObject.NULL)
+            .put("paragraphSpacing", s.paragraphSpacing?.let(::cssNumber) ?: JSONObject.NULL)
             .put(
                 "margins",
                 JSONObject()
-                    .put("top", DEFAULT_MARGIN_VERTICAL)
-                    .put("bottom", DEFAULT_MARGIN_VERTICAL)
-                    .put("left", DEFAULT_MARGIN_HORIZONTAL)
-                    .put("right", DEFAULT_MARGIN_HORIZONTAL),
+                    .put("top", s.marginTop)
+                    .put("bottom", s.marginBottom)
+                    .put("left", s.marginLeft)
+                    .put("right", s.marginRight),
             )
             .put("background", cssColor(backgroundColor))
             .put("textColor", cssColor(textColor))
@@ -594,7 +723,140 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             .toString()
     }
 
+    /** 1.8f as 1.8 rather than 1.7999999523. */
+    private fun cssNumber(value: Float): Double = EbookSettings.format(value).toDouble()
+
     private fun cssColor(color: Int) = String.format(Locale.ROOT, "#%06X", 0xFFFFFF and color)
+
+    // endregion
+
+    // region Settings
+
+    private fun resolveMode() {
+        vertical = when (settings.writingMode) {
+            EbookSettings.MODE_VERTICAL -> true
+            EbookSettings.MODE_HORIZONTAL -> false
+            else -> bookVertical
+        }
+        rtl = settings.rightToLeft(vertical)
+    }
+
+    private fun openSettings() {
+        val key = bookKey ?: return
+        setMenuVisible(false)
+        showPanel(settingsStore.initialScope(key))
+    }
+
+    /** Shows (or refreshes) the panel for [scope]. */
+    private fun showPanel(scope: SettingsScope) {
+        val key = bookKey ?: return
+        panel = EbookSettingsUiState(
+            settings = settingsStore.resolvedAt(scope, key),
+            scope = scope,
+            scopeHasValues = settingsStore.levelValues(scope, key).isNotEmpty(),
+            overridden = settingsStore.overriddenBelow(scope, key),
+            fonts = fontStore.list(),
+        )
+    }
+
+    private fun onSettingChanged(key: EbookSettings.Key, value: String) {
+        val book = bookKey ?: return
+        val scope = panel?.scope ?: return
+        settingsStore.set(scope, book, key, value)
+        refreshSettings()
+    }
+
+    private fun resetScope() {
+        val book = bookKey ?: return
+        val scope = panel?.scope ?: return
+        settingsStore.clear(scope, book)
+        refreshSettings()
+    }
+
+    /** Re-reads the effective settings after a change and applies them to the page. */
+    private fun refreshSettings() {
+        val book = bookKey ?: return
+        settings = settingsStore.effective(book)
+        resolveMode()
+        panel?.let { showPanel(it.scope) }
+        applySettings()
+    }
+
+    /** Re-lays out the open document if what the shell uses changed; it returns to the same character. */
+    private fun applySettings() {
+        if (webView == null || !shellLoaded || binding.errorPanel.isVisible) return
+        val json = settingsJson()
+        if (json == appliedJson) return
+        if (busy) {
+            pendingRelayout = true
+            return
+        }
+        busy = true
+        lifecycleScope.launch {
+            if (eval("window.__reader.relayout($json)") == "true") {
+                appliedJson = json
+                awaitLayout()
+            } else {
+                busy = false
+            }
+        }
+    }
+
+    private fun importFont() {
+        try {
+            // Font files often have no specific MIME type on the device; the content is checked instead.
+            fontPicker.launch(arrayOf("*/*"))
+        } catch (e: ActivityNotFoundException) {
+            toast(e.message)
+        }
+    }
+
+    private fun onFontPicked(uri: Uri) {
+        lifecycleScope.launch {
+            val pending = withIOContext { runCatching { fontStore.read(uri) } }.getOrElse {
+                Logger.w(it) { "Font import failed" }
+                toast(getString(MR.strings.ebook_font_invalid))
+                return@launch
+            }
+            if (pending.info.supportsVertical) {
+                saveFont(pending)
+                return@launch
+            }
+            val missing = buildList {
+                if (!pending.info.hasVerticalMetrics) add("vhea/vmtx")
+                if (!pending.info.hasVerticalGlyphs) add("vert/vrt2")
+            }.joinToString(", ")
+            MaterialAlertDialogBuilder(this@EbookReaderActivity)
+                .setTitle(pending.name)
+                .setMessage(getString(MR.strings.ebook_font_no_vertical, missing))
+                .setPositiveButton(getString(MR.strings.ebook_font_import_action)) { _, _ -> saveFont(pending) }
+                .setNegativeButton(getString(MR.strings.cancel), null)
+                .show()
+        }
+    }
+
+    private fun saveFont(pending: FontStore.Pending) {
+        lifecycleScope.launch {
+            val saved = withIOContext { runCatching { fontStore.save(pending) } }.getOrElse {
+                Logger.e(it) { "Saving font failed" }
+                toast(it.message)
+                return@launch
+            }
+            toast(getString(MR.strings.ebook_font_imported, saved.name))
+            panel?.let { showPanel(it.scope) }
+        }
+    }
+
+    private fun confirmDeleteFont(font: ImportedFont) {
+        MaterialAlertDialogBuilder(this)
+            .setMessage(getString(MR.strings.ebook_font_delete_confirm, font.name))
+            .setPositiveButton(getString(MR.strings.delete)) { _, _ ->
+                fontStore.delete(font.id)
+                refreshSettings()
+            }
+            .setNegativeButton(getString(MR.strings.cancel), null)
+            .show()
+    }
 
     // endregion
 
@@ -622,11 +884,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         private const val POLL_MS = 40L
         private const val LAYOUT_TIMEOUT_MS = 60_000L
 
-        // Stage 2 defaults, from the settings table of the design (section 5.6).
-        private const val DEFAULT_FONT_SIZE = 20
-        private const val DEFAULT_LINE_HEIGHT = 1.8
-        private const val DEFAULT_MARGIN_VERTICAL = 32
-        private const val DEFAULT_MARGIN_HORIZONTAL = 20
+        private const val MENU_SETTINGS = 1
 
         private val EXTERNAL_SCHEMES = setOf("http", "https", "mailto")
 

@@ -15,7 +15,8 @@
   var GAP = 24;     // invisible gap between consecutive pages, must be > 2 * P
   // anchor: first character of the page the reader navigated to. Relayouts (rotation, settings) keep
   // returning to it, so repeated relayouts do not drift; any navigation clears it.
-  var S = { frame: null, mode: 'H', settings: null, geo: null, page: 0, pages: 1, ready: false, error: null, seq: 0, anchor: null };
+  // t0/ms: start and duration of the last open or relayout (for diagnostics).
+  var S = { frame: null, mode: 'H', settings: null, geo: null, page: 0, pages: 1, ready: false, error: null, seq: 0, anchor: null, t0: 0, ms: 0 };
 
   function setImp(el, props) {
     Object.keys(props).forEach(function (k) { el.style.setProperty(k, props[k], 'important'); });
@@ -39,6 +40,23 @@
         (vertical ? 'max-width' : 'max-height') + ': ' + (vertical ? geo.contentW : geo.contentH) + 'px !important; ' +
         'object-fit: contain; box-sizing: border-box; break-inside: avoid; page-break-inside: avoid; }\n' +
       'html { color: ' + s.textColor + '; }\n';
+    // Font: the book's own (nothing to add), a generic family, or an imported font.
+    var family = null;
+    if (s.font && s.font.kind === 'imported' && s.font.url) {
+      css += '@font-face { font-family: "BookmaniaUserFont"; src: url("' + s.font.url + '"); }\n';
+      family = '"BookmaniaUserFont", serif';
+    } else if (s.font && (s.font.kind === 'sans' || s.font.kind === 'serif')) {
+      family = s.font.kind === 'sans' ? 'sans-serif' : 'serif';
+    }
+    if (family) css += 'html, body, body * { font-family: ' + family + ' !important; }\n';
+    // 0 adds nothing, so the book's own letter spacing (e.g. spaced headings) is kept.
+    if (typeof s.letterSpacing === 'number' && s.letterSpacing > 0) css += 'body, body * { letter-spacing: ' + s.letterSpacing + 'em !important; }\n';
+    if (typeof s.indent === 'number') css += 'p { text-indent: ' + s.indent + 'em !important; }\n';
+    if (typeof s.paragraphSpacing === 'number') {
+      // Logical sides, so the spacing goes between paragraphs in vertical text too; -webkit- forms for old WebViews.
+      css += 'p { -webkit-margin-before: 0 !important; -webkit-margin-after: ' + s.paragraphSpacing + 'em !important; ' +
+        'margin-block-start: 0 !important; margin-block-end: ' + s.paragraphSpacing + 'em !important; }\n';
+    }
     if (s.dark) {
       css += 'html, body { color: ' + s.textColor + ' !important; background-color: transparent !important; }\n' +
         'body * { color: inherit !important; background-color: transparent !important; }\n';
@@ -176,9 +194,16 @@
     }));
   }
 
+  // Waits for fonts and images, then counts the pages. Layout is forced first: font loads start only
+  // when a layout needs the font, and fonts.ready taken before that would not wait for them.
   function settle(seq) {
     var d = S.frame.contentDocument;
-    var fonts = d.fonts && d.fonts.ready ? d.fonts.ready : Promise.resolve();
+    d.documentElement.getBoundingClientRect();
+    var fonts = Promise.resolve();
+    if (d.fonts && d.fonts.ready) {
+      var user = S.settings.font && S.settings.font.kind === 'imported' ? d.fonts.load('1em "BookmaniaUserFont"').catch(function () {}) : null;
+      fonts = Promise.all([user, d.fonts.ready]);
+    }
     return Promise.all([fonts, waitForImages(d)]).then(function () {
       if (seq !== S.seq) return false;
       d.documentElement.getBoundingClientRect(); // force layout
@@ -205,6 +230,7 @@
 
   function open(src, settings, target) {
     var seq = ++S.seq;
+    S.t0 = Date.now();
     S.ready = false; S.error = null; S.page = 0; S.pages = 1;
     S.anchor = target && target.location ? target.location : null;
     S.settings = settings; S.mode = settings.vertical ? 'V' : 'H';
@@ -220,6 +246,7 @@
         settle(seq).then(function (ok) {
           if (!ok) return;
           start(target);
+          S.ms = Date.now() - S.t0;
           S.ready = true;
         }).catch(function (e) { fail(seq, e); });
       } catch (e) { fail(seq, e); }
@@ -232,6 +259,7 @@
   function relayout(settings) {
     if (!S.frame || !S.ready || S.error) return false;
     var seq = ++S.seq, loc = S.anchor || locate();
+    S.t0 = Date.now();
     S.anchor = loc;
     S.ready = false;
     if (settings) S.settings = settings;
@@ -241,6 +269,7 @@
     settle(seq).then(function (ok) {
       if (!ok) return;
       goPage(pageOfLocation(loc));
+      S.ms = Date.now() - S.t0;
       S.ready = true;
     }).catch(function (e) { fail(seq, e); });
     return true;
@@ -282,7 +311,7 @@
   }
 
   function status() {
-    return { ready: S.ready, error: S.error, page: S.page, pages: S.pages, mode: S.mode, seq: S.seq };
+    return { ready: S.ready, error: S.error, page: S.page, pages: S.pages, mode: S.mode, seq: S.seq, ms: S.ms };
   }
 
   var resizeTimer = null;
