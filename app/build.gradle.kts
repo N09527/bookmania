@@ -122,6 +122,19 @@ android {
         shaders = false
     }
 
+    // Bookmania release signing. The keystore and its passwords never go into the repository: set
+    // bookmaniaStoreFile, bookmaniaStorePassword, bookmaniaKeyAlias and bookmaniaKeyPassword in
+    // ~/.gradle/gradle.properties (or as ORG_GRADLE_PROJECT_* environment variables).
+    // Without them the bookmania release APK is built unsigned, as before.
+    providers.gradleProperty("bookmaniaStoreFile").orNull?.let { path ->
+        signingConfigs.create("bookmania") {
+            storeFile = file(path)
+            storePassword = providers.gradleProperty("bookmaniaStorePassword").get()
+            keyAlias = providers.gradleProperty("bookmaniaKeyAlias").get()
+            keyPassword = providers.gradleProperty("bookmaniaKeyPassword").get()
+        }
+    }
+
     flavorDimensions.add("default")
 
     productFlavors {
@@ -138,6 +151,8 @@ android {
         // Its application id is set in androidComponents below.
         create("bookmania") {
             dimension = "default"
+            // Debug builds keep the debug key (the build type's signing config wins).
+            signingConfigs.findByName("bookmania")?.let { signingConfig = it }
         }
     }
 
