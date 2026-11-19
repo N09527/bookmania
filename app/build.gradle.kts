@@ -62,6 +62,8 @@ android {
         buildConfigField("Boolean", "INCLUDE_UPDATER", "false")
         buildConfigField("Boolean", "BETA", "false")
         buildConfigField("Boolean", "NIGHTLY", "false")
+        // Whether the "Updated to vX / What's new" sheet also shows on the very first launch.
+        buildConfigField("Boolean", "UPDATE_NOTES_ON_FIRST_LAUNCH", "true")
 
         ndk {
             // False positive, we have x86 abi support
@@ -151,6 +153,7 @@ android {
         // Its application id is set in androidComponents below.
         create("bookmania") {
             dimension = "default"
+            buildConfigField("Boolean", "UPDATE_NOTES_ON_FIRST_LAUNCH", "false")
             // Debug builds keep the debug key (the build type's signing config wins).
             signingConfigs.findByName("bookmania")?.let { signingConfig = it }
         }

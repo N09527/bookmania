@@ -226,4 +226,16 @@ kotlin.UninitializedPropertyAccessException: lateinit property chapterSort has n
 
 ### 7.3 新圖示草稿
 
-三個原創草稿見 `screenshots/stage2/icon-drafts.png`：A、B 是「翻開的書＋直排文字線」（藍綠／靛藍），C 是「書脊組成的 B 字」（橘）。要換掉的範圍：桌面圖示與 4 種替代圖示、啟動畫面圖示、通知列小圖示；都可在 `bookmania` flavor 以同名資源覆蓋，不改上游檔案。**待使用者選擇或提供圖檔。**
+三個原創草稿見 `screenshots/stage2/icon-drafts.png`：A、B 是「翻開的書＋直排文字線」（藍綠／靛藍），C 是「書脊組成的 B 字」（橘）。使用者選擇 A、底色改橘色（見 7.4）。
+
+### 7.4 決定紀錄（2026-11-19，第二次回覆）
+
+| 回覆 | 使用者原文 | 處理 |
+|---|---|---|
+| 1 | 我要用A，但請幫我改橘色底 | 已完成。翻開的書＋直排文字線（文字線為挖空），底色 `#D9643A`。已替換：桌面圖示、4 種替代圖示（暫時都用同一個新圖示）、Android 13 單色主題圖示、通知列小圖示；啟動畫面原本就引用桌面圖示。全部放在 `app/src/bookmania/res/`，沒有改上游的圖示檔。預覽 `screenshots/stage2/icon-final.png`；模擬器上的應用程式清單 `release-app-drawer.png` |
+| 2 | 首次啟動不要跳出 | 已完成。`bookmania` 全新安裝（沒有記錄過版本）時不顯示「Updated to／What's new」；之後的版本更新仍照上游顯示。上游其他 flavor 不受影響（建置旗標 `UPDATE_NOTES_ON_FIRST_LAUNCH` 預設 true）。【已查證】移除後重新安裝 release 版，第一次啟動執行了初始遷移（0→162），沒有出現這個提示 |
+| 3 | 要求 | 對應哪一題**待確認** |
+| 4 | 請再給我一次問題內容 | 已在回覆中重新列出 |
+| 5 | 同意 | 依一對一對應，視為同意「長條模式不提供捲曲、直向翻頁的捲曲從下緣往上」**（對應方式待確認）** |
+
+上游檔案的改動：`MainActivity.kt` 1 行（顯示條件）、`Migrator.kt` +5 行（記錄是否為全新安裝）、`app/build.gradle.kts` +3 行（建置旗標）。`:app` 單元測試 22 個全部通過（含既有的 `MigratorTest`）。

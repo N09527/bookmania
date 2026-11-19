@@ -451,7 +451,7 @@ open class MainActivity : BaseActivity<MainActivityBinding>() {
             val didMigration = Migrator.awaitAndRelease()
 
             // Show changelog if needed
-            if (didMigration) {
+            if (didMigration && (BuildConfig.UPDATE_NOTES_ON_FIRST_LAUNCH || !Migrator.isFreshInstall)) {
                 if (!BuildConfig.DEBUG) {
                     content.post {
                         whatsNewSheet().show()
