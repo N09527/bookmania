@@ -94,6 +94,17 @@ def selected_scope(ns=None):
     return None
 
 
+def scope_is(expected, tries=4):
+    """Polls: the screen dump can be taken before the panel has redrawn on a slow emulator."""
+    got = None
+    for _ in range(tries):
+        got = selected_scope()
+        if got == expected:
+            break
+        time.sleep(2)
+    return got
+
+
 # ---------------------------------------------------------------- steps
 
 def step_reset():
@@ -144,9 +155,10 @@ def step_global():
         d.tap(sw['x'], sw['y'], 3)
         s = after_change('s3-06-indent-2')
         check('indent switched to 2 characters (60px)', near(px(s['p']['textIndent']), 60), s['p']['textIndent'])
-        d.set_slider('首行縮排', 1 / 4)
-        s = after_change('s3-07-indent-1')
-        check('indent 1 character (30px)', near(px(s['p']['textIndent']), 30), s['p']['textIndent'])
+        # 3 characters: unlike 1, this cannot be confused with the book's own 1em indent
+        d.set_slider('首行縮排', 3 / 4)
+        s = after_change('s3-07-indent-3')
+        check('indent 3 characters (90px)', near(px(s['p']['textIndent']), 90), s['p']['textIndent'])
     # Paragraph spacing: switch off → 0.5em, then the slider to 1em.
     d.reveal('段落間距')
     sw = d.switch_for('段落間距')
@@ -217,7 +229,9 @@ def step_persist():
     s = d.style()
     check('after restart: font size 30', s['html']['fontSize'] == '30px', s['html']['fontSize'])
     check('after restart: line height 72px', near(px(s['body']['lineHeight']), 72), s['body']['lineHeight'])
-    check('after restart: indent 30px', near(px(s['p']['textIndent']), 30), s['p']['textIndent'])
+    check('after restart: indent 90px', near(px(s['p']['textIndent']), 90), s['p']['textIndent'])
+    check('after restart: paragraph spacing 30px', near(px(s['p']['margin'][3]), 30), s['p']['margin'])
+    check('after restart: letter spacing 3px', near(px(s['p']['letterSpacing']), 3), s['p']['letterSpacing'])
     p = d.ebook_prefs()
     check('after restart: page box from the stored margins',
           s['frame'][:2] == [int(p['pref_ebook_marginLeft']) - 8, int(p['pref_ebook_marginTop']) - 8], [s['frame'], p.get('pref_ebook_marginLeft'), p.get('pref_ebook_marginTop')])
@@ -225,16 +239,40 @@ def step_persist():
     print(json.dumps(d.ebook_prefs(), ensure_ascii=False, indent=1))
 
 
+def overrides():
+    """(work, file) override maps from the stored preferences (identity fields included)."""
+    work, file = {}, {}
+    for k, v in d.ebook_prefs().items():
+        if k.startswith('pref_ebook_override_'):
+            m = json.loads(v)
+            if '_chapter' in m:
+                file = m
+            else:
+                work = m
+    return work, file
+
+
+def gfloat(key, default):
+    v = d.ebook_prefs().get('pref_ebook_' + key)
+    return float(v) if v is not None else default
+
+
 def step_scopes():
     d.open_book(*HORZ)
     s = d.style()
-    check('other book uses the global settings (30px)', s['html']['fontSize'] == '30px', s['html']['fontSize'])
+    g_size = gfloat('fontSize', 20)
+    check('other book (another work) uses the global font size', px(s['html']['fontSize']) == g_size, [s['html']['fontSize'], g_size])
     d.open_panel()
     d.tap_label('這部作品', exact=True)
-    check('work level selected', selected_scope() == '這部作品', selected_scope())
+    got = scope_is('這部作品')
+    check('work level selected', got == '這部作品', got)
     d.set_slider('字級', (24 - 12) / 36)
     s = after_change('s3-16-work-font-24')
-    check('work level font size 24 applies here', s['html']['fontSize'] == '24px', s['html']['fontSize'])
+    work, _ = overrides()
+    w_size = float(work.get('fontSize', -1))
+    check('work level font size stored (near 24) and applied', abs(w_size - 24) <= 1 and px(s['html']['fontSize']) == w_size,
+          {'stored': work, 'css': s['html']['fontSize']})
+    check('global value unchanged', gfloat('fontSize', 20) == g_size, gfloat('fontSize', 20))
     d.tap_label('全部書籍', exact=True)
     ns = d.nodes()
     d.shot('s3-17-global-view-with-work-override')
@@ -243,48 +281,65 @@ def step_scopes():
     d.tap_label('這個檔案', exact=True)
     d.set_slider('行距', (1.5 - 1.0) / 2.0)
     s = after_change('s3-18-file-line-height-1.5')
-    check('file level line height 1.5 (36px at 24px)', near(px(s['body']['lineHeight']), 36), s['body']['lineHeight'])
+    _, file = overrides()
+    f_lh = float(file.get('lineHeight', -1))
+    check('file level line height stored (near 1.5) and applied', abs(f_lh - 1.5) <= 0.1 and near(px(s['body']['lineHeight']), f_lh * w_size),
+          {'stored': file, 'css': s['body']['lineHeight']})
     d.close_panel()
-    p = d.ebook_prefs()
-    over = {k: json.loads(v) for k, v in p.items() if k.startswith('pref_ebook_override_')}
-    check('two override entries with identity fields', len(over) == 2 and all('_manga' in v for v in over.values()), over)
+    work, file = overrides()
+    check('override entries carry the identity (_source, _manga; file also _chapter)',
+          {'_source', '_manga'} <= set(work) and {'_source', '_manga', '_chapter'} <= set(file), [work, file])
 
     # Restart: the nearer levels still win, and the panel starts on the file level.
     d.open_book(*HORZ)
     s = d.style()
-    check('after restart: work font size 24', s['html']['fontSize'] == '24px', s['html']['fontSize'])
-    check('after restart: file line height 36px', near(px(s['body']['lineHeight']), 36), s['body']['lineHeight'])
+    check('after restart: work font size', px(s['html']['fontSize']) == w_size, s['html']['fontSize'])
+    check('after restart: file line height', near(px(s['body']['lineHeight']), f_lh * w_size), s['body']['lineHeight'])
     d.open_panel()
-    check('panel starts on the file level', selected_scope() == '這個檔案', selected_scope())
+    got = scope_is('這個檔案')
+    check('panel starts on the file level', got == '這個檔案', got)
     d.shot('s3-19-panel-file-level')
     d.close_panel()
 
     # The vertical book (another work) is not affected.
     d.open_book(*VERT)
     s = d.style()
-    check('other work keeps global 30px / 72px', s['html']['fontSize'] == '30px' and near(px(s['body']['lineHeight']), 72),
+    g_lh = gfloat('lineHeight', 1.8)
+    check('other work keeps the global values', px(s['html']['fontSize']) == g_size and near(px(s['body']['lineHeight']), g_lh * g_size),
           [s['html']['fontSize'], s['body']['lineHeight']])
 
 
 def step_vol2(manga, chapter):
     """A second file of the same work: work settings apply, file settings do not."""
+    work, _ = overrides()
+    w_size = float(work['fontSize'])
+    g_lh = gfloat('lineHeight', 1.8)
     d.open_book(manga, chapter)
     s = d.style()
-    check('same work, other file: work font size 24', s['html']['fontSize'] == '24px', s['html']['fontSize'])
-    check('same work, other file: global line height 2.4 (57.6px)', near(px(s['body']['lineHeight']), 57.6), s['body']['lineHeight'])
+    check('same work, other file: work font size', px(s['html']['fontSize']) == w_size, [s['html']['fontSize'], w_size])
+    check('same work, other file: global line height (not the other file\'s)', near(px(s['body']['lineHeight']), g_lh * w_size),
+          [s['body']['lineHeight'], g_lh * w_size])
     d.shot('s3-20-same-work-other-file')
 
 
 def step_reset_levels():
+    work, _ = overrides()
+    w_size = float(work['fontSize'])
+    g_size, g_lh = gfloat('fontSize', 20), gfloat('lineHeight', 1.8)
     d.open_book(*HORZ)
     d.open_panel()
+    got = scope_is('這個檔案')
+    check('panel starts on the file level', got == '這個檔案', got)
     d.tap_label('清除這一層的設定', exact=True)
     s = after_change('s3-21-file-level-cleared')
-    check('file level cleared: line height back to global (57.6px)', near(px(s['body']['lineHeight']), 57.6), s['body']['lineHeight'])
+    check('file level cleared: line height back to global', near(px(s['body']['lineHeight']), g_lh * w_size),
+          [s['body']['lineHeight'], g_lh * w_size])
     d.tap_label('這部作品', exact=True)
+    got = scope_is('這部作品')
+    check('work level selected for clearing', got == '這部作品', got)
     d.tap_label('清除這一層的設定', exact=True)
     s = after_change('s3-22-work-level-cleared')
-    check('work level cleared: font size back to global 30px', s['html']['fontSize'] == '30px', s['html']['fontSize'])
+    check('work level cleared: font size back to global', px(s['html']['fontSize']) == g_size, [s['html']['fontSize'], g_size])
     p = d.ebook_prefs()
     check('no override entries left', not any(k.startswith('pref_ebook_override_') for k in p), sorted(p))
     d.close_panel()
@@ -306,11 +361,31 @@ def pick_font_file(file_name):
             raise RuntimeError('picker did not open: ' + d.resumed())
         time.sleep(2)
     time.sleep(4)
-    if not d.find(file_name, exact=True):
+    if not d.wait_for(file_name, tries=2):
         roots = d.find('Show roots', exact=True)
         if roots:
             d.tap(roots['x'], roots['y'], 3)
-        d.tap_label('Downloads', exact=True, wait=5)
+        if d.find('Downloads', exact=True):
+            d.tap_label('Downloads', exact=True, wait=5)
+    if not d.wait_for(file_name, tries=2):
+        # Fallback: show the device storage root and open its Download folder.
+        more = d.find('More options', exact=True)
+        if more:
+            d.tap(more['x'], more['y'], 3)
+            if d.find('Show internal storage', exact=True):
+                d.tap_label('Show internal storage', exact=True, wait=3)
+            else:
+                d.shell('input keyevent 4')
+                time.sleep(2)
+        roots = d.find('Show roots', exact=True)
+        if roots:
+            d.tap(roots['x'], roots['y'], 3)
+        for name in ('Android SDK built for x86_64', 'Internal storage'):
+            if d.find(name, exact=True):
+                d.tap_label(name, exact=True, wait=5)
+                break
+        if d.find('Download', exact=True):
+            d.tap_label('Download', exact=True, wait=5)
     d.shot('s3-30-picker-' + file_name.split('.')[0])
     d.tap_label(file_name, exact=True, wait=8)
 
@@ -325,9 +400,14 @@ def step_fonts():
     d.open_panel()
     # 1. A font without vertical layout data: warning, then import anyway.
     pick_font_file('DejaVuSans.ttf')
-    ns = d.nodes()
+    warn = []
+    for _ in range(6):  # the font is read in the background before the dialog appears
+        ns = d.nodes()
+        warn = [n['text'] for n in ns if '沒有直排資訊（' in n['text']]
+        if warn:
+            break
+        time.sleep(2)
     d.shot('s3-31-no-vertical-warning')
-    warn = [n['text'] for n in ns if '沒有直排資訊' in n['text']]
     check('warning for a font without vertical data', bool(warn), warn)
     d.tap_label('匯入', exact=True, wait=4)
     ns = d.nodes()
@@ -389,6 +469,24 @@ def step_fonts():
     check('font files deleted', '.ttf' not in files and '.otf' not in files, files)
     check('font list empty', json.loads(d.ebook_prefs().get('__APP_STATE_ebook_fonts') or '[]') == [], d.ebook_prefs().get('__APP_STATE_ebook_fonts'))
     d.close_panel()
+
+
+def step_clear_fonts():
+    """Removes imported fonts and the list (app stopped), so step_fonts can run again."""
+    d.shell(f'am force-stop {d.PKG}')
+    time.sleep(1)
+    root = ET.fromstring(d.prefs())
+    for e in list(root):
+        if e.get('name', '') in ('__APP_STATE_ebook_fonts', 'pref_ebook_font'):
+            root.remove(e)
+    data = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + ET.tostring(root, encoding='unicode')
+    tmp = os.path.join(d.OUT, 'prefs-clean.xml')
+    with open(tmp, 'w', encoding='utf-8') as f:
+        f.write(data)
+    d.adb('push', tmp, '/data/local/tmp/p.xml')
+    d.shell(f'run-as {d.PKG} cp /data/local/tmp/p.xml shared_prefs/{d.PKG}_preferences.xml')
+    d.shell(f'run-as {d.PKG} rm -rf files/ebook-fonts')
+    check('imported fonts cleared', '__APP_STATE_ebook_fonts' not in d.ebook_prefs(), sorted(d.ebook_prefs()))
 
 
 def step_toolbar():

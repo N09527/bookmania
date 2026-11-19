@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBarsIgnoringVisibility
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -71,6 +74,7 @@ data class EbookSettingsUiState(
  * the rest of the page, so every change can be seen right away. Slider values are committed when
  * the slider is released.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EbookSettingsPanel(
     state: EbookSettingsUiState,
@@ -93,7 +97,9 @@ fun EbookSettingsPanel(
         tonalElevation = 3.dp,
         shadowElevation = 8.dp,
     ) {
-        Column(Modifier.navigationBarsPadding()) {
+        // Stay above the navigation bar area even while the bars are hidden: a bar shown by a swipe
+        // would cover the last row, and on gesture navigation that strip is the system gesture zone.
+        Column(Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 TabRow(selectedTabIndex = tab, modifier = Modifier.weight(1f), divider = {}) {
                     Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(MR.strings.ebook_settings_text)) })

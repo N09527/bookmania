@@ -48,8 +48,13 @@ class FontStore(private val context: Context, store: PreferenceStore) {
 
     /** Reads and checks a font chosen by the user; nothing is saved yet. */
     fun read(uri: Uri): Pending {
-        val bytes = context.contentResolver.openInputStream(uri)?.use { input ->
-            val out = ByteArrayOutputStream()
+        val resolver = context.contentResolver
+        // With the size known, the file is read into one exactly sized buffer (CJK fonts are often
+        // 10-30 MB; a growing buffer would hold up to three copies at once).
+        val declared = runCatching { resolver.openAssetFileDescriptor(uri, "r")?.use { it.length } }.getOrNull() ?: -1L
+        if (declared > MAX_BYTES) throw InvalidFontException("Font larger than ${MAX_BYTES shr 20} MB")
+        val bytes = resolver.openInputStream(uri)?.use { input ->
+            val out = SizedOutputStream(if (declared > 0) declared.toInt() else 1 shl 20)
             val buffer = ByteArray(64 * 1024)
             while (true) {
                 val n = input.read(buffer)
@@ -57,11 +62,16 @@ class FontStore(private val context: Context, store: PreferenceStore) {
                 out.write(buffer, 0, n)
                 if (out.size() > MAX_BYTES) throw InvalidFontException("Font larger than ${MAX_BYTES shr 20} MB")
             }
-            out.toByteArray()
+            out.bytes()
         } ?: throw InvalidFontException("Cannot read the file")
         val info = FontInspector.inspect(bytes)
         val fallbackName = uri.lastPathSegment?.substringAfterLast('/')?.substringBeforeLast('.')
         return Pending(bytes, info, info.familyName ?: fallbackName ?: "Font")
+    }
+
+    /** Returns its buffer without a copy when it is exactly full. */
+    private class SizedOutputStream(size: Int) : ByteArrayOutputStream(size) {
+        fun bytes(): ByteArray = if (count == buf.size) buf else toByteArray()
     }
 
     fun save(pending: Pending): ImportedFont {

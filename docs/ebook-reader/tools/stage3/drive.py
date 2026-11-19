@@ -177,18 +177,19 @@ def wait_for(label, tries=6, exact=True, pause=2.0):
 
 def open_panel():
     """Centre tap shows the toolbar (after a hit test in the WebView, so it can take a few seconds);
-    then the typesetting button. A second centre tap would hide the toolbar again, so wait instead."""
+    then the typesetting button. A second centre tap would hide the toolbar again, so it waits instead.
+    The first time, the panel can take more than half a minute to appear on a slow emulator."""
     if find('關閉', exact=True):
         return
-    for _ in range(2):
+    for _ in range(3):
         n = find('排版', exact=True)
         if n is None:
             tap(540, 960, 3)
-            n = wait_for('排版')
+            n = wait_for('排版', tries=4)
         if n is None:
             continue
         tap(n['x'], n['y'], 4)
-        if wait_for('關閉'):
+        if wait_for('關閉', tries=10, pause=3):
             return
     raise RuntimeError('settings panel did not open')
 
@@ -215,20 +216,38 @@ def slider_after(label, ns=None):
     return min(below, key=lambda s: s['b'][1]) if below else None
 
 
-def reveal(label, max_bottom=1700, tries=8):
-    """Scrolls the panel until a node whose text is exactly [label] ends above [max_bottom]."""
-    direction = 1
-    for i in range(tries):
+def _content_signature(ns):
+    inside = [n for n in ns if n['text'] and 1401 <= n['b'][1] < 1794]
+    return tuple((n['text'], n['b'][1]) for n in inside[:4])
+
+
+def reveal_node(pred, tries=16):
+    """Scrolls the panel content until pred(nodes) returns a node: forward until the content stops
+    moving twice in a row (an end, or a gesture the slow emulator dropped), then backward."""
+    direction, last, still = 1, None, 0
+    for _ in range(tries):
         ns = nodes()
-        n = next((m for m in ns if m['text'] == label), None)
-        if n is not None and n['b'][3] < max_bottom:
-            if n['b'][1] >= 1401 or n['y'] < 1390:  # inside the content window, or not in the panel at all
-                return n
-            direction = -1  # hidden under the panel header: scroll back
-        elif i == tries // 2:
-            direction = -1
-        scroll_panel(300 * direction)
+        hit = pred(ns)
+        if hit is not None:
+            return hit
+        sig = _content_signature(ns)
+        still = still + 1 if sig == last else 0
+        if still >= 2:
+            direction, still = -direction, 0
+        last = sig
+        scroll_panel(320 * direction)
     return None
+
+
+def reveal(label, max_bottom=1790, tries=16):
+    """Scrolls the panel until a node whose text is exactly [label] ends above [max_bottom]
+    (nodes outside the panel, e.g. the level selector, count as visible)."""
+    def pred(ns):
+        n = next((m for m in ns if m['text'] == label), None)
+        if n is not None and n['b'][3] < max_bottom and (n['b'][1] >= 1401 or n['y'] < 1390):
+            return n
+        return None
+    return reveal_node(pred, tries)
 
 
 def tap_revealed(label, wait=2.5):
@@ -249,23 +268,14 @@ def switch_for(label, ns=None):
     return min(row, key=lambda n: n['b'][2] - n['b'][0]) if row else None
 
 
-def reveal_slider(label, tries=8):
+def reveal_slider(label, tries=16):
     """Scrolls the panel until the slider under [label] is fully on screen. uiautomator reports
     nothing below y = 1794 on this device (navigation bar area), and the content starts at about
     y = 1401, so the slider has to be brought into that window."""
-    direction = 1
-    for i in range(tries):
-        ns = nodes()
+    def pred(ns):
         s = slider_after(label, ns)
-        if s is not None and s['b'][3] < 1790 and s['b'][3] - s['b'][1] > 60:
-            return s
-        lab = next((n for n in ns if n['text'] == label), None)
-        if lab is not None:
-            direction = 1  # label visible, slider below it
-        elif i == tries // 2:
-            direction = -1  # not found going down: go back up
-        scroll_panel(300 * direction)
-    return None
+        return s if s is not None and s['b'][3] < 1790 and s['b'][3] - s['b'][1] > 60 else None
+    return reveal_node(pred, tries)
 
 
 def set_slider(label, fraction, wait=3.0):
