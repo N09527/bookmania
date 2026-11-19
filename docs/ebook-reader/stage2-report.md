@@ -213,3 +213,17 @@ kotlin.UninitializedPropertyAccessException: lateinit property chapterSort has n
 | APK 簽章（第 10 題） | A | 在此環境產生新金鑰簽章 release 版，金鑰檔與密碼交給使用者保管 |
 | 套件名稱 | 保持 `io.github.n09527.bookmania` | 定案 |
 | App 圖示 | 換掉 | 沒有附圖檔，新圖示的樣式**待確認** |
+
+### 7.2 簽章版 release（2026-11-19）【已查證】
+
+- 金鑰：PKCS12、RSA 4096、別名 `bookmania`、憑證 `CN=Bookmania`（不含個人資料），有效至 2054-04-06。憑證 SHA-256：`E7:60:EA:64:56:C7:C0:08:2F:77:BA:D0:FA:37:28:DC:BD:D5:26:6C:2D:48:84:E6:AE:81:F9:DF:12:35:58:9C`。金鑰檔與密碼已交給使用者；在此環境存放於專案資料夾之外，沒有進入 git。
+- 設定：`app/build.gradle.kts` 從 Gradle 屬性 `bookmaniaStoreFile`、`bookmaniaStorePassword`、`bookmaniaKeyAlias`、`bookmaniaKeyPassword` 讀取（例如放在 `~/.gradle/gradle.properties`）；沒有設定時 release 照舊產生未簽章 APK，debug 版照舊用 debug 金鑰。
+- `./gradlew :app:assembleBookmaniaRelease`：成功（7 分 4 秒），產出 arm64-v8a 28.9 MB、armeabi-v7a 25.5 MB、x86 30.7 MB、x86_64 31.6 MB、universal 68.6 MB；`apksigner verify` 通過（v2 簽章，minSdk 26 不需要 v1），簽署者 `CN=Bookmania`，SHA-256 與金鑰相符；套件 `io.github.n09527.bookmania`；建置中沒有任何 Google Services／Crashlytics 任務。
+- 模擬器實測 release 版（經 R8 縮減、不可除錯）：從首次使用導覽開始（選資料夾用系統的資料夾選擇器），Local Source 開啟直排 EPUB、橫排 AZW3、合併式 MOBI、MOBI 6 都進入文字閱讀器並可翻頁，DRM 書顯示說明畫面；沒有當機（截圖 `release-vertical-epub.png`、`release-formats.png`）。release 版不能用除錯介面，所以沒有做逐字比對。
+- 導覽中的觀察（上游既有行為，未修改）：
+  - 首次啟動會跳出「Updated to v1.10.3／What's new in this release」，按下會連到 Yōkai 的更新說明。
+  - 導覽的權限步驟把「安裝應用程式」權限列為必要（上游用於自我更新與擴充套件）。Bookmania 已關閉自我更新。
+
+### 7.3 新圖示草稿
+
+三個原創草稿見 `screenshots/stage2/icon-drafts.png`：A、B 是「翻開的書＋直排文字線」（藍綠／靛藍），C 是「書脊組成的 B 字」（橘）。要換掉的範圍：桌面圖示與 4 種替代圖示、啟動畫面圖示、通知列小圖示；都可在 `bookmania` flavor 以同名資源覆蓋，不改上游檔案。**待使用者選擇或提供圖檔。**
