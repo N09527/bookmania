@@ -14,7 +14,7 @@
 4. **單元測試與建置**【已查證】：`:app` 37 個、`:core:ebook` 36 個、`:domain` 34 個全部通過（新增 19 個）；bookmania release（R8）建置成功。
 5. **過程中發現並修正 9 個問題**，其中 2 個是第 2 階段就存在的版面問題（工具列副標題被截、頁碼壓到導覽列），見第 4 節。
 6. **沒有修改任何上游檔案**；沒有動 migration、備份 protobuf 欄位或既有偏好設定鍵；minSdk 26。
-7. **需要注意**（第 5 節）：25 MB 的中文字型每開一個章節檔都要重新載入，在模擬器上首次開啟從 4–16 秒變成 43–51 秒；第一次跑字型步驟時 App 在模擬器上當機一次（繪圖資源配置失敗），之後沒有重現、原因未查明；橫向畫面時面板遮住約三分之二頁面；全部沒有在實機驗證。
+7. **需要注意**（第 5 節）：在此模擬器上「系統襯線」對繁中書看不出差異（系統沒有中文襯線字型）；25 MB 的中文字型每開一個章節檔都要重新載入，在模擬器上首次開啟從 4–16 秒變成 43–51 秒；第一次跑字型步驟時 App 在模擬器上當機一次（繪圖資源配置失敗），之後沒有重現、原因未查明；橫向畫面時面板遮住約三分之二頁面；全部沒有在實機驗證。
 
 ---
 
@@ -94,7 +94,8 @@
 |---|---|
 | `./gradlew testDebugUnitTest testBookmaniaDebugUnitTest :app:assembleBookmaniaRelease --continue` | BUILD SUCCESSFUL。`:app` 37 個（上游 20＋第 2 階段 2＋本階段 15）、`:core:ebook` 36 個（本階段新增 4）、`:domain` 34 個，全部通過 |
 | （本階段新增的測試） | `FontInspectorTest`：有直排資訊的 TTF、只有橫排的 TTF、CFF 的 `vrt2`、拒絕 TTC／WOFF／非字型。`EbookSettingsTest`：預設值、近層優先、範圍與步進、不合法值、字型 id、翻頁方向、往返轉換。`EbookSettingsStoreTest`：三層合併、全域鍵名、覆寫內的識別欄位、不同書的鍵不相撞、`resolvedAt`／`overriddenBelow`、清除、損毀的 JSON |
-| `:app:assembleBookmaniaRelease` | 成功，產出 arm64-v8a、armeabi-v7a、x86、x86_64、universal 五個 APK，套件 `io.github.n09527.bookmania`。**這次沒有在模擬器上操作 release 版**（第 5 節） |
+| `:app:assembleBookmaniaRelease` | 成功，產出 arm64-v8a、armeabi-v7a、x86、x86_64、universal 五個 APK，套件 `io.github.n09527.bookmania` |
+| release 版模擬器煙霧測試（R8 縮減、不可除錯，介面為英文） | 從 Local Source 開啟橫排 AZW3 → 開啟面板 → 切到「This file」並選「System serif」→ 強制停止 App、重新開啟同一本書：面板開在「This file」、仍選「System serif」（截圖 `release-panel.png`、`release-after-restart.png`）；沒有當機。只做了這些，字型匯入與各數值設定沒有在 release 版測試 |
 
 - 第 2 階段報告記的是 `:core:ebook` 32 個；加上 `FontInspectorTest` 4 個後為 36 個。
 
@@ -158,7 +159,8 @@
 - **模擬器上當機一次**：第一次跑字型步驟時，App 在顯示「已匯入字型」提示時中止（`SIGABRT`，RenderThread：`Failed to create EGLSurface … EGL_BAD_ALLOC`，錯誤來自模擬器的 `EGL_emulation` 繪圖層）。同樣的提示在匯入第一個字型時正常顯示；做了第 4 節第 9 點的修改後重跑全部字型步驟，沒有再發生。原因沒有查明：可能是模擬器軟體繪圖的資源問題，也可能與匯入時的記憶體用量有關；實機上是否會發生未驗證。
 - **大型字型的載入成本**：每開一個章節檔都會重新讀取並解析整個字型檔（目前字型回應為 `no-store`、WebView 設為不使用快取），數據見 3.3。讓同一個字型在章節之間重用的改善，留待後續階段評估。
 - **橫向畫面**：面板約遮住三分之二頁面（截圖 `s3-41`），可用但不理想；之後可考慮橫向時改成側邊面板。
-- **Release 版**：建置成功，但這次沒有安裝到模擬器上操作。
+- **Release 版**：只做了第 2 節的煙霧測試，字型匯入與各數值設定沒有在 release 版測試。
+- **「系統襯線」在此模擬器上看不出差異**【已查證：Android 8 模擬器】：選了之後書籍文件的 `font-family` 確實變成 `serif`，也重新排版，但畫面與先前完全相同。系統的 `fonts.xml` 中繁中（zh-Hant）只有 Noto Sans CJK，沒有中文襯線字型；量測書中英文字「WebView」的寬度，也與無襯線字型相近、與 Noto Serif 不同，表示繁中文件連英文也用同一個字型繪製。較新的 Android 是否內建中文襯線字型未查證；目前要明體／宋體的效果需匯入字型。
 - **備份與還原**：設定會進備份是讀程式碼確認的，沒有實際做一次備份與還原。
 - **字型名稱的語言優先順序**：只用單元測試的測試字型驗證（繁中名稱「書狂測試直排」）。Noto Serif CJK TC 雖有繁中（0x0404）名稱記錄，內容也是「Noto Serif CJK TC」，所以模擬器畫面上看不出優先順序的效果。
 - **書籍用絕對單位指定字級時**【推論，未用實際書籍測試】：字級設定是改 `html` 的 `font-size`，以 em／rem／百分比指定字級的書會跟著縮放；若書籍以 px 等絕對單位指定，那些文字不會隨字級設定改變。
