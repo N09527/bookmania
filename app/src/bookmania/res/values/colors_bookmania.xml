@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Default launcher icon background -->
     <color name="bookmania_icon_background">#D9643A</color>
+    <!-- Alternative launcher icons (Settings > App icon) -->
+    <color name="bookmania_icon_blue">#2F3E8F</color>
+    <color name="bookmania_icon_orange_light">#FFF1E6</color>
+    <color name="bookmania_icon_gray">#5F6368</color>
+    <color name="bookmania_icon_paper">#F3EAD7</color>
 </resources>

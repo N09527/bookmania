@@ -62,8 +62,10 @@ android {
         buildConfigField("Boolean", "INCLUDE_UPDATER", "false")
         buildConfigField("Boolean", "BETA", "false")
         buildConfigField("Boolean", "NIGHTLY", "false")
-        // Whether the "Updated to vX / What's new" sheet also shows on the very first launch.
-        buildConfigField("Boolean", "UPDATE_NOTES_ON_FIRST_LAUNCH", "true")
+        // Whether the "Updated to vX / What's new" sheet (upstream release notes) is shown after an update.
+        buildConfigField("Boolean", "SHOW_UPDATE_NOTES", "true")
+        // Whether onboarding requires the "install apps" permission (used by the self-updater and extensions).
+        buildConfigField("Boolean", "ONBOARDING_REQUIRES_INSTALL_PERMISSION", "true")
 
         ndk {
             // False positive, we have x86 abi support
@@ -153,7 +155,8 @@ android {
         // Its application id is set in androidComponents below.
         create("bookmania") {
             dimension = "default"
-            buildConfigField("Boolean", "UPDATE_NOTES_ON_FIRST_LAUNCH", "false")
+            buildConfigField("Boolean", "SHOW_UPDATE_NOTES", "false")
+            buildConfigField("Boolean", "ONBOARDING_REQUIRES_INSTALL_PERMISSION", "false")
             // Debug builds keep the debug key (the build type's signing config wins).
             signingConfigs.findByName("bookmania")?.let { signingConfig = it }
         }

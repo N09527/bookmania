@@ -239,3 +239,30 @@ kotlin.UninitializedPropertyAccessException: lateinit property chapterSort has n
 | 5 | 同意 | 依一對一對應，視為同意「長條模式不提供捲曲、直向翻頁的捲曲從下緣往上」**（對應方式待確認）** |
 
 上游檔案的改動：`MainActivity.kt` 1 行（顯示條件）、`Migrator.kt` +5 行（記錄是否為全新安裝）、`app/build.gradle.kts` +3 行（建置旗標）。`:app` 單元測試 22 個全部通過（含既有的 `MigratorTest`）。
+
+### 7.5 決定紀錄（2026-11-19，第三次回覆）
+
+使用者原文：「a要修 b不必要 c照做 d不同 e拿掉」
+
+| 題目 | 決定 | 處理 |
+|---|---|---|
+| (a) 上游兩個既有問題 | 要修 | 見 7.6 |
+| (b) 導覽要求「安裝應用程式」權限 | 不必要 | `bookmania` 版移到「Optional」，不授權也能完成導覽；其他 flavor 不變（建置旗標 `ONBOARDING_REQUIRES_INSTALL_PERMISSION`） |
+| (c) 第 5.6 節設定表 | 照做 | 第 3 階段依此實作 |
+| (d) 替代圖示 | 做成不同顏色 | Default 橘底白書、Blue 靛藍底白書、Orange 淺橘底橘書、Gray 灰底白書、Classic 米白紙色底深墨書 |
+| (e) 「Updated to／What's new」 | 拿掉 | `bookmania` 版一律不顯示（建置旗標 `SHOW_UPDATE_NOTES`）；先前為「僅首次不顯示」修改的 `Migrator.kt` 已還原成上游原樣 |
+
+第 3 點「要求」與第 5 點的對應方式已由這次逐題回覆取代。
+
+### 7.6 修正上游的兩個既有問題，以及 (b)(d)(e) 的驗證【已查證】
+
+| 項目 | 修改 | 驗證 |
+|---|---|---|
+| 漫畫型 EPUB「No pages found」 | `core/archive/.../EpubReader.kt`：`container.xml` 與 OPF 改用 XML 解析器（2 處；頁面內容仍用 HTML 解析） | release 版：固定版面與流動版面兩本漫畫型 EPUB 都在既有的漫畫閱讀器顯示頁面（1／6），logcat 沒有「No pages found」（截圖 `release-comic-epubs.png`） |
+| 以作品 id 開詳細頁時當機 | `MangaDetailsPresenter.kt`：初始化時只記下排除的掃圖組清單，不在 `runBlocking` 中重新載入章節（章節之後由既有的訂閱流程載入） | debug 版：強制停止後用 `SHOW_MANGA` 冷啟動開 id 14、9、3，三次都顯示正確作品的詳細頁與章節，當機紀錄為空。修正前同一路徑會當機 |
+| (b) 安裝權限非必要 | `PermissionStep.kt`、建置旗標 | release 版全新安裝：權限步驟沒有「Required」區塊，「Install apps permission」在「Optional but recommended」之下；不授權直接按「Get started」可完成導覽（截圖 `release-onboarding-permissions.png`） |
+| (e) 不顯示更新提示 | `MainActivity.kt` 1 行、建置旗標 | release 版全新安裝後第一次啟動，沒有出現「Updated to／What's new」 |
+| (d) 替代圖示 | 只新增 `app/src/bookmania/res/` 內的資源 | 預覽 `icon-variants.png`；debug 版的啟動畫面也已顯示新圖示（`debug-splash-new-icon.png`）。在設定中切換替代圖示的流程沒有在模擬器上操作 |
+
+- 單元測試：`:app` 22、`:domain` 34、`:core:ebook` 32，全部通過。
+- 導覽中「Install apps permission」的說明文字仍是上游的「To install the app on updates.」，沒有修改。

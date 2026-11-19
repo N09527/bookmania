@@ -5,6 +5,7 @@ import java.io.File
 import java.io.InputStream
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.parser.Parser
 
 /**
  * Wrapper over ZipFile to load files in epub format.
@@ -39,7 +40,9 @@ class EpubReader(private val reader: ArchiveReader) : Closeable by reader {
     fun getPackageHref(): String {
         val meta = getInputStream(resolveZipPath("META-INF", "container.xml"))
         if (meta != null) {
-            val metaDoc = meta.use { Jsoup.parse(it, null, "") }
+            // container.xml and the OPF are XML: the HTML parser does not close self-closing tags such as
+            // <item .../>, which nests every manifest item inside the first one.
+            val metaDoc = meta.use { Jsoup.parse(it, null, "", Parser.xmlParser()) }
             val path = metaDoc.getElementsByTag("rootfile").first()?.attr("full-path")
             if (path != null) {
                 return path
@@ -52,7 +55,7 @@ class EpubReader(private val reader: ArchiveReader) : Closeable by reader {
      * Returns the package document where all the files are listed.
      */
     fun getPackageDocument(ref: String): Document {
-        return getInputStream(ref)!!.use { Jsoup.parse(it, null, "") }
+        return getInputStream(ref)!!.use { Jsoup.parse(it, null, "", Parser.xmlParser()) }
     }
 
     /**

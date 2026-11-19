@@ -31,6 +31,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import dev.icerock.moko.resources.compose.stringResource
+import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.util.system.isShizukuInstalled
 import yokai.i18n.MR
 import yokai.presentation.component.Gap
@@ -43,7 +44,7 @@ internal class PermissionStep : OnboardingStep {
     private var batteryGranted by mutableStateOf(false)
 
     override val isComplete: Boolean
-        get() = installGranted
+        get() = installGranted || !BuildConfig.ONBOARDING_REQUIRES_INSTALL_PERMISSION
 
     @Composable
     override fun Content() {
@@ -70,11 +71,7 @@ internal class PermissionStep : OnboardingStep {
                 .isIgnoringBatteryOptimizations(context.packageName)
         }
 
-        Column(
-            modifier = Modifier.padding(vertical = Size.medium),
-        ) {
-            SectionHeader(stringResource(MR.strings.onboarding_permission_type_required))
-
+        val installItem: @Composable () -> Unit = {
             PermissionItem(
                 title = stringResource(MR.strings.onboarding_permission_install_apps),
                 subtitle = stringResource(MR.strings.onboarding_permission_install_apps_description),
@@ -91,10 +88,20 @@ internal class PermissionStep : OnboardingStep {
                     context.startActivity(intent)
                 },
             )
+        }
 
-            Gap(Size.medium)
+        Column(
+            modifier = Modifier.padding(vertical = Size.medium),
+        ) {
+            if (BuildConfig.ONBOARDING_REQUIRES_INSTALL_PERMISSION) {
+                SectionHeader(stringResource(MR.strings.onboarding_permission_type_required))
+                installItem()
+                Gap(Size.medium)
+            }
 
             SectionHeader(stringResource(MR.strings.onboarding_permission_type_optional))
+
+            if (!BuildConfig.ONBOARDING_REQUIRES_INSTALL_PERMISSION) installItem()
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 val permissionRequester =

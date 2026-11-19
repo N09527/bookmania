@@ -194,7 +194,9 @@ class MangaDetailsPresenter(
 
         isLockedFromSearch = controller.shouldLockIfNeeded && SecureActivityDelegate.shouldBeLocked()
         if (!::manga.isInitialized) runBlocking {
-            setCurrentExcludedScanlators(getExcludedScanlators.await(mangaId))
+            // Only remember the exclusions here: setCurrentExcludedScanlators() also reloads the chapters,
+            // which needs chapterSort (set in syncData() below). The subscription further down reloads them.
+            excludedScanlators = getExcludedScanlators.await(mangaId)
             refreshMangaFromDb()
         }
         syncData()

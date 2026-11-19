@@ -9,10 +9,6 @@ import kotlinx.coroutines.runBlocking
 
 object Migrator {
     private var result: Deferred<Boolean>? = null
-
-    /** True when no previous version was recorded (fresh install or cleared data). */
-    var isFreshInstall = false
-        private set
     val scope = CoroutineScope(Dispatchers.IO + Job())
 
     fun initialize(
@@ -22,7 +18,6 @@ object Migrator {
         dryRun: Boolean = false,
         onMigrationComplete: () -> Unit
     ) {
-        isFreshInstall = old == 0
         val migrationContext = MigrationContext(dryRun)
         val migrationJobFactory = MigrationJobFactory(migrationContext, scope)
         val migrationStrategyFactory = MigrationStrategyFactory(migrationJobFactory, onMigrationComplete)
