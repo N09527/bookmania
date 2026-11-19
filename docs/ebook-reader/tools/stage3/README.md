@@ -31,4 +31,13 @@ ADB=/path/to/adb python3 check_settings.py vol2 <作品id> <章節id>
 ADB=/path/to/adb python3 check_settings.py reset_levels fonts toolbar rotate
 ```
 
+決定紀錄 6.1 之後新增的兩個步驟（`FONT_FILE` 指向本機一個大型中文 OTF，腳本直接放進 App 私有目錄，不經過檔案選擇器；`CDP_TIMEOUT_MS` 放寬除錯介面的逾時）：
+
+```bash
+ADB=/path/to/adb FONT_FILE=/path/to/NotoSerifCJKtc-Bold.otf CDP_TIMEOUT_MS=120000 python3 check_settings.py font_speed side_panel
+```
+
+- `font_speed`：同一本書連續開三個章節檔，記錄每個檔案的排版耗時；再於不使用匯入字型時量一次作為對照。
+- `side_panel`：橫向畫面開啟面板，直書時面板在左、橫書時在右；從側邊面板改字體；點面板外的頁面會關閉面板。
+
 注意：模擬器沒有硬體加速時每個步驟都要數分鐘；`uiautomator` 不回報導覽列區域（y ≥ 1794）內的節點，所以腳本會先把面板捲到目標可見再點。

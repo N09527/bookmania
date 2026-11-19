@@ -179,18 +179,25 @@ def open_panel():
     """Centre tap shows the toolbar (after a hit test in the WebView, so it can take a few seconds);
     then the typesetting button. A second centre tap would hide the toolbar again, so it waits instead.
     The first time, the panel can take more than half a minute to appear on a slow emulator."""
-    if find('關閉', exact=True):
+    ns = nodes()
+    if find('關閉', ns, exact=True):
         return
-    for _ in range(3):
+    # Centre of the screen in the current orientation (the largest node is the window).
+    w = max((m['b'][2] for m in ns), default=1080)
+    h = max((m['b'][3] for m in ns), default=1920)
+    for _ in range(4):  # taps are sometimes lost on the slow emulator
+        if find('關閉', exact=True):
+            return
         n = find('排版', exact=True)
         if n is None:
-            tap(540, 960, 3)
-            n = wait_for('排版', tries=4)
+            tap(w // 2, h // 2, 3)
+            n = wait_for('排版', tries=5)
         if n is None:
             continue
         tap(n['x'], n['y'], 4)
         if wait_for('關閉', tries=10, pause=3):
             return
+    shot('open-panel-failed')
     raise RuntimeError('settings panel did not open')
 
 

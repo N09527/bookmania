@@ -18,6 +18,54 @@
   // t0/ms: start and duration of the last open or relayout (for diagnostics).
   var S = { frame: null, mode: 'H', settings: null, geo: null, page: 0, pages: 1, ready: false, error: null, seq: 0, anchor: null, t0: 0, ms: 0 };
 
+  // The imported font is loaded once per reader session (in this shell document) and the same FontFace
+  // is added to every book document: loading a large CJK font again for each chapter file took tens of
+  // seconds on a slow device. Where sharing is not possible the document loads it through @font-face.
+  var USER_FAMILY = 'BookmaniaUserFont';
+  var U = { url: null, face: null, ready: null };
+
+  function userFontUrl(s) {
+    return s && s.font && s.font.kind === 'imported' && s.font.url ? s.font.url : null;
+  }
+
+  // Starts loading the imported font named by the settings (once per URL). Resolves when it has loaded
+  // or failed; a failed font simply falls back to the next family.
+  function prepareUserFont(s) {
+    var url = userFontUrl(s);
+    if (url === U.url) return U.ready || Promise.resolve();
+    U.url = url; U.face = null; U.ready = Promise.resolve();
+    if (url && typeof FontFace === 'function') {
+      try {
+        U.face = new FontFace(USER_FAMILY, 'url("' + url + '")');
+        U.ready = U.face.load().then(function () {}, function () {});
+      } catch (e) { U.face = null; }
+    }
+    return U.ready;
+  }
+
+  // Puts the shared font into the document, or takes it out when another font is chosen.
+  // Returns 'none' (no imported font), 'shared', 'pending' (still loading), 'failed', or 'fallback'
+  // (sharing not possible here: the document must load the font itself through @font-face).
+  function attachUserFont(d, s) {
+    var url = userFontUrl(s), fonts = d.fonts;
+    if (d.__bookmaniaFace && (!url || d.__bookmaniaFace !== U.face)) {
+      try { fonts.delete(d.__bookmaniaFace); } catch (e) {}
+      d.__bookmaniaFace = null;
+    }
+    if (!url) return 'none';
+    if (!U.face || !fonts || !fonts.add) return 'fallback';
+    if (U.face.status === 'error') return 'failed';
+    if (U.face.status !== 'loaded') return 'pending';
+    if (d.__bookmaniaFace === U.face) return 'shared';
+    try {
+      fonts.add(U.face);
+      d.__bookmaniaFace = U.face;
+      return 'shared';
+    } catch (e) {
+      return 'fallback';
+    }
+  }
+
   function setImp(el, props) {
     Object.keys(props).forEach(function (k) { el.style.setProperty(k, props[k], 'important'); });
   }
@@ -28,7 +76,7 @@
     return { W: W, H: H, m: m, contentW: w, contentH: h, step: (S.mode === 'V' ? h : w) + GAP };
   }
 
-  function bookStyle(s, geo) {
+  function bookStyle(s, geo, userFontMode) {
     var vertical = S.mode === 'V';
     var wm = vertical ? 'vertical-rl' : 'horizontal-tb';
     var css = '' +
@@ -42,9 +90,9 @@
       'html { color: ' + s.textColor + '; }\n';
     // Font: the book's own (nothing to add), a generic family, or an imported font.
     var family = null;
-    if (s.font && s.font.kind === 'imported' && s.font.url) {
-      css += '@font-face { font-family: "BookmaniaUserFont"; src: url("' + s.font.url + '"); }\n';
-      family = '"BookmaniaUserFont", serif';
+    if (userFontUrl(s)) {
+      if (userFontMode === 'fallback') css += '@font-face { font-family: "' + USER_FAMILY + '"; src: url("' + s.font.url + '"); }\n';
+      family = '"' + USER_FAMILY + '", serif';
     } else if (s.font && (s.font.kind === 'sans' || s.font.kind === 'serif')) {
       family = s.font.kind === 'sans' ? 'sans-serif' : 'serif';
     }
@@ -87,7 +135,20 @@
       st.id = '__bookmania_style';
       (d.head || d.documentElement).appendChild(st);
     }
-    st.textContent = bookStyle(S.settings, g);
+    S.userFontMode = attachUserFont(d, S.settings);
+    st.textContent = bookStyle(S.settings, g, S.userFontMode);
+  }
+
+  // Lays out the open document with S.settings: styled at once, and once more when an imported font
+  // that was still loading is ready; then waits for fonts and images and counts the pages.
+  function layoutDocument(seq) {
+    applyLayout();
+    var pending = S.userFontMode === 'pending';
+    return (pending ? U.ready : Promise.resolve()).then(function () {
+      if (seq !== S.seq) return false;
+      if (pending) applyLayout();
+      return settle(seq);
+    });
   }
 
   function countPages() {
@@ -201,7 +262,7 @@
     d.documentElement.getBoundingClientRect();
     var fonts = Promise.resolve();
     if (d.fonts && d.fonts.ready) {
-      var user = S.settings.font && S.settings.font.kind === 'imported' ? d.fonts.load('1em "BookmaniaUserFont"').catch(function () {}) : null;
+      var user = userFontUrl(S.settings) ? d.fonts.load('1em "' + USER_FAMILY + '"').catch(function () {}) : null;
       fonts = Promise.all([user, d.fonts.ready]);
     }
     return Promise.all([fonts, waitForImages(d)]).then(function () {
@@ -234,6 +295,7 @@
     S.ready = false; S.error = null; S.page = 0; S.pages = 1;
     S.anchor = target && target.location ? target.location : null;
     S.settings = settings; S.mode = settings.vertical ? 'V' : 'H';
+    prepareUserFont(settings); // in parallel with the document
     document.body.style.background = settings.background;
     while (stage.firstChild) stage.removeChild(stage.firstChild);
     var f = document.createElement('iframe');
@@ -242,8 +304,7 @@
     f.addEventListener('load', function () {
       if (seq !== S.seq) return;
       try {
-        applyLayout();
-        settle(seq).then(function (ok) {
+        layoutDocument(seq).then(function (ok) {
           if (!ok) return;
           start(target);
           S.ms = Date.now() - S.t0;
@@ -264,9 +325,9 @@
     S.ready = false;
     if (settings) S.settings = settings;
     S.mode = S.settings.vertical ? 'V' : 'H';
+    prepareUserFont(S.settings);
     document.body.style.background = S.settings.background;
-    applyLayout();
-    settle(seq).then(function (ok) {
+    layoutDocument(seq).then(function (ok) {
       if (!ok) return;
       goPage(pageOfLocation(loc));
       S.ms = Date.now() - S.t0;

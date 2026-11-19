@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.util.TypedValue
 import android.view.GestureDetector
-import android.view.Gravity
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -160,10 +159,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 binding.toolbar.minimumHeight
             }
         }
+        // Left and right too: in landscape the navigation bar is at a side and would cover the buttons.
         ViewCompat.setOnApplyWindowInsetsListener(binding.toolbar) { v, insets ->
-            val top = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
-            v.updatePadding(top = top)
-            v.minimumHeight = actionBarSize + top
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
+            v.updatePadding(left = bars.left, top = bars.top, right = bars.right)
+            v.minimumHeight = actionBarSize + bars.top
             insets
         }
         val pageInfoMargin = (binding.pageInfo.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
@@ -196,13 +196,16 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
         binding.root.addView(
             ComposeView(this).apply {
-                layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM)
+                // Fills the screen so the panel can sit at the bottom or (landscape) at a side; touches
+                // outside the panel are not consumed and reach the touch layer below.
+                layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
                 elevation = resources.displayMetrics.density * 16 // above the toolbar and the page number
                 setContent {
                     YokaiTheme {
                         panel?.let { state ->
                             EbookSettingsPanel(
                                 state = state,
+                                sidePanelOnLeft = vertical,
                                 onScopeChange = ::showPanel,
                                 onSet = ::onSettingChanged,
                                 onResetScope = ::resetScope,

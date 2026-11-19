@@ -1,10 +1,16 @@
 package yokai.ebook.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -46,6 +53,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -70,14 +78,20 @@ data class EbookSettingsUiState(
 )
 
 /**
- * Typesetting settings (design section 5.6), shown at the bottom of the reader without covering
- * the rest of the page, so every change can be seen right away. Slider values are committed when
- * the slider is released.
+ * Typesetting settings (design section 5.6), shown without covering the whole page, so every
+ * change can be seen right away: at the bottom in portrait, as a full-height side panel in
+ * landscape (decided by the user). Slider values are committed when the slider is released.
+ *
+ * Fills the screen but only the panel takes touches; the rest goes to the views below.
+ *
+ * @param sidePanelOnLeft in landscape, put the panel on the left (for vertical text, whose pages
+ *   start on the right) instead of the right, so the beginning of the page stays visible.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EbookSettingsPanel(
     state: EbookSettingsUiState,
+    sidePanelOnLeft: Boolean,
     onScopeChange: (SettingsScope) -> Unit,
     onSet: (Key, String) -> Unit,
     onResetScope: () -> Unit,
@@ -89,123 +103,141 @@ fun EbookSettingsPanel(
     // Each tab keeps its own scroll position.
     val scrollStates = listOf(rememberScrollState(), rememberScrollState())
     val s = state.settings
-    // Keep most of the page visible, so changes can be seen while adjusting.
-    val maxHeight = (LocalConfiguration.current.screenHeightDp * 0.3f).dp
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        tonalElevation = 3.dp,
-        shadowElevation = 8.dp,
-    ) {
-        // Stay above the navigation bar area even while the bars are hidden: a bar shown by a swipe
-        // would cover the last row, and on gesture navigation that strip is the system gesture zone.
-        Column(Modifier.windowInsetsPadding(WindowInsets.navigationBarsIgnoringVisibility)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TabRow(selectedTabIndex = tab, modifier = Modifier.weight(1f), divider = {}) {
-                    Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(MR.strings.ebook_settings_text)) })
-                    Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(stringResource(MR.strings.ebook_settings_layout)) })
-                }
-                IconButton(onClick = onClose) {
-                    Icon(Icons.Outlined.Close, contentDescription = stringResource(MR.strings.close))
-                }
-            }
-            HorizontalDivider()
-            Column(Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp)) {
-                Choices(
-                    options = listOf(
-                        SettingsScope.GLOBAL to MR.strings.ebook_scope_global,
-                        SettingsScope.WORK to MR.strings.ebook_scope_work,
-                        SettingsScope.FILE to MR.strings.ebook_scope_file,
-                    ),
-                    selected = state.scope,
-                    onSelect = onScopeChange,
-                )
+    val config = LocalConfiguration.current
+    val landscape = config.screenWidthDp > config.screenHeightDp
+    // Portrait: keep most of the page visible above the panel.
+    val maxHeight = (config.screenHeightDp * 0.3f).dp
+    val sideWidth = minOf(420f, config.screenWidthDp * 0.5f).dp
+    val alignment = when {
+        !landscape -> Alignment.BottomCenter
+        sidePanelOnLeft -> AbsoluteAlignment.TopLeft
+        else -> AbsoluteAlignment.TopRight
+    }
+    // Stay clear of the system bars even while they are hidden: a bar shown by a swipe would
+    // cover the controls, and on gesture navigation the screen edges are system gesture zones.
+    val insets = when {
+        !landscape -> WindowInsets.navigationBarsIgnoringVisibility
+        sidePanelOnLeft -> WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Vertical + WindowInsetsSides.Left)
+        else -> WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Vertical + WindowInsetsSides.Right)
+    }
+    Box(Modifier.fillMaxSize(), contentAlignment = alignment) {
+        Surface(
+            modifier = if (landscape) Modifier.fillMaxHeight().width(sideWidth) else Modifier.fillMaxWidth(),
+            shape = when {
+                !landscape -> RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                sidePanelOnLeft -> AbsoluteRoundedCornerShape(topRight = 16.dp, bottomRight = 16.dp)
+                else -> AbsoluteRoundedCornerShape(topLeft = 16.dp, bottomLeft = 16.dp)
+            },
+            tonalElevation = 3.dp,
+            shadowElevation = 8.dp,
+        ) {
+            Column(Modifier.windowInsetsPadding(insets)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        stringResource(MR.strings.ebook_scope_inherited),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f),
-                    )
-                    TextButton(onClick = onResetScope, enabled = state.scopeHasValues) {
-                        Text(stringResource(MR.strings.ebook_scope_reset))
+                    TabRow(selectedTabIndex = tab, modifier = Modifier.weight(1f), divider = {}) {
+                        Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(MR.strings.ebook_settings_text)) })
+                        Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(stringResource(MR.strings.ebook_settings_layout)) })
+                    }
+                    IconButton(onClick = onClose) {
+                        Icon(Icons.Outlined.Close, contentDescription = stringResource(MR.strings.close))
                     }
                 }
-            }
-            HorizontalDivider()
-            Column(
-                modifier = Modifier
-                    .heightIn(max = maxHeight)
-                    .verticalScroll(scrollStates[tab])
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-            ) {
-                val over = state.overridden
-                if (tab == 0) {
-                    FontSection(s.font, state.fonts, over[Key.FONT], onSet, onImportFont, onDeleteFont)
-                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    StepSlider(
-                        MR.strings.ebook_font_size, s.fontSize.toFloat(),
-                        Range.fontSize.first.toFloat()..Range.fontSize.last.toFloat(), 1f, over[Key.FONT_SIZE],
-                        { it.roundToInt().toString() },
-                    ) { onSet(Key.FONT_SIZE, it.roundToInt().toString()) }
-                    StepSlider(
-                        MR.strings.ebook_line_height, s.lineHeight, Range.lineHeight, Range.LINE_HEIGHT_STEP, over[Key.LINE_HEIGHT],
-                        { EbookSettings.format(it) },
-                    ) { onSet(Key.LINE_HEIGHT, EbookSettings.format(it)) }
-                    StepSlider(
-                        MR.strings.ebook_letter_spacing, s.letterSpacing, Range.letterSpacing, Range.LETTER_SPACING_STEP,
-                        over[Key.LETTER_SPACING], { "${EbookSettings.format(it)} em" },
-                    ) { onSet(Key.LETTER_SPACING, EbookSettings.format(it)) }
-                    OptionalSlider(
-                        MR.strings.ebook_indent, s.indent, 2f, Range.indent, Range.INDENT_STEP, over[Key.INDENT],
-                        { stringResource(MR.strings.ebook_unit_characters, EbookSettings.format(it)) },
-                    ) { onSet(Key.INDENT, it?.let(EbookSettings::format) ?: EbookSettings.BOOK) }
-                    OptionalSlider(
-                        MR.strings.ebook_paragraph_spacing, s.paragraphSpacing, 0.5f, Range.paragraphSpacing,
-                        Range.PARAGRAPH_SPACING_STEP, over[Key.PARAGRAPH_SPACING], { "${EbookSettings.format(it)} em" },
-                    ) { onSet(Key.PARAGRAPH_SPACING, it?.let(EbookSettings::format) ?: EbookSettings.BOOK) }
-                } else {
-                    Label(MR.strings.ebook_writing_mode, over[Key.WRITING_MODE])
+                HorizontalDivider()
+                Column(Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp)) {
                     Choices(
                         options = listOf(
-                            EbookSettings.BOOK to MR.strings.ebook_writing_mode_book,
-                            EbookSettings.MODE_VERTICAL to MR.strings.ebook_writing_mode_vertical,
-                            EbookSettings.MODE_HORIZONTAL to MR.strings.ebook_writing_mode_horizontal,
+                            SettingsScope.GLOBAL to MR.strings.ebook_scope_global,
+                            SettingsScope.WORK to MR.strings.ebook_scope_work,
+                            SettingsScope.FILE to MR.strings.ebook_scope_file,
                         ),
-                        selected = s.writingMode,
-                        onSelect = { onSet(Key.WRITING_MODE, it) },
+                        selected = state.scope,
+                        onSelect = onScopeChange,
                     )
-                    Spacer(Modifier.height(12.dp))
-                    Label(MR.strings.ebook_page_direction, over[Key.PAGE_DIRECTION])
-                    Choices(
-                        options = listOf(
-                            EbookSettings.DIRECTION_AUTO to MR.strings.ebook_page_direction_auto,
-                            EbookSettings.DIRECTION_RTL to MR.strings.ebook_page_direction_rtl,
-                            EbookSettings.DIRECTION_LTR to MR.strings.ebook_page_direction_ltr,
-                        ),
-                        selected = s.pageDirection,
-                        onSelect = { onSet(Key.PAGE_DIRECTION, it) },
-                    )
-                    Text(
-                        stringResource(MR.strings.ebook_page_direction_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
-                    Label(MR.strings.ebook_margins, null)
-                    val margin = Range.margin.first.toFloat()..Range.margin.last.toFloat()
-                    val step = Range.MARGIN_STEP.toFloat()
-                    val dp: @Composable (Float) -> String = { "${it.roundToInt()} dp" }
-                    StepSlider(MR.strings.ebook_margin_top, s.marginTop.toFloat(), margin, step, over[Key.MARGIN_TOP], dp) {
-                        onSet(Key.MARGIN_TOP, it.roundToInt().toString())
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(MR.strings.ebook_scope_inherited),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TextButton(onClick = onResetScope, enabled = state.scopeHasValues) {
+                            Text(stringResource(MR.strings.ebook_scope_reset))
+                        }
                     }
-                    StepSlider(MR.strings.ebook_margin_bottom, s.marginBottom.toFloat(), margin, step, over[Key.MARGIN_BOTTOM], dp) {
-                        onSet(Key.MARGIN_BOTTOM, it.roundToInt().toString())
-                    }
-                    StepSlider(MR.strings.ebook_margin_left, s.marginLeft.toFloat(), margin, step, over[Key.MARGIN_LEFT], dp) {
-                        onSet(Key.MARGIN_LEFT, it.roundToInt().toString())
-                    }
-                    StepSlider(MR.strings.ebook_margin_right, s.marginRight.toFloat(), margin, step, over[Key.MARGIN_RIGHT], dp) {
-                        onSet(Key.MARGIN_RIGHT, it.roundToInt().toString())
+                }
+                HorizontalDivider()
+                Column(
+                    modifier = (if (landscape) Modifier.weight(1f) else Modifier.heightIn(max = maxHeight))
+                        .verticalScroll(scrollStates[tab])
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                ) {
+                    val over = state.overridden
+                    if (tab == 0) {
+                        FontSection(s.font, state.fonts, over[Key.FONT], onSet, onImportFont, onDeleteFont)
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                        StepSlider(
+                            MR.strings.ebook_font_size, s.fontSize.toFloat(),
+                            Range.fontSize.first.toFloat()..Range.fontSize.last.toFloat(), 1f, over[Key.FONT_SIZE],
+                            { it.roundToInt().toString() },
+                        ) { onSet(Key.FONT_SIZE, it.roundToInt().toString()) }
+                        StepSlider(
+                            MR.strings.ebook_line_height, s.lineHeight, Range.lineHeight, Range.LINE_HEIGHT_STEP, over[Key.LINE_HEIGHT],
+                            { EbookSettings.format(it) },
+                        ) { onSet(Key.LINE_HEIGHT, EbookSettings.format(it)) }
+                        StepSlider(
+                            MR.strings.ebook_letter_spacing, s.letterSpacing, Range.letterSpacing, Range.LETTER_SPACING_STEP,
+                            over[Key.LETTER_SPACING], { "${EbookSettings.format(it)} em" },
+                        ) { onSet(Key.LETTER_SPACING, EbookSettings.format(it)) }
+                        OptionalSlider(
+                            MR.strings.ebook_indent, s.indent, 2f, Range.indent, Range.INDENT_STEP, over[Key.INDENT],
+                            { stringResource(MR.strings.ebook_unit_characters, EbookSettings.format(it)) },
+                        ) { onSet(Key.INDENT, it?.let(EbookSettings::format) ?: EbookSettings.BOOK) }
+                        OptionalSlider(
+                            MR.strings.ebook_paragraph_spacing, s.paragraphSpacing, 0.5f, Range.paragraphSpacing,
+                            Range.PARAGRAPH_SPACING_STEP, over[Key.PARAGRAPH_SPACING], { "${EbookSettings.format(it)} em" },
+                        ) { onSet(Key.PARAGRAPH_SPACING, it?.let(EbookSettings::format) ?: EbookSettings.BOOK) }
+                    } else {
+                        Label(MR.strings.ebook_writing_mode, over[Key.WRITING_MODE])
+                        Choices(
+                            options = listOf(
+                                EbookSettings.BOOK to MR.strings.ebook_writing_mode_book,
+                                EbookSettings.MODE_VERTICAL to MR.strings.ebook_writing_mode_vertical,
+                                EbookSettings.MODE_HORIZONTAL to MR.strings.ebook_writing_mode_horizontal,
+                            ),
+                            selected = s.writingMode,
+                            onSelect = { onSet(Key.WRITING_MODE, it) },
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Label(MR.strings.ebook_page_direction, over[Key.PAGE_DIRECTION])
+                        Choices(
+                            options = listOf(
+                                EbookSettings.DIRECTION_AUTO to MR.strings.ebook_page_direction_auto,
+                                EbookSettings.DIRECTION_RTL to MR.strings.ebook_page_direction_rtl,
+                                EbookSettings.DIRECTION_LTR to MR.strings.ebook_page_direction_ltr,
+                            ),
+                            selected = s.pageDirection,
+                            onSelect = { onSet(Key.PAGE_DIRECTION, it) },
+                        )
+                        Text(
+                            stringResource(MR.strings.ebook_page_direction_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp),
+                        )
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                        Label(MR.strings.ebook_margins, null)
+                        val margin = Range.margin.first.toFloat()..Range.margin.last.toFloat()
+                        val step = Range.MARGIN_STEP.toFloat()
+                        val dp: @Composable (Float) -> String = { "${it.roundToInt()} dp" }
+                        StepSlider(MR.strings.ebook_margin_top, s.marginTop.toFloat(), margin, step, over[Key.MARGIN_TOP], dp) {
+                            onSet(Key.MARGIN_TOP, it.roundToInt().toString())
+                        }
+                        StepSlider(MR.strings.ebook_margin_bottom, s.marginBottom.toFloat(), margin, step, over[Key.MARGIN_BOTTOM], dp) {
+                            onSet(Key.MARGIN_BOTTOM, it.roundToInt().toString())
+                        }
+                        StepSlider(MR.strings.ebook_margin_left, s.marginLeft.toFloat(), margin, step, over[Key.MARGIN_LEFT], dp) {
+                            onSet(Key.MARGIN_LEFT, it.roundToInt().toString())
+                        }
+                        StepSlider(MR.strings.ebook_margin_right, s.marginRight.toFloat(), margin, step, over[Key.MARGIN_RIGHT], dp) {
+                            onSet(Key.MARGIN_RIGHT, it.roundToInt().toString())
+                        }
                     }
                 }
             }

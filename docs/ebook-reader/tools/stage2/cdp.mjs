@@ -1,7 +1,8 @@
 // Minimal DevTools client for the Bookmania reader shell (debug builds only).
 // Usage: node cdp.mjs <port> <expression>   → prints the JSON value of the expression
 const [port = '9333', expr = 'window.__reader.status()'] = process.argv.slice(2);
-setTimeout(() => { console.log(JSON.stringify({ timeout: true })); process.exit(3); }, 20000).unref();
+// CDP_TIMEOUT_MS: overall limit (default 20 s); large font loads on a slow emulator take longer.
+setTimeout(() => { console.log(JSON.stringify({ timeout: true })); process.exit(3); }, Number(process.env.CDP_TIMEOUT_MS || 20000)).unref();
 const targets = await (await fetch(`http://127.0.0.1:${port}/json`, { signal: AbortSignal.timeout(10000) })).json();
 const target = targets.find(t => (t.url || '').includes('/shell/reader.html'));
 if (!target) { console.log(JSON.stringify({ noTarget: targets.map(t => t.url) })); process.exit(2); }

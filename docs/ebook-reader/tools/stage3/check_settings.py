@@ -489,6 +489,105 @@ def step_clear_fonts():
     check('imported fonts cleared', '__APP_STATE_ebook_fonts' not in d.ebook_prefs(), sorted(d.ebook_prefs()))
 
 
+FONT_TEST_ID = '0123456789abcdef0123456789abcd99'
+FONT_FILE = os.environ.get('FONT_FILE', '')  # a large CJK OTF on this machine, e.g. Noto Serif CJK TC
+
+
+def set_test_font(selected):
+    """Installs FONT_FILE as an imported font straight into app storage (no picker) and selects it."""
+    d.shell(f'am force-stop {d.PKG}')
+    time.sleep(1)
+    root = ET.fromstring(d.prefs())
+    for e in list(root):
+        n = e.get('name', '')
+        if n.startswith('pref_ebook_override_') or n in ('__APP_STATE_ebook_fonts', 'pref_ebook_font'):
+            root.remove(e)
+    lst = ET.SubElement(root, 'string', name='__APP_STATE_ebook_fonts')
+    lst.text = json.dumps([{'id': FONT_TEST_ID, 'name': 'Test CJK font', 'extension': 'otf', 'vertical': True}])
+    if selected:
+        ET.SubElement(root, 'string', name='pref_ebook_font').text = FONT_TEST_ID
+    tmp = os.path.join(d.OUT, 'prefs-font.xml')
+    with open(tmp, 'w', encoding='utf-8') as f:
+        f.write("<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n" + ET.tostring(root, encoding='unicode'))
+    d.adb('push', tmp, '/data/local/tmp/p.xml')
+    d.shell(f'run-as {d.PKG} cp /data/local/tmp/p.xml shared_prefs/{d.PKG}_preferences.xml')
+    if FONT_FILE and 'otf' not in d.shell(f'run-as {d.PKG} ls files/ebook-fonts'):
+        d.adb('push', FONT_FILE, '/data/local/tmp/font.otf', timeout=300)
+        d.shell(f'run-as {d.PKG} mkdir -p files/ebook-fonts')
+        d.shell(f'run-as {d.PKG} cp /data/local/tmp/font.otf files/ebook-fonts/{FONT_TEST_ID}.otf')
+
+
+def next_chapter_ms():
+    """Goes to the last page and turns the page (vertical book: left tap), returns the new document's layout time."""
+    before = d.style()
+    d.cdp('window.__reader.goPage(100000); "ok"')
+    time.sleep(2)
+    for attempt in range(4):  # a tap can be lost on the slow emulator; the page only changes once
+        d.tap(180, 960, 3)
+        t = time.time()
+        while time.time() - t < (300 if attempt == 3 else 30):
+            s = d.style()
+            if s and s['src'] != before['src'] and s['st']['ready']:
+                return s
+            st = d.status()
+            if st and st['seq'] != before['st']['seq'] and not st['ready']:
+                t = time.time()  # a new document is being laid out: keep waiting
+            time.sleep(2)
+    raise RuntimeError('next chapter did not open')
+
+
+def step_font_speed():
+    """Chapter files after the first reuse the imported font loaded once by the shell."""
+    set_test_font(selected=True)
+    st = d.open_book(*VERT)
+    s1 = d.style()
+    check('first chapter file with the imported font', 'BookmaniaUserFont:loaded' in s1['faces'], {'ms': st['ms'], 'faces': s1['faces']})
+    s2 = next_chapter_ms()
+    check('next chapter file uses the shared font', 'BookmaniaUserFont:loaded' in s2['faces'] and 'BookmaniaUserFont' in s2['p']['fontFamily'],
+          {'src': s2['src'], 'ms': s2['st']['ms'], 'faces': s2['faces']})
+    d.shot('s3-50-shared-font-next-chapter')
+    s3 = next_chapter_ms()
+    check('third chapter file too', 'BookmaniaUserFont:loaded' in s3['faces'], {'src': s3['src'], 'ms': s3['st']['ms']})
+    # Same documents without the imported font, for comparison.
+    set_test_font(selected=False)
+    st0 = d.open_book(*VERT)
+    t2 = next_chapter_ms()
+    t3 = next_chapter_ms()
+    check('timing without the imported font (comparison)', True,
+          {'first': st0['ms'], 'second': t2['st']['ms'], 'third': t3['st']['ms']})
+
+
+def step_side_panel():
+    """Landscape: the panel is a full-height side panel, on the left for vertical books, right for horizontal."""
+    d.shell('settings put system accelerometer_rotation 0')
+    try:
+        for book, side, name in ((VERT, 'left', 's3-51-side-panel-vertical'), (HORZ, 'right', 's3-52-side-panel-horizontal')):
+            d.open_book(*book)
+            d.shell('settings put system user_rotation 1')
+            time.sleep(15)
+            d.wait_ready(settle=4.0)  # the native side also has to see the relayout finish before taps count
+            d.open_panel()
+            ns = d.nodes()
+            d.shot(name)
+            close = d.find('關閉', ns, exact=True)
+            tabs = d.find('文字', ns, exact=True)
+            ok = bool(close and tabs) and ((close['x'] < 960) if side == 'left' else (tabs['x'] > 960))
+            check(f'landscape: side panel on the {side}', ok, {'close': close and close['b'], 'tab': tabs and tabs['b']})
+            # A setting still applies from the side panel (a control visible without scrolling).
+            d.tap_label('系統襯線', exact=True, wait=3)
+            s = after_change(name + '-serif')
+            check(f'landscape ({side}): font changed from the side panel', s['p']['fontFamily'] == 'serif', s['p']['fontFamily'])
+            d.tap_label('書籍指定', exact=True, wait=3)
+            after_change(name + '-book-font')
+            # A tap on the page outside the panel closes it.
+            d.tap(1700 if side == 'left' else 200, 540, 4)
+            check(f'landscape ({side}): tap on the page closes the panel', d.find('關閉', exact=True) is None)
+            d.shell('settings put system user_rotation 0')
+            time.sleep(10)
+    finally:
+        d.shell('settings put system user_rotation 0')
+
+
 def step_toolbar():
     """The toolbar with title and subtitle under the status bar, and the page number above the navigation bar."""
     d.open_book(*VERT)

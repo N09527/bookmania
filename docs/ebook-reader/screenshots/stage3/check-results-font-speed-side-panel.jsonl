@@ -1,0 +1,10 @@
+{"step": "font_speed", "check": "first chapter file with the imported font", "ok": true, "detail": {"ms": 19580, "faces": ["BookmaniaUserFont:loaded"]}}
+{"step": "font_speed", "check": "next chapter file uses the shared font", "ok": true, "detail": {"src": "OEBPS/text/ch02.xhtml", "ms": 5026, "faces": ["BookmaniaUserFont:loaded"]}}
+{"step": "font_speed", "check": "third chapter file too", "ok": true, "detail": {"src": "OEBPS/text/ch03.xhtml", "ms": 6036}}
+{"step": "font_speed", "check": "timing without the imported font (comparison)", "ok": true, "detail": {"first": 6477, "second": 4899, "third": 3208}}
+{"step": "side_panel", "check": "landscape: side panel on the left", "ok": true, "detail": {"close": [802, 95, 865, 158], "tab": [156, 99, 229, 152]}}
+{"step": "side_panel", "check": "landscape (left): font changed from the side panel", "ok": true, "detail": "serif"}
+{"step": "side_panel", "check": "landscape (left): tap on the page closes the panel", "ok": true, "detail": null}
+{"step": "side_panel", "check": "landscape: side panel on the right", "ok": true, "detail": {"close": [1700, 95, 1763, 158], "tab": [1149, 99, 1222, 152]}}
+{"step": "side_panel", "check": "landscape (right): font changed from the side panel", "ok": true, "detail": "serif"}
+{"step": "side_panel", "check": "landscape (right): tap on the page closes the panel", "ok": true, "detail": null}
