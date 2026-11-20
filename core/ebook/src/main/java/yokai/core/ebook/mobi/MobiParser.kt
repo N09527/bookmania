@@ -326,13 +326,19 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
     private val fileposList: List<Int>
     private val cache = DocumentCache()
 
+    /** Table of contents entries from the NCX index (tag 1: text position, 3: label, 4: level, 21: parent). */
+    private data class NcxItem(val index: Int, val label: String, val pos: Int?, val level: Long?, val parent: Long?)
+
+    private val ncxItems: List<NcxItem> = runCatching { readNcxItems() }.getOrDefault(emptyList())
+
     init {
         val iso = String(raw, Charsets.ISO_8859_1) // one char per byte: regex offsets are byte offsets
         val breaks = PAGEBREAK.findAll(iso).map { it.range.first }.toList()
         val bounds = (listOf(0) + breaks + raw.size).distinct()
         // Sections without text or images (typically after the last page break) would show as blank pages.
         sections = bounds.zipWithNext().filter { (a, b) -> b > a && hasContent(iso, a, b) }.ifEmpty { listOf(0 to raw.size) }
-        fileposList = FILEPOS_IN_TAG.findAll(iso).mapNotNull { it.groupValues[1].toIntOrNull() }
+        // Positions that need an anchor: link targets in the text and the NCX entries.
+        fileposList = (FILEPOS_IN_TAG.findAll(iso).mapNotNull { it.groupValues[1].toIntOrNull() } + ncxItems.mapNotNull { it.pos })
             .filter { it in 0 until raw.size }.toSortedSet().toList()
     }
 
@@ -340,7 +346,8 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
 
     override val resourcePaths: Collection<String> get() = spine.map { it.href }
 
-    override val toc: List<TocEntry> by lazy { runCatching { readToc() }.getOrDefault(emptyList()) }
+    /** The NCX index when the book has one (Calibre and KindleGen write it), else the guide's table of contents. */
+    override val toc: List<TocEntry> by lazy { runCatching { ncxToc().ifEmpty { readToc() } }.getOrDefault(emptyList()) }
 
     override fun open(href: String): InputStream? {
         val path = href.substringBefore('#')
@@ -384,6 +391,25 @@ internal class Mobi6Publication(file: MobiFile, source: RandomAccessSource) : Mo
             RECINDEX_ATTR.replace(tag, " src=\"../${resourcePath(id)}\"")
         }
         return html
+    }
+
+    private fun readNcxItems(): List<NcxItem> {
+        val h = file.headers
+        if (h.ncxIndex == NULL_INDEX) return emptyList()
+        val data = MobiIndex.read(file.start + h.ncxIndex.toInt(), file::record, h.charset)
+        return data.entries.mapIndexed { i, e ->
+            NcxItem(i, data.cncx[e.tag(3)?.toInt()].orEmpty().trim(), e.tag(1)?.toInt(), e.tag(4), e.tag(21))
+        }
+    }
+
+    private fun ncxToc(): List<TocEntry> {
+        val items = ncxItems
+        fun build(item: NcxItem, depth: Int): TocEntry {
+            val children = if (depth > 16) emptyList() else items.filter { it.parent == item.index.toLong() }.map { build(it, depth + 1) }
+            val href = item.pos?.takeIf { it in 0 until raw.size }?.let { "${sectionPath(sectionOf(it))}#filepos$it" }
+            return TocEntry(item.label.ifEmpty { "…" }, href, children)
+        }
+        return items.filter { it.level == 0L || it.parent == null }.map { build(it, 0) }
     }
 
     private fun readToc(): List<TocEntry> {

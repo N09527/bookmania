@@ -15,6 +15,7 @@ import yokai.domain.chapter.interactor.GetChapter
 import yokai.domain.history.interactor.GetHistory
 import yokai.domain.manga.interactor.GetExcludedScanlators
 import yokai.domain.track.interactor.GetTrack
+import yokai.ebook.data.EbookBackup
 
 class MangaBackupCreator(
     private val customMangaManager: CustomMangaManager = Injekt.get(),
@@ -55,6 +56,7 @@ class MangaBackupCreator(
                 }
             }.orEmpty()
             if (chapters.isNotEmpty()) {
+                EbookBackup.attachPositions(manga, chapters)
                 mangaObject.chapters = chapters
             }
         }

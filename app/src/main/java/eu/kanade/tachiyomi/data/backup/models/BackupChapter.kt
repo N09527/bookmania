@@ -26,6 +26,10 @@ data class BackupChapter(
 
     // J2K specific values
     @ProtoNumber(800) var pagesLeft: Int = 0,
+
+    // Bookmania: exact reading position of a text book (yokai.ebook.data.EbookBackup), JSON. A large
+    // number that upstream does not use; other apps skip the unknown field.
+    @ProtoNumber(20101) var bookmaniaEbookPosition: String? = null,
 ) {
     fun toChapterImpl(): ChapterImpl {
         return ChapterImpl().apply {

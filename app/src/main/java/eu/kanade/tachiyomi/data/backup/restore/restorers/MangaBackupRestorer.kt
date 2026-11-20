@@ -32,6 +32,7 @@ import yokai.domain.manga.interactor.InsertManga
 import yokai.domain.manga.interactor.UpdateManga
 import yokai.domain.track.interactor.GetTrack
 import yokai.domain.track.interactor.InsertTrack
+import yokai.ebook.data.EbookBackup
 
 class MangaBackupRestorer(
     private val customMangaManager: CustomMangaManager = Injekt.get(),
@@ -79,6 +80,7 @@ class MangaBackupRestorer(
                 // Fetch rest of manga information
                 restoreExistingManga(manga, chapters, categories, history, tracks, backupCategories, filteredScanlators, customManga)
             }
+            EbookBackup.restorePositions(manga, backupManga.chapters)
         } catch (e: Exception) {
             onError(manga, e)
         }

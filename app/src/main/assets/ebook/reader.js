@@ -19,12 +19,13 @@
   var GAP = 24;     // invisible gap between consecutive pages, must be > 2 * P
   var COL_GAP = 40; // gap between the two columns of a spread (fixed, decision 9 of the design)
   var MIN_COL = 120; // narrower than this, two columns fall back to one
+  var POSITION_TEXT = 24; // characters of text saved with a reading position (to find it again)
   // anchor: first character of the page the reader navigated to. Relayouts (rotation, settings) keep
   // returning to it, so repeated relayouts do not drift; any navigation clears it.
   // t0/ms: start and duration of the last open or relayout (for diagnostics).
   // frames[0] shows the first page of the spread (frame is the same element); frames[1] the second.
   var S = { frame: null, frames: [], src: null, cols: 1, mode: 'H', settings: null, geo: null, page: 0, pages: 1,
-    ready: false, error: null, seq: 0, anchor: null, t0: 0, ms: 0, rubyFix: false };
+    ready: false, error: null, seq: 0, anchor: null, t0: 0, ms: 0, rubyFix: false, textIdx: null };
 
   // Old WebViews (seen on WebView 69) draw the ruby of a page's first line at the end of the previous
   // page: the annotation sticks out above its line box and the page break falls between them. Once
@@ -328,6 +329,99 @@
     return 0;
   }
 
+  // Every non-whitespace character of the open document's body in document order, with the text node
+  // (index in the same walk as locate()) and offset it comes from. Used to save and restore a reading
+  // position by its text and to convert between positions and fractions. Built once per document.
+  function isSpace(code) {
+    return code === 32 || (code >= 9 && code <= 13) || code === 0xA0 || code === 0x3000 || code === 0x1680 ||
+      (code >= 0x2000 && code <= 0x200A) || code === 0x2028 || code === 0x2029 || code === 0x202F ||
+      code === 0x205F || code === 0xFEFF;
+  }
+
+  function textIndex() {
+    var d = S.frame.contentDocument;
+    if (S.textIdx && S.textIdx.doc === d) return S.textIdx;
+    var w = d.createTreeWalker(d.body || d.documentElement, NodeFilter.SHOW_TEXT), i = 0;
+    var chars = [], node = [], off = [];
+    for (var n = w.nextNode(); n; n = w.nextNode(), i++) {
+      var t = n.data;
+      for (var c = 0; c < t.length; c++) {
+        if (isSpace(t.charCodeAt(c))) continue;
+        chars.push(t.charAt(c)); node.push(i); off.push(c);
+      }
+    }
+    S.textIdx = { doc: d, text: chars.join(''), node: node, off: off };
+    return S.textIdx;
+  }
+
+  // Index in textIndex() of the first character at or after location [node, offset].
+  function indexOfLocation(idx, loc) {
+    var lo = 0, hi = idx.node.length;
+    while (lo < hi) {
+      var mid = (lo + hi) >> 1;
+      if (idx.node[mid] < loc[0] || (idx.node[mid] === loc[0] && idx.off[mid] < loc[1])) lo = mid + 1; else hi = mid;
+    }
+    return lo;
+  }
+
+  function locationAt(idx, k) {
+    if (!idx.node.length) return null;
+    k = Math.max(0, Math.min(idx.node.length - 1, k));
+    return [idx.node[k], idx.off[k]];
+  }
+
+  // A saved position, tried in order: the location itself (when the text there still matches), the
+  // saved text (the occurrence nearest the saved fraction), then the fraction. Null when the
+  // document has no text.
+  function resolvePosition(t) {
+    var idx = textIndex(), total = idx.text.length, want = t.text || '';
+    if (!total) return null;
+    // The fraction was saved as index / total; the small margin undoes rounding (546 / 1880 * 1880 can
+    // come out as 545.999…, which would open one character, possibly one page, too early).
+    var expected = typeof t.progression === 'number' ? Math.min(total - 1, Math.floor(t.progression * total + 1e-6)) : 0;
+    if (t.location) {
+      var k = indexOfLocation(idx, t.location);
+      if (k < total && idx.node[k] === t.location[0] && idx.off[k] === t.location[1] &&
+          (!want || idx.text.substr(k, want.length) === want)) {
+        return t.location;
+      }
+    }
+    if (want.length >= 4) {
+      var best = -1, from = 0, at;
+      while ((at = idx.text.indexOf(want, from)) >= 0) {
+        if (best < 0 || Math.abs(at - expected) < Math.abs(best - expected)) best = at;
+        from = at + 1;
+      }
+      if (best >= 0) return locationAt(idx, best);
+    }
+    if (typeof t.progression === 'number') return locationAt(idx, expected);
+    return null;
+  }
+
+  // The current reading position: first character of the current page (or the anchor kept across
+  // relayouts), the text from there, and where it is in the document's text.
+  // A page without text (a picture) has no location; it is saved by its page instead.
+  function position() {
+    if (!S.frame || !S.ready || S.error) return null;
+    var idx = textIndex(), loc = S.anchor || locate(), total = idx.text.length;
+    var base = { chars: total, page: S.page, pages: S.pages, cols: S.cols };
+    if (!loc) return Object.assign(base, { location: null, text: '', before: null });
+    var k = indexOfLocation(idx, loc);
+    if (k < total) loc = [idx.node[k], idx.off[k]];
+    return Object.assign(base, { location: loc, text: idx.text.substr(k, POSITION_TEXT), before: k });
+  }
+
+  // Goes to the page with the character at fraction f of the document's text (pages, for a document
+  // without text).
+  function goProgress(f) {
+    if (!S.ready || S.error) return false;
+    f = Math.max(0, Math.min(1, +f || 0));
+    var idx = textIndex(), loc = idx.text.length ? locationAt(idx, Math.floor(f * idx.text.length)) : null;
+    goPage(loc ? pageOfLocation(loc) : Math.round(f * (S.pages - 1)));
+    S.anchor = null;
+    return true;
+  }
+
   function waitForImages(d) {
     var imgs = Array.prototype.slice.call(d.images || []);
     return Promise.all(imgs.map(function (img) {
@@ -386,13 +480,26 @@
     });
   }
 
+  // target: 'start', 'end', {fragment}, a saved position {location, text, progression} (see
+  // resolvePosition) or {pageProgression} (a page without text). A restored position becomes the
+  // anchor, so later relayouts keep it.
   function start(target) {
     var k = 0;
     if (target === 'end') k = S.pages - 1;
     else if (target && target.fragment) {
       var el = findFragment(S.frame.contentDocument, target.fragment);
       k = el ? pageOfElement(el) : 0;
-    } else if (target && target.location) k = pageOfLocation(target.location);
+    } else if (target && (target.location || target.text || typeof target.progression === 'number')) {
+      var loc = resolvePosition(target);
+      if (loc) {
+        k = pageOfLocation(loc);
+        S.anchor = loc;
+      } else if (typeof target.progression === 'number') {
+        k = Math.round(target.progression * (S.pages - 1));
+      }
+    } else if (target && typeof target.pageProgression === 'number') {
+      k = Math.floor(target.pageProgression * S.pages + 1e-6); // a page without text, saved by its page
+    }
     goPage(k);
   }
 
@@ -416,7 +523,7 @@
     var seq = ++S.seq;
     S.t0 = Date.now();
     S.ready = false; S.error = null; S.page = 0; S.pages = 1;
-    S.anchor = target && target.location ? target.location : null;
+    S.anchor = null; S.textIdx = null;
     S.settings = settings; S.mode = settings.vertical ? 'V' : 'H';
     prepareUserFont(settings); // in parallel with the document
     document.body.style.background = settings.background;
@@ -512,5 +619,5 @@
   }
 
   window.__reader = { open: open, relayout: relayout, next: next, prev: prev, goPage: goToPage, goFragment: goFragment,
-    hit: hit, status: status };
+    goProgress: goProgress, position: position, hit: hit, status: status };
 })();

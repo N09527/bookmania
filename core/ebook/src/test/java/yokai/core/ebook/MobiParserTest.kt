@@ -78,6 +78,25 @@ class MobiParserTest {
     }
 
     @Test
+    fun `MOBI 6 table of contents from the NCX index`() {
+        open("zh-horizontal-mobi6.mobi").use { pub ->
+            pub.toc.map { it.title } shouldBe listOf("第1章", "第2章", "第3章")
+            for (entry in pub.toc) {
+                val href = entry.href!!
+                val (path, anchor) = href.split('#')
+                val html = pub.open(path)!!.readBytes().toString(Charsets.UTF_8)
+                // The entry points at an anchor in its section, at the start of the chapter's heading.
+                val doc = Jsoup.parse(html)
+                val target = doc.getElementById(anchor)
+                (target != null) shouldBe true
+                val after = html.substringAfter("id=\"$anchor\"")
+                (entry.title.substringAfter("第").substringBefore("章") in Jsoup.parse(after).text().take(40).replace('１', '1').replace('２', '2').replace('３', '3')) shouldBe true
+            }
+            pub.toc.map { pub.spine.indexOfFirst { s -> s.href == it.href!!.substringBefore('#') } } shouldBe listOf(0, 1, 2)
+        }
+    }
+
+    @Test
     fun `MOBI 6 has no blank sections`() {
         for (name in listOf("zh-horizontal-mobi6.mobi", "text-with-images-mobi6.mobi")) {
             open(name).use { pub ->

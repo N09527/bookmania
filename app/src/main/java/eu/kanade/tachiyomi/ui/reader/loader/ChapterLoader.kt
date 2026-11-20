@@ -47,6 +47,7 @@ class ChapterLoader(
                     .onEach { it.chapter = chapter }
 
                 if (pages.isEmpty()) {
+                    EbookRouter.noImagePages(manga, chapter.chapter, context)?.let { throw it }
                     throw Exception(context.getString(MR.strings.no_pages_found))
                 }
 
@@ -85,7 +86,7 @@ class ChapterLoader(
                     is LocalSource.Format.Directory -> DirectoryPageLoader(format.file)
                     is LocalSource.Format.Archive -> ArchivePageLoader(format.file.archiveReader(context))
                     is LocalSource.Format.Epub -> {
-                        if (EbookRouter.isTextEpub(dbChapter.url, format.file, context)) {
+                        if (EbookRouter.isTextEpub(manga, dbChapter, format.file, context)) {
                             throw EbookRouter.textBookException(context)
                         }
                         EpubPageLoader(format.file.epubReader(context))

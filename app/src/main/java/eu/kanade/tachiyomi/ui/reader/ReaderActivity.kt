@@ -527,6 +527,7 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
      */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.reader, menu)
+        EbookRouter.addImageReaderItems(this, menu)
         return true
     }
 
@@ -543,6 +544,7 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
             binding.chaptersSheet.shiftPageButton.setImageDrawable(icon)
         }
         setBottomNavButtons(preferences.pageLayout().get())
+        EbookRouter.prepareImageReaderItems(menu, viewModel.manga, viewModel.getCurrentChapter()?.chapter)
         (binding.toolbar.background as? LayerDrawable)?.let { layerDrawable ->
             val isDoublePage = splitItem?.isVisible ?: false
             // Shout out to Google for not fixing setVisible https://issuetracker.google.com/issues/127538945
@@ -649,6 +651,7 @@ class ReaderActivity : BaseActivity<ReaderActivityBinding>() {
      * entries.
      */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (EbookRouter.onImageReaderItem(this, item, viewModel.manga, viewModel.getCurrentChapter()?.chapter)) return true
         when (item.itemId) {
             R.id.action_shift_double_page -> {
                 shiftDoublePages()

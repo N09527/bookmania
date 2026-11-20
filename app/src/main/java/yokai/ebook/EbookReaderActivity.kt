@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.PointF
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
@@ -29,9 +30,13 @@ import android.webkit.WebViewClient
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
@@ -45,7 +50,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewFeature
 import co.touchlab.kermit.Logger
+import com.hippo.unifile.UniFile
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dev.icerock.moko.resources.compose.stringResource
 import eu.kanade.tachiyomi.BuildConfig
 import eu.kanade.tachiyomi.R
 import eu.kanade.tachiyomi.data.database.models.Chapter
@@ -55,9 +62,17 @@ import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
 import eu.kanade.tachiyomi.ui.reader.settings.ReaderBackgroundColor
+import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation
+import eu.kanade.tachiyomi.ui.reader.viewer.navigation.DisabledNavigation
+import eu.kanade.tachiyomi.ui.reader.viewer.navigation.EdgeNavigation
+import eu.kanade.tachiyomi.ui.reader.viewer.navigation.KindlishNavigation
+import eu.kanade.tachiyomi.ui.reader.viewer.navigation.LNavigation
+import eu.kanade.tachiyomi.ui.reader.viewer.navigation.RightAndLeftNavigation
 import eu.kanade.tachiyomi.util.system.getResourceColor
+import eu.kanade.tachiyomi.util.system.launchIO
 import eu.kanade.tachiyomi.util.system.toast
 import eu.kanade.tachiyomi.util.system.withIOContext
+import eu.kanade.tachiyomi.util.system.withUIContext
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.math.abs
@@ -65,16 +80,28 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
 import uy.kohesive.injekt.injectLazy
+import yokai.core.ebook.BookStats
 import yokai.core.ebook.CorruptBookException
 import yokai.core.ebook.DrmProtectedException
 import yokai.core.ebook.Publication
+import yokai.core.ebook.TocEntry
 import yokai.core.ebook.UnsupportedBookException
 import yokai.core.ebook.WritingModeHint
 import yokai.domain.chapter.interactor.GetChapter
+import yokai.domain.chapter.interactor.UpdateChapter
+import yokai.domain.history.interactor.UpsertHistory
+import yokai.domain.library.LibraryPreferences
 import yokai.domain.manga.interactor.GetManga
+import yokai.domain.track.interactor.GetTrack
+import yokai.ebook.data.EbookDatabase
+import yokai.ebook.data.EbookLocator
+import yokai.ebook.data.ReadingProgress
 import yokai.ebook.settings.BookKey
 import yokai.ebook.settings.EbookSettings
 import yokai.ebook.settings.EbookSettingsPanel
@@ -100,6 +127,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private val getManga: GetManga by injectLazy()
     private val getChapter: GetChapter by injectLazy()
     private val sourceManager: SourceManager by injectLazy()
+    private val updateChapter: UpdateChapter by injectLazy()
+    private val upsertHistory: UpsertHistory by injectLazy()
+    private val getTrack: GetTrack by injectLazy()
+    private val libraryPreferences: LibraryPreferences by injectLazy()
+    private val ebookDb by lazy { EbookDatabase.get(this) }
 
     private val requestHandler by lazy { EbookRequestHandler(assets) }
     private val settingsStore by lazy { EbookSettingsStore(preferences.preferenceStore) }
@@ -112,6 +144,18 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private var chapter: Chapter? = null
     private var spineIndex = 0
     private var bookKey: BookKey? = null
+    private var bookFile: UniFile? = null
+    /** Saves progress, read state and reading time (see [ReadingSession]). */
+    private var session: ReadingSession? = null
+    /** Where to open the book (a saved position), used once when the shell is ready. */
+    private var restoreTarget: EbookLocator? = null
+    /** The position shown now, saved shortly after it changes and when the reader is paused. */
+    private var currentLocator: EbookLocator? = null
+    private var saveJob: Job? = null
+    private val saveLock = Mutex()
+    /** Page shown and pages of the open document in the current layout, saved with [currentLocator]. */
+    private var currentPage = 0
+    private var currentDocPages = 1
     private var settings = EbookSettings.DEFAULTS
     /** The book's own writing mode, used while the setting is "依書籍". */
     private var bookVertical = false
@@ -139,6 +183,12 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
 
     /** The settings panel, or null when it is closed. */
     private var panel by mutableStateOf<EbookSettingsUiState?>(null)
+
+    /** The bottom bar shown with the menu: page information and the whole-book slider. */
+    private var barVisible by mutableStateOf(false)
+    private var pageInfoText by mutableStateOf("")
+    private var bookProgress by mutableStateOf<Float?>(null)
+    private var rtlState by mutableStateOf(false)
     private val fontPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onFontPicked(uri)
     }
@@ -169,13 +219,6 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             v.minimumHeight = actionBarSize + bars.top
             insets
         }
-        val pageInfoMargin = (binding.pageInfo.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
-        ViewCompat.setOnApplyWindowInsetsListener(binding.pageInfo) { v, insets ->
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                bottomMargin = pageInfoMargin + insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-            }
-            insets
-        }
 
         resolveColors()
         binding.root.setBackgroundColor(backgroundColor)
@@ -187,15 +230,34 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
         binding.toolbar.setNavigationIconTint(getResourceColor(R.attr.colorOnSurface))
         binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.menu.add(Menu.NONE, MENU_TOC, Menu.NONE, getString(MR.strings.ebook_toc)).apply {
+            setIcon(R.drawable.ic_format_list_numbered_24dp)
+            iconTintList = ColorStateList.valueOf(getResourceColor(R.attr.colorOnSurface))
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            isVisible = false // until a book is open
+        }
         binding.toolbar.menu.add(Menu.NONE, MENU_SETTINGS, Menu.NONE, getString(MR.strings.ebook_settings)).apply {
             setIcon(R.drawable.ic_tune_24dp)
             iconTintList = ColorStateList.valueOf(getResourceColor(R.attr.colorOnSurface))
             setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
             isVisible = false // until a book is open
         }
+        binding.toolbar.menu.add(Menu.NONE, MENU_OPEN_AS_IMAGES, Menu.CATEGORY_SECONDARY, getString(MR.strings.ebook_open_as_images)).apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
+            isVisible = false // EPUB only, once it is open
+        }
         binding.toolbar.setOnMenuItemClickListener { item ->
-            if (item.itemId == MENU_SETTINGS) openSettings()
-            item.itemId == MENU_SETTINGS
+            when (item.itemId) {
+                MENU_SETTINGS -> openSettings()
+                MENU_TOC -> showToc()
+                MENU_OPEN_AS_IMAGES -> {
+                    val m = manga
+                    val c = chapter
+                    if (m != null && c != null) EbookRouter.openAsImages(this, m, c)
+                }
+                else -> return@setOnMenuItemClickListener false
+            }
+            true
         }
         binding.root.addView(
             ComposeView(this).apply {
@@ -205,6 +267,19 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 elevation = resources.displayMetrics.density * 16 // above the toolbar and the page number
                 setContent {
                     YokaiTheme {
+                        if (barVisible) {
+                            Box(Modifier.fillMaxSize()) {
+                                EbookProgressBar(
+                                    pageInfo = pageInfoText,
+                                    progress = bookProgress,
+                                    rightToLeft = rtlState,
+                                    titleAt = ::tocTitleAt,
+                                    onSeek = ::seekBook,
+                                    sliderLabel = stringResource(MR.strings.ebook_book_progress),
+                                    modifier = Modifier.align(Alignment.BottomCenter),
+                                )
+                            }
+                        }
                         panel?.let { state ->
                             EbookSettingsPanel(
                                 state = state,
@@ -260,6 +335,26 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         if (hasFocus) applySystemBars()
     }
 
+    override fun onResume() {
+        super.onResume()
+        session?.startTimer()
+    }
+
+    override fun onPause() {
+        // Write what is shown now and the reading time, also when the reader is being closed.
+        saveJob?.cancel()
+        persistPosition()
+        val readingSession = session
+        val span = readingSession?.stopTimer()
+        if (readingSession != null && span != null) {
+            launchIO {
+                runCatching { readingSession.saveReadingTime(span.first, span.second) }
+                    .onFailure { Logger.e(it) { "Saving the reading time failed" } }
+            }
+        }
+        super.onPause()
+    }
+
     override fun onDestroy() {
         waitJob?.cancel()
         resizeJob?.cancel()
@@ -290,35 +385,97 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                     is LocalSource.Format.Ebook -> format.file
                     else -> throw UnsupportedBookException("Not a text book")
                 }
-                Triple(manga, chapter, LocalEbooks.open(file, this@EbookReaderActivity))
+                Loaded(manga, chapter, file, LocalEbooks.open(file, this@EbookReaderActivity))
             }
         }
         if (isDestroyed) {
-            result.getOrNull()?.third?.close()
+            result.getOrNull()?.publication?.close()
             return
         }
-        binding.progress.isVisible = false
-        val (manga, chapter, pub) = result.getOrElse {
+        val loaded = result.getOrElse {
+            binding.progress.isVisible = false
             showError(it)
             return
         }
+        val (manga, chapter, file, pub) = loaded
         this.manga = manga
         this.chapter = chapter
+        bookFile = file
         publication = pub
         if (pub.spine.isEmpty()) {
+            binding.progress.isVisible = false
             showError(getString(MR.strings.ebook_cannot_open_title), getString(MR.strings.ebook_no_content))
             return
         }
         val key = BookKey(manga.source, manga.url, chapter.url)
         bookKey = key
+        val readingSession = ReadingSession(
+            manga, chapter, key, ebookDb, preferences, libraryPreferences, getChapter, updateChapter, upsertHistory, getTrack,
+        )
+        restoreTarget = withIOContext {
+            readingSession.init()
+            readingSession.positionToRestore() ?: estimatedPosition(chapter, file, key, pub.spine.size, readingSession)
+        }
+        session = readingSession
+        readingSession.startTimer()
+        binding.progress.isVisible = false
         settings = settingsStore.effective(key)
         bookVertical = pub.writingModeHint == WritingModeHint.VERTICAL
         resolveMode()
         binding.toolbar.title = pub.metadata.title ?: chapter.name
         binding.toolbar.subtitle = manga.title
         binding.toolbar.menu.findItem(MENU_SETTINGS)?.isVisible = true
+        binding.toolbar.menu.findItem(MENU_TOC)?.isVisible = true
+        binding.toolbar.menu.findItem(MENU_OPEN_AS_IMAGES)?.isVisible = EbookRouter.canOpenAsImages(chapter)
         requestHandler.publication = pub
         createWebView()
+        loadCharCounts()
+    }
+
+    private data class Loaded(val manga: Manga, val chapter: Chapter, val file: UniFile, val publication: Publication)
+
+    /**
+     * Character counts of the book's documents for whole-book progress: cached in ebook.db for this
+     * version of the file, else counted from a separate copy of the book (the open one serves the WebView).
+     */
+    private fun charCounts(file: UniFile, key: BookKey, spineSize: Int): IntArray? {
+        val size = file.length()
+        val modified = file.lastModified()
+        ebookDb.info(key)?.countsFor(size, modified)?.takeIf { it.size == spineSize }?.let { return it }
+        val counts = runCatching { LocalEbooks.open(file, this).use { BookStats.charCounts(it) } }
+            .onFailure { Logger.w(it) { "Counting the book's text failed" } }
+            .getOrNull() ?: return null
+        ebookDb.updateInfo(key) { it.copy(fileSize = size, fileModified = modified, charCounts = counts) }
+        return counts.takeIf { it.size == spineSize }
+    }
+
+    /**
+     * Without a saved position (e.g. a backup made without one) but with a page in the chapter list,
+     * starts near that page: its fraction of the book, located with the character counts. Like the
+     * manga reader, a read chapter starts from the beginning.
+     */
+    private fun estimatedPosition(chapter: Chapter, file: UniFile, key: BookKey, spineSize: Int, session: ReadingSession): EbookLocator? {
+        val read = chapter.last_page_read
+        val left = chapter.pages_left
+        if (chapter.read || read <= 0 || left <= 1) return null
+        val counts = charCounts(file, key, spineSize) ?: return null
+        val progress = ReadingProgress(counts).also { session.progress = it }
+        val (spine, fraction) = progress.locate(read.toDouble() / (read + left))
+        val href = publication?.spine?.getOrNull(spine)?.href ?: return null
+        return EbookLocator(spine = spine, href = href, progression = fraction)
+    }
+
+    /** Counts the text in the background; whole-book progress (slider, page estimates) waits for it. */
+    private fun loadCharCounts() {
+        val file = bookFile ?: return
+        val key = bookKey ?: return
+        val size = spine.size
+        if (session?.progress != null) return
+        lifecycleScope.launch {
+            val counts = withIOContext { charCounts(file, key, size) } ?: return@launch
+            session?.progress = ReadingProgress(counts)
+            capturePosition() // the page estimate in the chapter list can now be written
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -393,7 +550,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             if (!shellLoaded && url == EbookRequestHandler.SHELL_URL) {
                 shellLoaded = true
                 busy = false
-                openSpine(firstLinear(), START)
+                openInitial()
             }
         }
 
@@ -422,6 +579,34 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     }
 
     private fun firstLinear() = linearIndices().firstOrNull() ?: 0
+
+    /** Opens the saved position, or the first document. */
+    private fun openInitial() {
+        val saved = restoreTarget
+        restoreTarget = null
+        if (saved != null) {
+            // The path wins over the index, in case the book's spine changed.
+            val index = spine.indexOfFirst { it.href == saved.href }.takeIf { it >= 0 } ?: saved.spine.takeIf { it in spine.indices }
+            if (index != null) {
+                openSpine(index, targetFor(saved))
+                return
+            }
+        }
+        openSpine(firstLinear(), START)
+    }
+
+    /** The shell's open target for a saved position (see reader.js start()). */
+    private fun targetFor(saved: EbookLocator): String {
+        val target = JSONObject()
+        if (saved.location == null && saved.pageProgression != null) {
+            target.put("pageProgression", saved.pageProgression)
+        } else {
+            saved.location?.let { target.put("location", JSONArray(it)) }
+            if (saved.text.isNotEmpty()) target.put("text", saved.text)
+            target.put("progression", saved.progression)
+        }
+        return target.toString()
+    }
 
     private fun openSpine(index: Int, target: String) {
         val wv = webView ?: return
@@ -458,6 +643,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                         if (pendingRelayout) {
                             pendingRelayout = false
                             applySettings()
+                        } else {
+                            capturePosition()
                         }
                     }
                     return@launch
@@ -523,6 +710,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                     pages = status.optInt("pages", 1)
                     columns = status.optInt("cols", 1)
                     updatePageInfo()
+                    capturePosition()
                     return@launch
                 }
             }
@@ -535,7 +723,153 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         pages = status.optInt("pages", 1)
         columns = status.optInt("cols", 1)
         updatePageInfo()
+        capturePosition()
     }
+
+    /** Reads the position shown now from the shell and saves it shortly after (see [scheduleSave]). */
+    private suspend fun capturePosition() {
+        if (busy || session == null || binding.errorPanel.isVisible) return
+        val pos = eval("window.__reader.position()")?.let(::parseObject) ?: return
+        val index = spineIndex
+        val item = spine.getOrNull(index) ?: return
+        val location = pos.optJSONArray("location")?.let { listOf(it.getInt(0), it.getInt(1)) }
+        val chars = pos.optInt("chars")
+        val before = if (pos.isNull("before")) null else pos.optInt("before")
+        val shownPage = pos.optInt("page")
+        val docPages = pos.optInt("pages", 1).coerceAtLeast(1)
+        val shownColumns = pos.optInt("cols", 1)
+        val progression = if (location != null && before != null && chars > 0) (before.toDouble() / chars).coerceIn(0.0, 1.0) else 0.0
+        val pageProgression = if (location == null) (shownPage.toDouble() / docPages).coerceIn(0.0, 1.0) else null
+        val atEnd = shownPage + shownColumns > docPages - 1 && linearIndices().none { it > index }
+        currentLocator = EbookLocator(
+            spine = index,
+            href = item.href,
+            location = location,
+            text = pos.optString("text"),
+            progression = progression,
+            pageProgression = pageProgression,
+            total = if (atEnd) 1.0 else session?.progress?.total(index, pageProgression ?: progression),
+            atEnd = atEnd,
+            updatedAt = System.currentTimeMillis(),
+        )
+        currentDocPages = docPages
+        currentPage = shownPage
+        bookProgress = currentLocator?.total?.toFloat()
+        scheduleSave()
+    }
+
+    /** Page turns come in bursts; the position is written once they stop. */
+    private fun scheduleSave() {
+        saveJob?.cancel()
+        saveJob = lifecycleScope.launch {
+            delay(SAVE_DELAY_MS)
+            persistPosition()
+        }
+    }
+
+    /**
+     * Writes the current position, progress and read state. Runs outside the activity's scope so that
+     * leaving the reader does not cancel it.
+     */
+    private fun persistPosition() {
+        val locator = currentLocator ?: return
+        val readingSession = session ?: return
+        val docPages = currentDocPages
+        val shownPage = currentPage
+        launchIO {
+            val errors = saveLock.withLock {
+                runCatching { readingSession.save(locator, locator.spine, shownPage, docPages) }
+                    .onFailure { Logger.e(it) { "Saving the reading position failed" } }
+                    .getOrDefault(emptyList())
+            }
+            if (errors.isNotEmpty()) {
+                withUIContext {
+                    toast(getString(MR.strings.failed_to_update_, errors.joinToString(", ") { getString(it.first.nameRes()) }))
+                }
+            }
+        }
+    }
+
+    // region Table of contents and progress slider
+
+    /** A table of contents entry with its depth and the spine index of its target (null without a target). */
+    private data class TocItem(val title: String, val href: String?, val depth: Int, val spine: Int?)
+
+    private val tocItems: List<TocItem> by lazy {
+        val items = ArrayList<TocItem>()
+        fun add(entries: List<TocEntry>, depth: Int) {
+            for (e in entries) {
+                val target = e.href?.substringBefore('#')
+                items += TocItem(e.title, e.href, depth, target?.let { t -> spine.indexOfFirst { it.href == t }.takeIf { it >= 0 } })
+                if (depth < 8) add(e.children, depth + 1)
+            }
+        }
+        add(publication?.toc.orEmpty(), 0)
+        items
+    }
+
+    private fun showToc() {
+        val items = tocItems
+        if (items.isEmpty()) {
+            toast(getString(MR.strings.ebook_toc_empty))
+            return
+        }
+        setMenuVisible(false)
+        // The current entry: the last one that starts in or before the open document.
+        val current = items.indexOfLast { it.spine != null && it.spine <= spineIndex }
+        val labels = items.map { "\u3000".repeat(it.depth) + it.title }.toTypedArray()
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(MR.strings.ebook_toc))
+            .setSingleChoiceItems(labels, current) { dialog, which ->
+                dialog.dismiss()
+                goToHref(items[which].href)
+            }
+            .setNegativeButton(getString(MR.strings.cancel), null)
+            .show()
+    }
+
+    /** Opens a container path with an optional `#fragment` (a table of contents target). */
+    private fun goToHref(href: String?) {
+        if (href == null || busy) return
+        val path = href.substringBefore('#')
+        val fragment = href.substringAfter('#', "").ifEmpty { null }
+        val index = spine.indexOfFirst { it.href == path }
+        if (index < 0) {
+            toast(getString(MR.strings.ebook_link_not_found))
+            return
+        }
+        if (index != spineIndex) {
+            openSpine(index, if (fragment == null) START else "{fragment: ${JSONObject.quote(fragment)}}")
+            return
+        }
+        lifecycleScope.launch {
+            val script = if (fragment == null) "window.__reader.goPage(0)" else "window.__reader.goFragment(${JSONObject.quote(fragment)})"
+            if (eval(script) == "true") refreshPage() else toast(getString(MR.strings.ebook_link_not_found))
+        }
+    }
+
+    /** The table of contents entry at a fraction of the book (the slider's label while dragging). */
+    private fun tocTitleAt(fraction: Float): String? {
+        val progress = session?.progress ?: return null
+        val (index, _) = progress.locate(fraction.toDouble())
+        return tocItems.lastOrNull { it.spine != null && it.spine <= index }?.title
+    }
+
+    /** Moves to a fraction of the whole book (the slider was released there). */
+    private fun seekBook(fraction: Float) {
+        val progress = session?.progress ?: return
+        if (busy) return
+        val (index, docFraction) = progress.locate(fraction.toDouble())
+        if (index == spineIndex) {
+            lifecycleScope.launch {
+                if (eval("window.__reader.goProgress($docFraction)") == "true") refreshPage()
+            }
+        } else {
+            openSpine(index, JSONObject().put("progression", docFraction).toString())
+        }
+    }
+
+    // endregion
 
     private fun onLink(url: String) {
         val inBook = EbookRequestHandler.bookPathOf(url)
@@ -618,14 +952,32 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 onLink(link)
                 return@launch
             }
-            val third = binding.root.width / 3f
-            when {
-                x < third -> if (rtl) nextPage() else previousPage()
-                x > third * 2 -> if (rtl) previousPage() else nextPage()
-                else -> setMenuVisible(true)
+            val w = binding.root.width.coerceAtLeast(1).toFloat()
+            val h = binding.root.height.coerceAtLeast(1).toFloat()
+            when (navigation().getAction(PointF(x / w, y / h))) {
+                ViewerNavigation.NavigationRegion.MENU -> setMenuVisible(true)
+                ViewerNavigation.NavigationRegion.NEXT -> nextPage()
+                ViewerNavigation.NavigationRegion.PREV -> previousPage()
+                // Left and right follow the page direction: the next page is on the left when pages turn right to left.
+                ViewerNavigation.NavigationRegion.LEFT -> if (rtl) nextPage() else previousPage()
+                ViewerNavigation.NavigationRegion.RIGHT -> if (rtl) previousPage() else nextPage()
             }
         }
     }
+
+    /**
+     * Tap zones of the existing reader settings for paged viewers ("navigation layout" and "invert
+     * tapping"), read at each tap so a change in the settings applies at once. The default is the
+     * left / right thirds that the paged viewers use (RightAndLeftNavigation).
+     */
+    private fun navigation(): ViewerNavigation = when (preferences.navigationModePager().get()) {
+        1 -> LNavigation()
+        2 -> KindlishNavigation()
+        3 -> EdgeNavigation()
+        4 -> RightAndLeftNavigation()
+        5 -> DisabledNavigation()
+        else -> RightAndLeftNavigation()
+    }.also { it.invertMode = preferences.pagerNavInverted().get() }
 
     /**
      * Page keys are handled before the view hierarchy: a focused WebView would otherwise consume
@@ -657,10 +1009,10 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private fun setMenuVisible(visible: Boolean) {
         menuVisible = visible
         binding.toolbar.isVisible = visible
-        binding.pageInfo.isVisible = visible && webView != null && publication != null
+        barVisible = visible && webView != null && publication != null && !binding.errorPanel.isVisible
         applySystemBars()
         // The shell re-lays out by itself after rotation (pages and columns change), so read them again.
-        if (binding.pageInfo.isVisible && !busy) lifecycleScope.launch { refreshPage() }
+        if (barVisible && !busy) lifecycleScope.launch { refreshPage() }
     }
 
     private fun applySystemBars() {
@@ -674,7 +1026,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private fun updatePageInfo() {
         // Two columns: both pages of the spread, e.g. "3–4/35" (the last spread can hold one page).
         val shown = if (columns > 1 && page + 2 <= pages) "${page + 1}–${page + 2}" else "${page + 1}"
-        binding.pageInfo.text = "${spineIndex + 1}/${spine.size} · $shown/$pages"
+        pageInfoText = "${spineIndex + 1}/${spine.size} · $shown/$pages"
     }
 
     private fun showError(error: Throwable) {
@@ -702,6 +1054,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private fun showError(title: String, message: String) {
         panel = null
         binding.toolbar.menu.findItem(MENU_SETTINGS)?.isVisible = false
+        binding.toolbar.menu.findItem(MENU_TOC)?.isVisible = false
         binding.progress.isVisible = false
         binding.errorTitle.text = title
         binding.errorMessage.text = message
@@ -788,6 +1141,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             else -> bookVertical
         }
         rtl = settings.rightToLeft(vertical)
+        rtlState = rtl
     }
 
     private fun openSettings() {
@@ -931,11 +1285,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         private const val START = "'start'"
         private const val END = "'end'"
         private const val POLL_MS = 40L
+        private const val SAVE_DELAY_MS = 1_000L
         private const val RESIZE_POLL_MS = 200L
         private const val RESIZE_GRACE_MS = 15_000L
         private const val LAYOUT_TIMEOUT_MS = 60_000L
 
         private const val MENU_SETTINGS = 1
+        private const val MENU_TOC = 2
+        private const val MENU_OPEN_AS_IMAGES = 3
 
         private val EXTERNAL_SCHEMES = setOf("http", "https", "mailto")
 
