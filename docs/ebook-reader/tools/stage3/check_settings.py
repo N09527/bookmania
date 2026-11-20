@@ -569,7 +569,7 @@ def step_side_panel():
             d.open_panel()
             ns = d.nodes()
             d.shot(name)
-            close = d.find('關閉', ns, exact=True)
+            close = d.close_button(ns)
             tabs = d.find('文字', ns, exact=True)
             ok = bool(close and tabs) and ((close['x'] < 960) if side == 'left' else (tabs['x'] > 960))
             check(f'landscape: side panel on the {side}', ok, {'close': close and close['b'], 'tab': tabs and tabs['b']})
@@ -581,7 +581,7 @@ def step_side_panel():
             after_change(name + '-book-font')
             # A tap on the page outside the panel closes it.
             d.tap(1700 if side == 'left' else 200, 540, 4)
-            check(f'landscape ({side}): tap on the page closes the panel', d.find('關閉', exact=True) is None)
+            check(f'landscape ({side}): tap on the page closes the panel', d.close_button() is None)
             d.shell('settings put system user_rotation 0')
             time.sleep(10)
     finally:
@@ -614,7 +614,7 @@ def step_rotate():
     st = d.wait_ready()
     ns = d.nodes()
     d.shot('s3-41-landscape-panel')
-    check('landscape: panel shown (close button found)', d.find('關閉', ns, exact=True) is not None)
+    check('landscape: panel shown (close button found)', d.close_button(ns) is not None)
     check('landscape: page laid out again', st['ready'] and st['error'] is None, st)
     d.shell('settings put system user_rotation 0')
     time.sleep(12)

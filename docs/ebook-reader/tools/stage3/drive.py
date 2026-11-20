@@ -92,7 +92,11 @@ def shot(name):
 
 
 def cdp(expr):
-    r = subprocess.run(['node', os.path.join(S2, 'cdp.mjs'), '9333', expr], capture_output=True, timeout=60)
+    limit = int(os.environ.get('CDP_TIMEOUT_MS', '20000')) / 1000 + 15
+    try:
+        r = subprocess.run(['node', os.path.join(S2, 'cdp.mjs'), '9333', expr], capture_output=True, timeout=max(60, limit))
+    except subprocess.TimeoutExpired:
+        return None  # no answer yet (e.g. first start after a cold boot); callers poll again
     out = r.stdout.decode('utf-8', 'replace').strip()
     try:
         return json.loads(out)
@@ -143,6 +147,23 @@ def ebook_prefs():
     return out
 
 
+def dismiss_anr():
+    """Closes an "Application Not Responding" or crash dialog that holds the input focus (on this slow
+    emulator System UI often stops responding for a while, and key events then go to its dialog).
+    Returns the focused window line if a dialog was closed, else None. The caller logs it: a dialog of
+    the app under test is a finding, not something to hide."""
+    focus = shell('dumpsys window windows | grep mCurrentFocus').strip()
+    if 'Not Responding' not in focus and 'Application Error' not in focus:
+        return None
+    ns = nodes()
+    for res in ('android:id/aerr_wait', 'android:id/aerr_close'):
+        for n in ns:
+            if n['res'] == res:
+                tap(n['x'], n['y'], wait=2.0)
+                return focus
+    return focus + ' (no button found)'
+
+
 def resumed():
     for line in shell('dumpsys activity activities').splitlines():
         if 'mResumedActivity' in line:
@@ -180,13 +201,13 @@ def open_panel():
     then the typesetting button. A second centre tap would hide the toolbar again, so it waits instead.
     The first time, the panel can take more than half a minute to appear on a slow emulator."""
     ns = nodes()
-    if find('關閉', ns, exact=True):
+    if close_button(ns):
         return
     # Centre of the screen in the current orientation (the largest node is the window).
     w = max((m['b'][2] for m in ns), default=1080)
     h = max((m['b'][3] for m in ns), default=1920)
     for _ in range(4):  # taps are sometimes lost on the slow emulator
-        if find('關閉', exact=True):
+        if close_button():
             return
         n = find('排版', exact=True)
         if n is None:
@@ -195,14 +216,23 @@ def open_panel():
         if n is None:
             continue
         tap(n['x'], n['y'], 4)
-        if wait_for('關閉', tries=10, pause=3):
-            return
+        for _ in range(10):
+            if close_button():
+                return
+            time.sleep(3)
     shot('open-panel-failed')
     raise RuntimeError('settings panel did not open')
 
 
+def close_button(ns=None):
+    """The panel's close button: an icon whose description is 關閉 (the two-column choice "關閉" is a
+    text node, so text matches do not count)."""
+    ns = ns if ns is not None else nodes()
+    return next((n for n in ns if n['desc'] == '關閉' and not n['text']), None)
+
+
 def close_panel():
-    n = find('關閉', exact=True)
+    n = close_button()
     if n:
         tap(n['x'], n['y'], 3)
 

@@ -221,6 +221,17 @@ fun EbookSettingsPanel(
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(top = 4.dp),
                         )
+                        Spacer(Modifier.height(12.dp))
+                        Label(MR.strings.ebook_columns, over[Key.COLUMNS])
+                        Choices(
+                            options = listOf(
+                                EbookSettings.COLUMNS_OFF to MR.strings.ebook_columns_off,
+                                EbookSettings.COLUMNS_ON to MR.strings.ebook_columns_on,
+                                EbookSettings.COLUMNS_LANDSCAPE to MR.strings.ebook_columns_landscape,
+                            ),
+                            selected = s.columns,
+                            onSelect = { onSet(Key.COLUMNS, it) },
+                        )
                         HorizontalDivider(Modifier.padding(vertical = 8.dp))
                         Label(MR.strings.ebook_margins, null)
                         val margin = Range.margin.first.toFloat()..Range.margin.last.toFloat()

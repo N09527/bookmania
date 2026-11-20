@@ -124,9 +124,12 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private var pendingRelayout = false
     private var page = 0
     private var pages = 1
+    /** Pages shown side by side (2 in two-column mode). */
+    private var columns = 1
 
     private var busy = false
     private var waitJob: Job? = null
+    private var resizeJob: Job? = null
     private var menuVisible = false
     private lateinit var gestures: GestureDetector
     private lateinit var insetsController: WindowInsetsControllerCompat
@@ -259,6 +262,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
 
     override fun onDestroy() {
         waitJob?.cancel()
+        resizeJob?.cancel()
         webView?.let {
             (it.parent as? android.view.ViewGroup)?.removeView(it)
             it.destroy()
@@ -367,6 +371,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 return true
             }
         }
+        // The shell lays the document out again by itself when the viewport changes (rotation, split
+        // screen); page, page count and columns change with it, so read them again once it is done.
+        wv.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+            if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) refreshAfterResize()
+        }
         binding.webContainer.addView(wv)
         webView = wv
         busy = true
@@ -444,6 +453,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                     } else {
                         page = status.optInt("page")
                         pages = status.optInt("pages", 1)
+                        columns = status.optInt("cols", 1)
                         updatePageInfo()
                         if (pendingRelayout) {
                             pendingRelayout = false
@@ -491,10 +501,39 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
     }
 
+    /**
+     * Waits for the relayout the shell starts by itself after a viewport change (its layout counter `seq`
+     * moves on), then updates the page indicator. The page's resize event can come seconds after the view
+     * changed size (seen on a slow emulator), so the wait is long; if no new layout shows up within
+     * [RESIZE_GRACE_MS], the current one is taken.
+     */
+    private fun refreshAfterResize() {
+        resizeJob?.cancel()
+        resizeJob = lifecycleScope.launch {
+            val before = eval("window.__reader.status()")?.let(::parseObject)?.optInt("seq", -1) ?: -1
+            val start = SystemClock.uptimeMillis()
+            while (SystemClock.uptimeMillis() - start < LAYOUT_TIMEOUT_MS) {
+                delay(RESIZE_POLL_MS)
+                if (busy) continue // awaitLayout() updates the indicator when the layout it waits for is done
+                val status = eval("window.__reader.status()")?.let(::parseObject) ?: continue
+                if (!status.isNull("error")) return@launch // the error screen has no page indicator
+                val relaidOut = status.optInt("seq", -1) != before
+                if (status.optBoolean("ready") && (relaidOut || SystemClock.uptimeMillis() - start > RESIZE_GRACE_MS)) {
+                    page = status.optInt("page")
+                    pages = status.optInt("pages", 1)
+                    columns = status.optInt("cols", 1)
+                    updatePageInfo()
+                    return@launch
+                }
+            }
+        }
+    }
+
     private suspend fun refreshPage() {
         val status = eval("window.__reader.status()")?.let(::parseObject) ?: return
         page = status.optInt("page")
         pages = status.optInt("pages", 1)
+        columns = status.optInt("cols", 1)
         updatePageInfo()
     }
 
@@ -620,6 +659,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         binding.toolbar.isVisible = visible
         binding.pageInfo.isVisible = visible && webView != null && publication != null
         applySystemBars()
+        // The shell re-lays out by itself after rotation (pages and columns change), so read them again.
+        if (binding.pageInfo.isVisible && !busy) lifecycleScope.launch { refreshPage() }
     }
 
     private fun applySystemBars() {
@@ -631,7 +672,9 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     }
 
     private fun updatePageInfo() {
-        binding.pageInfo.text = "${spineIndex + 1}/${spine.size} · ${page + 1}/$pages"
+        // Two columns: both pages of the spread, e.g. "3–4/35" (the last spread can hold one page).
+        val shown = if (columns > 1 && page + 2 <= pages) "${page + 1}–${page + 2}" else "${page + 1}"
+        binding.pageInfo.text = "${spineIndex + 1}/${spine.size} · $shown/$pages"
     }
 
     private fun showError(error: Throwable) {
@@ -706,6 +749,9 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
         return JSONObject()
             .put("vertical", vertical)
+            // Which side the first page of a two-column spread goes on; the shell decides when to use two columns.
+            .put("rtl", rtl)
+            .put("columns", s.columns)
             .put("font", font)
             .put("fontSize", s.fontSize)
             .put("lineHeight", cssNumber(s.lineHeight))
@@ -885,6 +931,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         private const val START = "'start'"
         private const val END = "'end'"
         private const val POLL_MS = 40L
+        private const val RESIZE_POLL_MS = 200L
+        private const val RESIZE_GRACE_MS = 15_000L
         private const val LAYOUT_TIMEOUT_MS = 60_000L
 
         private const val MENU_SETTINGS = 1

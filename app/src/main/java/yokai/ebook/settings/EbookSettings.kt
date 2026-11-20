@@ -29,6 +29,8 @@ data class EbookSettings(
     val writingMode: String = BOOK,
     /** [DIRECTION_AUTO] (vertical: right-to-left, horizontal: left-to-right), [DIRECTION_RTL] or [DIRECTION_LTR]. */
     val pageDirection: String = DIRECTION_AUTO,
+    /** Two columns: [COLUMNS_OFF], [COLUMNS_ON] or [COLUMNS_LANDSCAPE] (only when the screen is wider than tall). */
+    val columns: String = COLUMNS_LANDSCAPE,
 ) {
     enum class Key(val id: String) {
         FONT("font"),
@@ -43,6 +45,7 @@ data class EbookSettings(
         MARGIN_RIGHT("marginRight"),
         WRITING_MODE("writingMode"),
         PAGE_DIRECTION("pageDirection"),
+        COLUMNS("columns"),
         ;
 
         companion object {
@@ -70,6 +73,7 @@ data class EbookSettings(
         Key.MARGIN_RIGHT.id to marginRight.toString(),
         Key.WRITING_MODE.id to writingMode,
         Key.PAGE_DIRECTION.id to pageDirection,
+        Key.COLUMNS.id to columns,
     )
 
     companion object {
@@ -82,6 +86,9 @@ data class EbookSettings(
         const val DIRECTION_AUTO = "auto"
         const val DIRECTION_RTL = "rtl"
         const val DIRECTION_LTR = "ltr"
+        const val COLUMNS_OFF = "off"
+        const val COLUMNS_ON = "on"
+        const val COLUMNS_LANDSCAPE = "landscape"
 
         val DEFAULTS = EbookSettings()
 
@@ -124,6 +131,7 @@ data class EbookSettings(
                 writingMode = str(Key.WRITING_MODE)?.takeIf { it in setOf(BOOK, MODE_VERTICAL, MODE_HORIZONTAL) } ?: d.writingMode,
                 pageDirection = str(Key.PAGE_DIRECTION)?.takeIf { it in setOf(DIRECTION_AUTO, DIRECTION_RTL, DIRECTION_LTR) }
                     ?: d.pageDirection,
+                columns = str(Key.COLUMNS)?.takeIf { it in setOf(COLUMNS_OFF, COLUMNS_ON, COLUMNS_LANDSCAPE) } ?: d.columns,
             )
         }
 

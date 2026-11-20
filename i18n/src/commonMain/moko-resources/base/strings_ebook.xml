@@ -54,5 +54,9 @@
     <string name="ebook_page_direction_rtl">Right to left</string>
     <string name="ebook_page_direction_ltr">Left to right</string>
     <string name="ebook_page_direction_hint">Automatic: right to left for vertical text, left to right for horizontal text.</string>
+    <string name="ebook_columns">Two columns</string>
+    <string name="ebook_columns_off">Off</string>
+    <string name="ebook_columns_on">On</string>
+    <string name="ebook_columns_landscape">Landscape only</string>
     <string name="ebook_unit_characters">%s characters</string>
 </resources>

@@ -21,6 +21,7 @@ class EbookSettingsTest {
         assertEquals(listOf(32, 32, 20, 20), listOf(d.marginTop, d.marginBottom, d.marginLeft, d.marginRight))
         assertEquals(EbookSettings.BOOK, d.writingMode)
         assertEquals(EbookSettings.DIRECTION_AUTO, d.pageDirection)
+        assertEquals(EbookSettings.COLUMNS_LANDSCAPE, d.columns)
     }
 
     @Test
@@ -58,7 +59,7 @@ class EbookSettingsTest {
         val s = EbookSettings.parse(
             mapOf(
                 "font" to "../../etc/passwd", "fontSize" to "big", "lineHeight" to "NaN", "writingMode" to "diagonal",
-                "pageDirection" to "up", "indent" to "x",
+                "pageDirection" to "up", "indent" to "x", "columns" to "3",
             ),
         )
         assertEquals(EbookSettings.DEFAULTS, s)
@@ -81,7 +82,10 @@ class EbookSettingsTest {
 
     @Test
     fun `map round trip`() {
-        val s = EbookSettings(font = "serif", fontSize = 24, lineHeight = 2.2f, letterSpacing = 0.05f, indent = 2f, paragraphSpacing = 0.5f)
+        val s = EbookSettings(
+            font = "serif", fontSize = 24, lineHeight = 2.2f, letterSpacing = 0.05f, indent = 2f, paragraphSpacing = 0.5f,
+            columns = EbookSettings.COLUMNS_ON,
+        )
         assertEquals(s, EbookSettings.parse(s.toMap()))
         assertEquals("2.2", s.toMap()["lineHeight"])
         assertEquals("book", EbookSettings().toMap()["indent"])
