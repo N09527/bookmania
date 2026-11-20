@@ -1,6 +1,8 @@
 #!/bin/bash
 # After the two-column refactor of the shell: one column again (as in stage 2), and complete
-# pagination while the ruby fix is active (font sizes where it switches on, see ruby_check.py).
+# pagination with one column while the ruby fix is active (font size 30, see ruby_check.py). Two
+# columns with the fix active are covered by run-matrix.sh (vertical EPUB in portrait at the default
+# size: the fix is on for every chapter file, see the .ruby.jsonl summaries).
 HERE=$(cd "$(dirname "$0")" && pwd); cd "$HERE"
 export OUT="${OUT:-$HERE/out}"  # results, logs and screenshots (out/shots)
 while read -r manga chapter label side opts; do
@@ -12,5 +14,4 @@ done <<'LIST'
 14 16 v-epub-1col-default - --columns off
 8 10 h-epub-1col-default - --columns off
 14 16 v-epub-1col-size30-rubyfix - --columns off --font-size 30
-14 16 v-epub-2col-size24-rubyfix right --columns on --font-size 24
 LIST

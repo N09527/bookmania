@@ -1,0 +1,255 @@
+{
+ "status": {
+  "ready": true,
+  "error": null,
+  "page": 0,
+  "pages": 23,
+  "cols": 2,
+  "mode": "V",
+  "seq": 1,
+  "ms": 20111,
+  "rubyFix": true
+ },
+ "rows": [
+  {
+   "css": "",
+   "pageBox": 668,
+   "blocks": [
+    {
+     "tag": "h1",
+     "text": "第１章　測試章節",
+     "lines": 1,
+     "pages": [
+      0
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "18.76px",
+      "18.76px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第１段】英文單",
+     "lines": 2,
+     "pages": [
+      0,
+      0
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第２段】漢ㄏㄢ",
+     "lines": 3,
+     "pages": [
+      1,
+      1,
+      1
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "",
+     "lines": 1,
+     "pages": [
+      2
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "img",
+     "page": 2,
+     "size": [
+      166,
+      221
+     ],
+     "inside": true,
+     "breakInside": "avoid"
+    },
+    {
+     "tag": "p",
+     "text": "【第３段】長一點",
+     "lines": 3,
+     "pages": [
+      3,
+      3,
+      3
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第４段】短段落",
+     "lines": 1,
+     "pages": [
+      3
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第５段】這是一",
+     "lines": 2,
+     "pages": [
+      4,
+      4
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    }
+   ]
+  },
+  {
+   "css": "p { orphans: 1 !important; widows: 1 !important; }",
+   "pageBox": 668,
+   "blocks": [
+    {
+     "tag": "h1",
+     "text": "第１章　測試章節",
+     "lines": 1,
+     "pages": [
+      0
+     ],
+     "orphans": "2",
+     "widows": "2",
+     "margin": [
+      "18.76px",
+      "18.76px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第１段】英文單",
+     "lines": 2,
+     "pages": [
+      0,
+      0
+     ],
+     "orphans": "1",
+     "widows": "1",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第２段】漢ㄏㄢ",
+     "lines": 3,
+     "pages": [
+      1,
+      1,
+      1
+     ],
+     "orphans": "1",
+     "widows": "1",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "",
+     "lines": 1,
+     "pages": [
+      2
+     ],
+     "orphans": "1",
+     "widows": "1",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "img",
+     "page": 2,
+     "size": [
+      166,
+      221
+     ],
+     "inside": true,
+     "breakInside": "avoid"
+    },
+    {
+     "tag": "p",
+     "text": "【第３段】長一點",
+     "lines": 3,
+     "pages": [
+      3,
+      3,
+      3
+     ],
+     "orphans": "1",
+     "widows": "1",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第４段】短段落",
+     "lines": 1,
+     "pages": [
+      3
+     ],
+     "orphans": "1",
+     "widows": "1",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    },
+    {
+     "tag": "p",
+     "text": "【第５段】這是一",
+     "lines": 2,
+     "pages": [
+      4,
+      4
+     ],
+     "orphans": "1",
+     "widows": "1",
+     "margin": [
+      "0px",
+      "0px"
+     ]
+    }
+   ]
+  }
+ ]
+}

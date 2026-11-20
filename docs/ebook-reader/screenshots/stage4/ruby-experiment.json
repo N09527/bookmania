@@ -1,0 +1,665 @@
+[
+ {
+  "fontSize": 16,
+  "candidate": "none",
+  "pages": 8,
+  "ruby": 16,
+  "misplaced": 4,
+  "lineHeight": "28.8px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    4,
+    3
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    4,
+    3
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    6,
+    5
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    6,
+    5
+   ]
+  ]
+ },
+ {
+  "fontSize": 16,
+  "candidate": "rt line-height 1",
+  "pages": 8,
+  "ruby": 16,
+  "misplaced": 4,
+  "lineHeight": "28.8px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    4,
+    3
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    4,
+    3
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    6,
+    5
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    6,
+    5
+   ]
+  ]
+ },
+ {
+  "fontSize": 16,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 8,
+  "ruby": 16,
+  "misplaced": 4,
+  "lineHeight": "28.8px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    4,
+    3
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    4,
+    3
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    6,
+    5
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    6,
+    5
+   ]
+  ]
+ },
+ {
+  "fontSize": 16,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 8,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "28.8px",
+  "examples": []
+ },
+ {
+  "fontSize": 16,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 8,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "35.2px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    6,
+    5
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    6,
+    5
+   ]
+  ]
+ },
+ {
+  "fontSize": 18,
+  "candidate": "none",
+  "pages": 9,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "32.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 18,
+  "candidate": "rt line-height 1",
+  "pages": 9,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "32.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 18,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 9,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "32.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 18,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 9,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "32.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 18,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 9,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "39.6px",
+  "examples": []
+ },
+ {
+  "fontSize": 20,
+  "candidate": "none",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "36px",
+  "examples": []
+ },
+ {
+  "fontSize": 20,
+  "candidate": "rt line-height 1",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "36px",
+  "examples": []
+ },
+ {
+  "fontSize": 20,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "36px",
+  "examples": []
+ },
+ {
+  "fontSize": 20,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "36px",
+  "examples": []
+ },
+ {
+  "fontSize": 20,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "44px",
+  "examples": []
+ },
+ {
+  "fontSize": 22,
+  "candidate": "none",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "39.6px",
+  "examples": []
+ },
+ {
+  "fontSize": 22,
+  "candidate": "rt line-height 1",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "39.6px",
+  "examples": []
+ },
+ {
+  "fontSize": 22,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "39.6px",
+  "examples": []
+ },
+ {
+  "fontSize": 22,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "39.6px",
+  "examples": []
+ },
+ {
+  "fontSize": 22,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 10,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "48.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 24,
+  "candidate": "none",
+  "pages": 14,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "43.2px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    3,
+    2
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    3,
+    2
+   ]
+  ]
+ },
+ {
+  "fontSize": 24,
+  "candidate": "rt line-height 1",
+  "pages": 14,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "43.2px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    3,
+    2
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    3,
+    2
+   ]
+  ]
+ },
+ {
+  "fontSize": 24,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 14,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "43.2px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    3,
+    2
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    3,
+    2
+   ]
+  ]
+ },
+ {
+  "fontSize": 24,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 14,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "43.2px",
+  "examples": []
+ },
+ {
+  "fontSize": 24,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 14,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "52.8px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    5,
+    4
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    5,
+    4
+   ]
+  ]
+ },
+ {
+  "fontSize": 26,
+  "candidate": "none",
+  "pages": 17,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "46.8px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    7,
+    6
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    7,
+    6
+   ]
+  ]
+ },
+ {
+  "fontSize": 26,
+  "candidate": "rt line-height 1",
+  "pages": 17,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "46.8px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    7,
+    6
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    7,
+    6
+   ]
+  ]
+ },
+ {
+  "fontSize": 26,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 17,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "46.8px",
+  "examples": []
+ },
+ {
+  "fontSize": 26,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 17,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "46.8px",
+  "examples": []
+ },
+ {
+  "fontSize": 26,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 17,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "57.2px",
+  "examples": []
+ },
+ {
+  "fontSize": 28,
+  "candidate": "none",
+  "pages": 19,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "50.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 28,
+  "candidate": "rt line-height 1",
+  "pages": 19,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "50.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 28,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 19,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "50.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 28,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 19,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "50.4px",
+  "examples": []
+ },
+ {
+  "fontSize": 28,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 19,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "61.6px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    1,
+    0
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    1,
+    0
+   ]
+  ]
+ },
+ {
+  "fontSize": 30,
+  "candidate": "none",
+  "pages": 22,
+  "ruby": 16,
+  "misplaced": 6,
+  "lineHeight": "54px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    5,
+    4
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    5,
+    4
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    12,
+    11
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    12,
+    11
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    19,
+    18
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    19,
+    18
+   ]
+  ]
+ },
+ {
+  "fontSize": 30,
+  "candidate": "rt line-height 1",
+  "pages": 22,
+  "ruby": 16,
+  "misplaced": 6,
+  "lineHeight": "54px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    5,
+    4
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    5,
+    4
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    12,
+    11
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    12,
+    11
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    19,
+    18
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    19,
+    18
+   ]
+  ]
+ },
+ {
+  "fontSize": 30,
+  "candidate": "rt 1 + ruby 2.2",
+  "pages": 22,
+  "ruby": 16,
+  "misplaced": 6,
+  "lineHeight": "54px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    5,
+    4
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    5,
+    4
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    12,
+    11
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    12,
+    11
+   ],
+   [
+    "漢",
+    "ㄏㄢˋ",
+    19,
+    18
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    19,
+    18
+   ]
+  ]
+ },
+ {
+  "fontSize": 30,
+  "candidate": "rt 1 + ruby 2.6",
+  "pages": 22,
+  "ruby": 16,
+  "misplaced": 0,
+  "lineHeight": "54px",
+  "examples": []
+ },
+ {
+  "fontSize": 30,
+  "candidate": "all lines 2.2 (reference)",
+  "pages": 22,
+  "ruby": 16,
+  "misplaced": 2,
+  "lineHeight": "66px",
+  "examples": [
+   [
+    "漢",
+    "ㄏㄢˋ",
+    1,
+    0
+   ],
+   [
+    "字",
+    "ㄗˋ",
+    1,
+    0
+   ]
+  ]
+ }
+]

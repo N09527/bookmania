@@ -1,0 +1,19 @@
+# logcat -b crash（模擬器，2026-11-20）
+11-20 13:01:07.570  6602  6658 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 6658 (RenderThread)
+11-20 13:01:08.082  6752  6752 F DEBUG   : pid: 6602, tid: 6658, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-20 13:01:08.087  6752  6752 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x74d3d90ac010, eglErr = EGL_BAD_ALLOC'
+11-20 13:01:08.170  6752  6752 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-20 13:01:08.170  6752  6752 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-20 13:01:08.171  6752  6752 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+
+# logcat -b events：am_crash / am_anr（本次開機）
+11-20 12:24:42.327  1669  1684 I am_anr  : [0,2077,com.google.android.gms.persistent,-1194836411,executing service com.google.android.gms/com.google.android.location.internal.server.HardwareArProviderService]
+11-20 12:25:04.937  1669  1684 I am_anr  : [0,2520,com.google.android.gms.persistent,-1194836411,executing service com.google.android.gms/.trustagent.speech.service.VoiceUnlockService]
+11-20 12:38:06.587  1669  1684 I am_anr  : [0,4885,io.github.n09527.bookmania.debug,687390278,executing service io.github.n09527.bookmania.debug/androidx.work.impl.foreground.SystemForegroundService]
+11-20 13:01:11.039  1669  6757 I am_crash: [1669,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
