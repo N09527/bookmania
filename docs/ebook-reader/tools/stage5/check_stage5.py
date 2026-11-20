@@ -530,13 +530,59 @@ def step_ids():
     c.close()
 
 
+def ensure_unread(manga, chapter):
+    """A read chapter opens at the start of the book (like the manga reader), which would hide whether
+    the position is restored; such a chapter is marked unread first, in the chapter list (App stopped
+    afterwards). Returns the chapter's rows."""
+    stop_app(0)
+    m = main_rows(chapter)
+    if m['read']:
+        note(f"chapter {chapter} is read; marking it unread in the chapter list")
+        swipe_chapter_left(manga, m['chapter'])
+        stop_app(3)
+        m = main_rows(chapter)
+        if m['read']:
+            raise RuntimeError(f'chapter {chapter} is still read')
+    return m
+
+
+def go_to_start():
+    """Shows the start of the book: the first table of contents entry, unless the first page of the first
+    document is shown already (page information 1/N · 1/M)."""
+    ns = show_menu()
+    info = page_info(ns)
+    mt = PAGE_INFO.match(info or '')
+    if mt and mt.group(1) == '1' and mt.group(3) == '1':
+        hide_menu()
+        return info
+    st0 = d.status()
+    n = d.find('目錄', exact=True)
+    d.tap(n['x'], n['y'], 4)
+    items = []
+    for _ in range(6):
+        items = toc_items(d.nodes())
+        if items:
+            break
+        time.sleep(2)
+    if not items:
+        raise RuntimeError('table of contents did not open')
+    d.tap(items[0]['x'], items[0]['y'], 3)
+    wait_change(st0, 120)
+    time.sleep(3)
+    ns = show_menu()
+    info = page_info(ns)
+    hide_menu()
+    return info
+
+
 def step_restore(manga, chapter, label, pages, columns, landscape):
     STEP[0] = 'restore:' + label
     set_prefs({'pref_ebook_columns': columns} if columns != 'off' else {}, reset_typesetting=True)
     rotate(landscape)
-    before = main_rows(chapter)
+    before = ensure_unread(manga, chapter)
     t_open = time.time()
     open_book(manga, chapter)
+    note('start: ' + str(go_to_start()))
     turn(pages)
     p = pos()
     st = d.status()
@@ -583,7 +629,9 @@ def step_rotate(manga, chapter, label, pages):
     STEP[0] = 'rotate:' + label
     set_prefs({}, reset_typesetting=True)
     rotate(False)
+    ensure_unread(manga, chapter)
     open_book(manga, chapter)
+    note('start: ' + str(go_to_start()))
     turn(pages)
     a = pos()
     st0 = d.status()
@@ -626,7 +674,9 @@ def step_settings(manga, chapter, label, pages):
     STEP[0] = 'settings:' + label
     set_prefs({}, reset_typesetting=True)
     rotate(False)
+    ensure_unread(manga, chapter)
     open_book(manga, chapter)
+    note('start: ' + str(go_to_start()))
     turn(pages)
     a = pos()
     st0 = d.status()
@@ -660,8 +710,8 @@ def step_fallback(manga, chapter, label):
     rotate(False)
     m = main_rows(chapter)
     saved, _ = ebook_rows(m['key'])
-    if not saved or not saved.get('location'):
-        check('a saved position with a location exists', False, saved)
+    if not saved or not saved.get('location') or m['read'] or m['last_page_read'] == 0:
+        check('starting point: unread, a saved position with a location', False, {'saved': saved, 'read': m['read'], 'last_page_read': m['last_page_read']})
         return
     # 1. The location does not match any more (e.g. the file was edited): found again by the saved text.
     edit_position(m['key'], lambda loc: dict(loc, location=[0, 0]))
