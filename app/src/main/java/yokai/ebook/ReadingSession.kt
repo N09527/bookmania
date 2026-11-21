@@ -61,9 +61,14 @@ class ReadingSession(
      * read chapter at its first page and an unread one at `last_page_read`: a book left on its last page
      * or marked read starts from the beginning, and so does one whose progress was cleared in the chapter
      * list ("mark as unread" sets `last_page_read` to 0).
+     *
+     * When the user switched the book from the image reader ([switchedFromImages]), the page numbers and
+     * the read state are the image reader's (it marks a chapter read on its last picture, and its first
+     * picture is page 0), so the text position is taken back unless it was on the last page.
      */
-    fun positionToRestore(): EbookLocator? {
+    fun positionToRestore(switchedFromImages: Boolean = false): EbookLocator? {
         val saved = positions.position(key) ?: return null
+        if (switchedFromImages) return saved.takeUnless { it.atEnd }
         val cleared = (saved.chapterPage ?: 0) > 0 && chapter.last_page_read == 0
         return saved.takeUnless { it.atEnd || chapter.read || cleared }
     }

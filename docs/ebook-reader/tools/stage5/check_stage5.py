@@ -1118,9 +1118,12 @@ def step_end(manga, chapter, label):
     s = slider_node(ns)
     rtl = bool(d.cdp('window.__reader.status().mode') == 'V')
     st0 = d.status()
-    # The end of the book: the left end of a right-to-left slider.
-    x = s['b'][0] + 6 if rtl else s['b'][2] - 6
-    d.tap(x, s['y'], 3)
+    # The end of the book: the left end of a right-to-left slider. The slider takes touches on its track
+    # only (a tap in the padding at its very end does nothing, seen on the emulator), so the finger goes
+    # down on the track and is dragged past the end, where the value stops at the end of the book.
+    x_from = slider_x(s, 0.5)
+    x_to = 0 if rtl else 1079
+    d.swipe(x_from, s['y'], x_to, s['y'], 1500, 3)
     st = wait_change(st0, 120)
     time.sleep(4)
     p = pos()

@@ -253,7 +253,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 MENU_OPEN_AS_IMAGES -> {
                     val m = manga
                     val c = chapter
-                    if (m != null && c != null) EbookRouter.openAsImages(this, m, c)
+                    if (m != null && c != null) {
+                        lifecycleScope.launch {
+                            // Written before the image reader reads the chapter: it starts from these page
+                            // numbers (EbookRouter.fitImageReaderPage).
+                            writePosition()
+                            EbookRouter.openAsImages(this@EbookReaderActivity, m, c)
+                        }
+                    }
                 }
                 else -> return@setOnMenuItemClickListener false
             }
@@ -414,7 +421,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         )
         restoreTarget = withIOContext {
             readingSession.init()
-            readingSession.positionToRestore() ?: estimatedPosition(chapter, file, key, pub.spine.size, readingSession)
+            readingSession.positionToRestore(intent.getBooleanExtra(EXTRA_SWITCHED_FROM_IMAGES, false))
+                ?: estimatedPosition(chapter, file, key, pub.spine.size, readingSession)
         }
         session = readingSession
         readingSession.startTimer()
@@ -772,11 +780,24 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
      * leaving the reader does not cancel it.
      */
     private fun persistPosition() {
-        val locator = currentLocator ?: return
-        val readingSession = session ?: return
+        val save = positionWriter() ?: return
+        launchIO { save() }
+    }
+
+    /** Saves the position shown now and returns once it is written (main thread). */
+    private suspend fun writePosition() {
+        saveJob?.cancel()
+        val save = positionWriter() ?: return
+        withIOContext { save() }
+    }
+
+    /** Takes the position shown now (main thread); the function returned writes it (see [ReadingSession.save]). */
+    private fun positionWriter(): (suspend () -> Unit)? {
+        val locator = currentLocator ?: return null
+        val readingSession = session ?: return null
         val docPages = currentDocPages
         val shownPage = currentPage
-        launchIO {
+        return {
             val errors = saveLock.withLock {
                 runCatching { readingSession.save(locator, locator.spine, shownPage, docPages) }
                     .onFailure { Logger.e(it) { "Saving the reading position failed" } }
@@ -1281,6 +1302,9 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     companion object {
         private const val EXTRA_MANGA = "manga"
         private const val EXTRA_CHAPTER = "chapter"
+
+        /** Set when the user switched this chapter from the image reader ("open as text"). */
+        const val EXTRA_SWITCHED_FROM_IMAGES = "switched_from_images"
 
         private const val START = "'start'"
         private const val END = "'end'"

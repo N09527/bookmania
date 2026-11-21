@@ -16,10 +16,13 @@ import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.util.system.toast
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.floor
+import kotlin.math.min
 import yokai.core.ebook.ContentClassifier
 import yokai.core.ebook.ContentKind
 import yokai.core.ebook.DrmProtectedException
 import yokai.ebook.data.EbookDatabase
+import yokai.ebook.data.EbookLocator
 import yokai.ebook.settings.BookKey
 import yokai.i18n.MR
 import yokai.util.lang.getString
@@ -110,9 +113,10 @@ object EbookRouter {
     }
 
     /** Replaces [activity] (the image reader) with the text reader, without a second transition. */
-    fun handOff(activity: Activity, mangaId: Long?, chapterId: Long?): Boolean {
+    fun handOff(activity: Activity, mangaId: Long?, chapterId: Long?, switchedByUser: Boolean = false): Boolean {
         if (mangaId == null || mangaId < 0 || chapterId == null || chapterId < 0) return false
         val intent = EbookReaderActivity.newIntent(activity, mangaId, chapterId)
+            .putExtra(EbookReaderActivity.EXTRA_SWITCHED_FROM_IMAGES, switchedByUser)
             .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
         activity.startActivity(intent)
         activity.finish()
@@ -145,8 +149,39 @@ object EbookRouter {
         if (item.itemId != MENU_OPEN_AS_TEXT) return false
         if (manga == null || chapter == null) return true
         setKind(activity, manga, chapter, ContentKind.TEXT)
-        handOff(activity, manga.id, chapter.id)
+        handOff(activity, manga.id, chapter.id, switchedByUser = true)
         return true
+    }
+
+    /**
+     * Called from ChapterLoader (I/O thread) once the image reader has the pages of a chapter. The page
+     * numbers the text reader writes to a chapter are an estimate of text pages, not image pages: used as
+     * they are, the image reader could start past its last page and crash (PagerViewer takes
+     * pages[requestedPage]), or start on its last page and mark the book read. For a Local Source EPUB whose
+     * page numbers were written by the text reader, the image reader starts at the same fraction of the book
+     * instead; a page out of range for another reason starts at the first page. Only the chapter object in
+     * memory changes: the image reader writes its own page once it shows one.
+     */
+    fun fitImageReaderPage(context: Context, manga: Manga, chapter: Chapter, pageCount: Int) {
+        if (manga.source != LocalSource.ID || !isEpub(chapter)) return
+        val saved = if (chapter.read) null else runCatching { EbookDatabase.get(context).position(key(manga, chapter)) }.getOrNull()
+        imageReaderStartPage(chapter.last_page_read, chapter.pages_left, saved, pageCount)?.let { chapter.last_page_read = it }
+    }
+
+    /**
+     * See [fitImageReaderPage]: the page the image reader starts at, or null to keep [page]. [saved] is the
+     * text reader's position of the chapter; its `chapterPage` equals [page] when the text reader wrote the
+     * chapter's page numbers last.
+     */
+    internal fun imageReaderStartPage(page: Int, pagesLeft: Int, saved: EbookLocator?, pageCount: Int): Int? = when {
+        pageCount <= 0 -> null
+        saved?.chapterPage != null && saved.chapterPage == page -> {
+            val total = page + pagesLeft
+            val fraction = saved.total ?: if (total > 0) page.toDouble() / total else 0.0
+            min(pageCount - 1, floor(fraction.coerceIn(0.0, 1.0) * pageCount).toInt())
+        }
+        page !in 0 until pageCount -> 0
+        else -> null
     }
 
     /** From the text reader: reopens [chapter] in the image reader and remembers that choice. */

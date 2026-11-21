@@ -207,6 +207,20 @@ class ReadingSessionTest {
     }
 
     @Test
+    fun `switched back from the image reader, the text position comes back`() = runTest {
+        positions.map[key] = locator().copy(chapterPage = 12)
+        // the image reader left the chapter on its first picture (page 0), or marked it read on its last one
+        val firstPicture = ChapterImpl().apply { id = 5; last_page_read = 0; pages_left = 3 }
+        assertNull(session(chapter = firstPicture).positionToRestore())
+        assertEquals(locator().copy(chapterPage = 12), session(chapter = firstPicture).positionToRestore(switchedFromImages = true))
+        val lastPicture = ChapterImpl().apply { id = 5; read = true; last_page_read = 2; pages_left = 1 }
+        assertEquals(locator().copy(chapterPage = 12), session(chapter = lastPicture).positionToRestore(switchedFromImages = true))
+        // a text position on the book's last page still starts the book again
+        positions.map[key] = locator(atEnd = true).copy(chapterPage = 26)
+        assertNull(session(chapter = firstPicture).positionToRestore(switchedFromImages = true))
+    }
+
+    @Test
     fun `a restored backup keeps the newer position`() {
         positions.map[key] = locator().copy(updatedAt = 200)
         assertEquals(false, positions.putPositionIfNewer(key, locator().copy(updatedAt = 100, progression = 0.1)))

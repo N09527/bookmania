@@ -50,6 +50,7 @@ class ChapterLoader(
                     EbookRouter.noImagePages(manga, chapter.chapter, context)?.let { throw it }
                     throw Exception(context.getString(MR.strings.no_pages_found))
                 }
+                EbookRouter.fitImageReaderPage(context, manga, chapter.chapter, pages.size)
 
                 // If the chapter is partially read, set the starting page to the last the user read
                 // otherwise use the requested page.
