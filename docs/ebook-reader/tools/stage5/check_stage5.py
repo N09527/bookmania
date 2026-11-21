@@ -809,6 +809,18 @@ def open_manga(manga):
 SWIPES = [0]
 
 
+def wait_app_drawn(timeout=120):
+    """Waits until the App's launch screen is gone. It is the system's starting window "Splash Screen
+    <package>", kept until the App's window draws (BaseActivity keeps it up to 5 s after the activity is
+    created, which itself takes seconds on this emulator); touches made meanwhile are lost."""
+    t = time.time()
+    while time.time() - t < timeout:
+        if f'Splash Screen {d.PKG}' not in d.shell('dumpsys window windows'):
+            return True
+        time.sleep(2)
+    return False
+
+
 def swipe_chapter_left(manga, name):
     """In the chapter list a swipe to the left toggles read / unread (MangaDetailsAdapter.onItemSwiped);
     "unread" also clears last_page_read and pages_left (MangaDetailsPresenter.markChaptersRead).
@@ -818,9 +830,13 @@ def swipe_chapter_left(manga, name):
     row = None
     for _ in range(20):
         time.sleep(4)
+        if not wait_app_drawn():
+            note('the launch screen is still shown')
         clear_dialogs()
         row = d.find(name, exact=True)
         if row:
+            time.sleep(3)  # the manga screen fades in (a touch during the transition is ignored)
+            row = d.find(name, exact=True) or row
             break
     SWIPES[0] += 1
     if row is None:
