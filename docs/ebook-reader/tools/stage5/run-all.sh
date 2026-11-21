@@ -56,6 +56,7 @@ run tapzones 8 10 epub-horizontal 0 NONE
 run volume 14 16
 # Text / image switch and the stored classification
 run switch 4 5 epub-with-pictures images
-run switch 14 16 epub-without-pictures no-images
+run switch 8 10 epub-without-pictures no-images
+run switch_back 14 16 epub-one-picture 12
 run switch_comic 11 13
 run classify 15 17

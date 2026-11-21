@@ -18,6 +18,8 @@ Usage: python3 -I check_stage5.py <step> [arguments]        (environment: ADB=/p
   volume <manga> <chapter>
   switch <manga> <chapter> <label> images|no-images   text EPUB: to images and back; without pictures the
                                         image reader finds no pages and hands the book back to the text reader
+  switch_back <manga> <chapter> <label> <pages>   a text book with fewer pictures than text pages, read for
+                                        <pages> pages: to the image reader (no crash) and back to the same position
   switch_comic <manga> <chapter>        comic EPUB: to text and back to images
   classify <manga> <chapter>            an EPUB never opened before: routed directly after the first time
   backup_setting <chapter>              writes a per-file typesetting setting (to go through the backup)
@@ -1382,6 +1384,53 @@ def step_switch(manga, chapter, label, has_images):
     stop_app()
 
 
+def step_switch_back(manga, chapter, label, pages):
+    """A text book with fewer pictures than text pages, read for [pages] pages, switched to the image reader
+    and back. The chapter's page numbers are the text reader's estimate, past the image reader's pages
+    (it used to crash on them); the image reader starts on one of its own pages, and the switch back to text
+    returns to the text position."""
+    STEP[0] = 'switch_back:' + label
+    set_prefs({}, reset_typesetting=True)
+    rotate(False)
+    ensure_unread(manga, chapter)
+    open_book(manga, chapter)
+    note('start: ' + str(go_to_start()))
+    turn(pages)
+    p = pos()
+    s = doc_path(src())
+    d.adb('logcat', '-c')
+    ok = to_images()
+    r = wait_resumed(IMAGE_READER)
+    time.sleep(20)
+    r = d.resumed()
+    starts = activity_starts()
+    crash = d.adb('logcat', '-d', '-b', 'crash')
+    d.shot(label + '-1-image-reader')
+    check('text reader 以圖片模式開啟 with a text page past the pictures: the image reader shows the book, no crash',
+          ok and IMAGE_READER in r and not any('CrashActivity' in x for x in starts) and 'FATAL EXCEPTION' not in crash,
+          {'resumed': r, 'starts': starts, 'crash log': crash[-800:], 'text position': [s, p and p['location']]})
+    ok = to_text()
+    r = wait_resumed(READER)
+    st = None
+    try:
+        pid = d.shell(f'pidof {d.PKG}').strip()
+        d.adb('forward', '--remove-all')
+        d.adb('forward', 'tcp:9333', f'localabstract:webview_devtools_remote_{pid}')
+        st = d.wait_ready(settle=2.0)
+    except RuntimeError as e:
+        st = {'error': str(e)}
+    p2 = pos()
+    s2 = doc_path(src())
+    d.shot(label + '-2-back-to-text')
+    check('image reader 以文字模式開啟: the text reader returns to the text position',
+          ok and READER in r and p and p2 and s2 == s and p2['location'] == p['location'],
+          {'before': [s, p and p['location']], 'after': [s2, p2 and p2['location']], 'status': st})
+    leave_reader()
+    stop_app()
+    m = main_rows(chapter)
+    note(f"chapter after the image reader: read={m['read']} last_page_read={m['last_page_read']} pages_left={m['pages_left']}")
+
+
 def step_switch_comic(manga, chapter):
     """A comic EPUB (image reader by its classification): to text and back to images."""
     STEP[0] = 'switch:comic'
@@ -1540,6 +1589,8 @@ def run_step(a, x):
         step_volume(int(x[0]), int(x[1]))
     elif a.step == 'switch':
         step_switch(int(x[0]), int(x[1]), x[2], x[3] == 'images')
+    elif a.step == 'switch_back':
+        step_switch_back(int(x[0]), int(x[1]), x[2], int(x[3]))
     elif a.step == 'switch_comic':
         step_switch_comic(int(x[0]), int(x[1]))
     elif a.step == 'classify':
