@@ -1,14 +1,25 @@
 #!/bin/bash
 # Stage 5 checks on the emulator, in order (later steps use positions saved by earlier ones).
 # Usage: ADB=/path/to/adb ./run-all.sh [first step number]
+#        STEPS="3 5 7-40" ./run-all.sh   (only these steps; numbers as printed by a full run)
 # The ids are the test books on the emulator used for the stage 5 report (python3 -I check_stage5.py ids).
 set -u
 cd "$(dirname "$0")"
 from=${1:-1}
 n=0
+wanted() {
+  [ -z "${STEPS:-}" ] && { [ "$1" -ge "$from" ]; return; }
+  for w in $STEPS; do
+    case $w in
+      *-*) [ "$1" -ge "${w%-*}" ] && [ "$1" -le "${w#*-}" ] && return 0 ;;
+      *) [ "$1" -eq "$w" ] && return 0 ;;
+    esac
+  done
+  return 1
+}
 run() {
   n=$((n + 1))
-  [ "$n" -lt "$from" ] && return
+  wanted "$n" || return
   echo "=== $n: $* ($(date +%H:%M:%S))"
   timeout 3600 python3 -I check_stage5.py "$@" 2>&1
   echo "=== $n done ($(date +%H:%M:%S))"

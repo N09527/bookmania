@@ -3,6 +3,7 @@ mode, table of contents, whole-book slider, tap zones, volume keys and the text 
 
 Usage: python3 -I check_stage5.py <step> [arguments]        (environment: ADB=/path/to/adb)
   ids                                   test books on the device (manga and chapter ids)
+  warmup <manga> <chapter>              opens a book once after the emulator booted (long waits)
   restore <manga> <chapter> <label> [--pages N] [--columns off|on|landscape] [--landscape]
   rotate <manga> <chapter> <label> [--pages N]
   settings <manga> <chapter> <label> [--pages N]
@@ -24,7 +25,8 @@ Usage: python3 -I check_stage5.py <step> [arguments]        (environment: ADB=/p
   backup_check <file.tachibk>           the backup holds every position of ebook.db (field 20101)
   backup_prepare <source|manga url|chapter url>   removes the positions, keeps one newer position
   backup_verify                         after restoring the backup in the App: positions back, newer one kept
-Results: out/results.jsonl (one JSON line per check), screenshots: out/shots/, database copies: out/db/.
+Results: out/results.jsonl (one JSON line per check), screenshots: out/shots/, database copies: out/db/,
+crashes and "not responding" events of the system log after each step: out/system-events.log.
 Needs ../stage3/drive.py and ../stage4/verify_columns.py (see ../stage3/README.md); the App language is
 Traditional Chinese (the script looks for Chinese labels).
 """
@@ -521,6 +523,39 @@ def step_backup_verify():
 # region Steps
 
 
+def step_warmup(manga, chapter):
+    """The first book opened after the emulator booted takes minutes (the WebView starts for the first
+    time); this opens one with long waits, so that the timed steps that follow do not run into it."""
+    STEP[0] = 'warmup'
+    d.shell(f'am force-stop {d.PKG}')
+    time.sleep(2)
+    d.shell(f'am start -n {d.PKG}/{IMAGE_READER} --el manga {manga} --el chapter {chapter}')
+    r = wait_resumed(READER, timeout=600)
+    pid = d.shell(f'pidof {d.PKG}').strip()
+    d.adb('forward', '--remove-all')
+    d.adb('forward', 'tcp:9333', f'localabstract:webview_devtools_remote_{pid}')
+    st = d.wait_ready(timeout=900, settle=2.0)
+    note(f'warm-up: {r} {st}')
+    leave_reader()
+    stop_app()
+
+
+def save_system_logs(step):
+    """Appends crashes (logcat crash buffer) and "not responding" / crash events of the event log to
+    out/system-events.log, then clears both buffers, so that each step's entries can be told apart."""
+    crash = d.adb('logcat', '-d', '-b', 'crash')
+    events = [ln for ln in d.adb('logcat', '-d', '-b', 'events').splitlines() if 'am_anr' in ln or 'am_crash' in ln]
+    if crash.strip() or events:
+        with open(os.path.join(OUT, 'system-events.log'), 'a', encoding='utf-8') as f:
+            f.write(f'--- {time.strftime("%H:%M:%S")} after {step}\n')
+            if crash.strip():
+                f.write(crash.rstrip() + '\n')
+            for ln in events:
+                f.write(ln + '\n')
+    d.adb('logcat', '-c', '-b', 'crash')
+    d.adb('logcat', '-c', '-b', 'events')
+
+
 def step_ids():
     c = pull_db('tachiyomi.db')
     rows = c.execute('SELECT m._id, m.title, c._id, c.url, c.read, c.last_page_read, c.pages_left FROM mangas m '
@@ -588,6 +623,10 @@ def step_restore(manga, chapter, label, pages, columns, landscape):
     st = d.status()
     s = doc_path(src())
     d.shot(label + '-1-before-exit')
+    if p is None or st is None:
+        check('the reader answers after the page turns', False,
+              {'resumed': d.resumed(), 'pid': d.shell(f'pidof {d.PKG}').strip(), 'status': st, 'position': p})
+        return
     note(f'shown: {s} page {st["page"]}/{st["pages"]} cols {st["cols"]} {p}')
     left = leave_reader()
     t_close = time.time()
@@ -1337,7 +1376,19 @@ def main():
     ap.add_argument('--landscape', action='store_true')
     a = ap.parse_args()
     x = a.args
-    if a.step == 'ids':
+    try:
+        run_step(a, x)
+    finally:
+        try:
+            save_system_logs(' '.join([a.step] + x))
+        except Exception as e:  # the logs are evidence only
+            print('system logs not saved:', e)
+
+
+def run_step(a, x):
+    if a.step == 'warmup':
+        step_warmup(int(x[0]), int(x[1]))
+    elif a.step == 'ids':
         step_ids()
     elif a.step == 'restore':
         step_restore(int(x[0]), int(x[1]), x[2], a.pages, a.columns, a.landscape)
