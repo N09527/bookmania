@@ -870,7 +870,7 @@ def swipe_chapter_left(manga, name):
         note(f'swipe {SWIPES[0]}: chapter row {name} not found')
         d.shot(f'swipe-{SWIPES[0]}-no-row')
         return None
-    d.swipe(980, row['y'], 120, row['y'], 300, 1)
+    d.swipe(980, row['y'], 120, row['y'], 1500, 1)  # a 300 ms swipe is often not taken on this emulator
     snack = None
     for _ in range(4):
         ns = d.nodes()
