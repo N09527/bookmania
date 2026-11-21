@@ -7,6 +7,8 @@ flap, the shadow, a moving page). Where the new page shows up first tells the ed
 
 Usage: python3 -I check_pageturn.py <step> [arguments]        (environment: ADB=/path/to/adb)
   text <manga> <chapter> <none|slide|curl> <label> [--columns on] [--back] [--landscape] [--direction rtl|ltr]
+                                        chapter 0: the work's chapter whose file name ends with --file
+  rapid <manga> <chapter> <none|slide|curl> <label>   three keys in one command: each turn counts, nothing is left on top
   image <manga> <chapter> <l2r|r2l|vertical|webtoon> <label> [--curl on|off] [--double] [--back]
   add_chapter <manga> <file on the device> <new file name>   copies a file into the work's folder and refreshes
                                         the work's chapter list (pull to refresh on its page)
@@ -48,6 +50,19 @@ def note(text):
 
 # region Recording and analysis
 
+def rotate(landscape, timeout=60):
+    """Rotates the screen and waits until the display has the orientation (it can take a while here)."""
+    c.rotate(landscape)
+    want = '1920x1080' if landscape else '1080x1920'
+    t = time.time()
+    while time.time() - t < timeout:
+        if f'cur={want}' in d.shell('dumpsys window displays'):
+            return True
+        time.sleep(2)
+    note(f'the display did not turn to {want}')
+    return False
+
+
 def grab(size):
     """A screenshot, scaled to the recording size, in grey."""
     png = d.adb('exec-out', 'screencap', '-p', text=False, timeout=90)
@@ -75,6 +90,7 @@ def record_turn(label, code, seconds=60, size=None):
     for f in os.listdir(folder):
         os.remove(os.path.join(folder, f))
     w, h = size
+    record_turn.since = device_time()
     before = grab(size)
     before.save(os.path.join(folder, 'before.png'))
     d.shell('rm -f /sdcard/turn.mp4')
@@ -128,10 +144,16 @@ def cells(diff):
     return np.abs(diff[:gh * CELL, :gw * CELL]).reshape(gh, CELL, gw, CELL).mean(axis=(1, 3))
 
 
+def colour_diff(x, y):
+    """Per pixel, the largest difference of the three colour channels (two comic pages can differ only in
+    colour, which a grey picture hardly shows)."""
+    return np.abs(np.asarray(x, dtype=np.int16) - np.asarray(y, dtype=np.int16)).max(axis=2)
+
+
 def classify(frame, before, after):
     """Per cell: informative (the two pages differ there), old (as before) and new (as after)."""
-    F, B, A = grey(frame), grey(before), grey(after)
-    d_fb, d_fa, d_ab = cells(F - B), cells(F - A), cells(A - B)
+    F, B, A = frame.convert('RGB'), before.convert('RGB'), after.convert('RGB')
+    d_fb, d_fa, d_ab = cells(colour_diff(F, B)), cells(colour_diff(F, A)), cells(colour_diff(A, B))
     informative = d_ab > 12
     old = informative & (d_fb < 7) & (d_fa > 10)
     new = informative & (d_fa < 7) & (d_fb > 10)
@@ -194,6 +216,80 @@ def sheet(label, before, after, frames, rows, picks=6):
     return path
 
 
+def patch_shift(frame, page, vertical=False, size=(48, 32), max_err=6.0):
+    """How far [page] is shifted in [frame] (pixels of the recording, along x; along y when [vertical]):
+    small patches of the page that hold text are looked for in the same rows of the frame; the median of
+    the shifts found with a small difference, or None when no patch is found (the page is off the frame)."""
+    F = grey(frame)
+    P = grey(page)
+    if vertical:
+        F, P = F.T, P.T
+    h, w = P.shape
+    pw, ph = size
+    shifts = []
+    for py in range(20, h - ph - 20, ph * 2):
+        for px in range(0, w - pw, pw):
+            patch = P[py:py + ph, px:px + pw]
+            if patch.std() < 25:  # blank: matches anywhere
+                continue
+            band = F[py:py + ph, :]
+            best = None
+            for x in range(0, w - pw + 1, 2):
+                err = np.abs(band[:, x:x + pw] - patch).mean()
+                if best is None or err < best[1]:
+                    best = (x - px, err)
+            if best and best[1] < max_err:
+                shifts.append(best[0])
+    if len(shifts) < 3:
+        return None, len(shifts)
+    median = int(np.median(shifts))
+    agree = sum(abs(x - median) <= 4 for x in shifts)
+    if agree < max(3, 0.6 * len(shifts)):  # patches that also match elsewhere (repeated characters)
+        return None, len(shifts)
+    return median, agree
+
+
+def slide_check(rows, frames, before, after, expect_old_sign, vertical=False):
+    """For the frames of a slide: how far the old page and the new page are shifted. The old page leaves
+    in the direction [expect_old_sign] (-1 left / up, 1 right / down) and the new page follows it in."""
+    found = []
+    old_most = max(r['old'] for r in rows)
+    new_most = max(r['new'] for r in rows)
+    for r, (t, img) in zip(rows, frames):
+        if r['old'] >= 0.95 * old_most or r['new'] >= 0.95 * new_most:
+            continue  # the page before or after the turn
+        dx_old, n_old = patch_shift(img, before, vertical)
+        dx_new, n_new = patch_shift(img, after, vertical)
+        found.append({'t': r['t'], 'old page shifted by': dx_old, 'patches': n_old, 'new page shifted by': dx_new, 'patches new': n_new})
+    moved_old = [f['old page shifted by'] for f in found if f['old page shifted by'] not in (None, 0)]
+    moved_new = [f['new page shifted by'] for f in found if f['new page shifted by'] not in (None, 0)]
+    ok = bool(moved_old or moved_new) and all(dx * expect_old_sign > 0 for dx in moved_old) and \
+        all(dx * expect_old_sign < 0 for dx in moved_new)
+    return ok, found
+
+
+def device_time():
+    try:
+        return float(d.shell('date +%s').strip())
+    except ValueError:
+        return 0.0
+
+
+def turn_logs(since):
+    """The App's debug lines about page turns (PageTurner) written since [since] (device time, seconds)."""
+    out = d.adb('logcat', '-d', '-v', 'epoch', '-s', 'Yokai:D')
+    lines = []
+    for ln in out.splitlines():
+        parts = ln.split()
+        try:
+            t = float(parts[0])
+        except (ValueError, IndexError):
+            continue
+        if t >= since and 'page turn:' in ln:
+            lines.append(ln[ln.index('page turn:'):])
+    return lines
+
+
 def no_overlay_left(after, late):
     """The picture after the turn stays as it is: nothing is left on top of the reader."""
     diff = cells(grey(late) - grey(after))
@@ -210,7 +306,7 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     if direction:
         values['pref_ebook_pageDirection'] = direction
     c.set_prefs(values, reset_typesetting=True)
-    c.rotate(landscape)
+    rotate(landscape)
     st = c.open_book(manga, chapter)
     if not st or not st.get('ready'):
         return check('the book opened', False, st)
@@ -223,6 +319,8 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     if not st or st.get('pages', 0) < start_page + 2 * st.get('cols', 1):
         return check('the document has pages around page %d' % start_page, False, st)
     size = screen_size()
+    check('the screen is in ' + ('landscape' if landscape else 'portrait'), (size[0] > size[1]) == landscape,
+          {'screen': size, 'columns shown': st.get('cols')})
     size = (size[0] // 2, size[1] // 2)
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
     st2 = d.status()
@@ -233,33 +331,49 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     step = st.get('cols', 1)
     expected = st['page'] - step if back else st['page'] + step
     check('the page turned', st2 and st2['page'] == expected, {'before': st, 'after': st2, 'expected page': expected})
+    logs = turn_logs(record_turn.since)
+    check('the App logged the turn (debug log)', (style == 'none') == (not logs), {'log': logs})
     # the page direction: as set, else vertical text turns right to left (the shell's mode 'V')
     rtl = direction == 'rtl' or (direction is None and st.get('mode') == 'V')
     verdicts(label, style, rows, back, columns == 'on', rtl=rtl, edge=None, sheet_path=path,
-             leftover=no_overlay_left(after, late))
-    c.rotate(False)
+             leftover=no_overlay_left(after, late), slide_frames=(frames, before, after))
+    rotate(False)
 
 
-def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover):
+def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover, slide_frames=None):
     during = mid(rows)
     detail = {'frames': len(rows), 'frames during the turn': len(during), 'sheet': os.path.relpath(sheet_path, OUT)}
-    check('nothing is left over the page after the turn', leftover < 0.02, {'changed cells': round(leftover, 4)})
+    if leftover is not None:  # not measured again by reanalyse
+        check('nothing is left over the page after the turn', leftover < 0.02, {'changed cells': round(leftover, 4)})
     if not rows:
         return check('recorded', False, detail)
     last = rows[-1]
-    check('the recording ends on the new page', last['new'] >= 0.9 and last['old'] <= 0.05, last)
+    # relative to the frames that show most of each page: the video's compression keeps them below 1
+    new_most = max(r['new'] for r in rows)
+    old_most = max(r['old'] for r in rows)
+    check('the recording ends on the new page', last['new'] >= 0.9 * new_most and last['old'] <= 0.1 * old_most,
+          {'last': last, 'most new': new_most, 'most old': old_most})
     if style == 'none':
         return check('no animation: no frame shows parts of both pages', len(during) == 0, {**detail, 'during': during[:3]})
-    check('the turn is animated (frames show parts of both pages)', len(during) >= 2, detail)
-    if not during:
-        return False
-    first = during[0]
+    # one frame between the two pages is enough to tell the turn was animated: this emulator draws about one
+    # frame of the turn per second even with animations 20 times slower, and a slide moves most of the way
+    # in its first quarter
+    check('the turn is animated (frames between the two pages)', len(during) >= 1, detail)
+    # the first frame of the turn that shows some of the new page: where it shows up tells the direction
+    showing = [r for r in during if r['new'] >= 0.02 and r['new_at']]
+    if not showing:
+        return check('a frame of the turn shows part of the new page', False, detail)
+    first = showing[0]
     if style == 'slide':
-        # the new page comes in from the side the next page lies on
-        side = first['new_at'][0] if first['new_at'] else None
+        # the new page comes in from the side the next page lies on, the old page leaves on the other
         expect_right = (not back) != bool(rtl)
-        return check('the new page slides in from the ' + ('right' if expect_right else 'left'),
-                     side is not None and ((side > 0.5) if expect_right else (side < 0.5)), {**detail, 'first': first})
+        if slide_frames is None:
+            side = first['new_at'][0] if first['new_at'] else None
+            return check('the new page slides in from the ' + ('right' if expect_right else 'left'),
+                         side is not None and ((side > 0.5) if expect_right else (side < 0.5)), {**detail, 'first': first})
+        ok, found = slide_check(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
+        return check('the old page moves ' + ('left' if expect_right else 'right') + ' and the new page comes in from the '
+                     + ('right' if expect_right else 'left'), ok, {**detail, 'shifts': found})
     # curl
     if edge == 'BOTTOM':
         ok = first['new_bottom_half'] >= 0.8 if not back else first['new_bottom_half'] <= 0.2
@@ -286,6 +400,44 @@ def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover):
               {'new_right_half during the first half of the turn': other_half})
     return True
 
+def rapid_step(manga, chapter, style, label):
+    """Three Page Down keys sent together: a turn still being prepared or played when the next key comes
+    is ended at once, and every key turns a page."""
+    c.STEP[0] = f'rapid:{label}'
+    c.set_prefs({'pref_ebook_page_turn': style}, reset_typesetting=True)
+    rotate(False)
+    st = c.open_book(manga, chapter)
+    if not st or not st.get('ready'):
+        return check('the book opened', False, st)
+    d.cdp('window.__reader.goPage(1)')
+    time.sleep(4)
+    st = d.status()
+    size = screen_size()
+    size = (size[0] // 2, size[1] // 2)
+    before = grab(size)
+    d.shell(f'input keyevent {KEY_PAGE_DOWN} {KEY_PAGE_DOWN} {KEY_PAGE_DOWN}')
+    time.sleep(30)
+    st2 = d.status()
+    after = grab(size)
+    time.sleep(3)
+    late = grab(size)
+    after.save(os.path.join(OUT, 'shots', f'{label}-after.png'))
+    check('three quick keys turn three pages', st2 and st2['page'] == st['page'] + 3, {'before': st, 'after': st2})
+    check('nothing is left over the page', no_overlay_left(after, late) < 0.02, None)
+
+def reanalyse(label, style, back=False, spread=False, rtl=False, edge=None):
+    """The verdicts again for a recording in out/rec/<label> (after a change of the analysis)."""
+    folder = os.path.join(OUT, 'rec', label)
+    before = Image.open(os.path.join(folder, 'before.png')).convert('RGB')
+    after = Image.open(os.path.join(folder, 'after.png')).convert('RGB')
+    frames = extract(folder, before.size) if not any(n.startswith('f0') for n in os.listdir(folder)) else [
+        (t, Image.open(os.path.join(folder, n)).convert('RGB').resize(before.size))
+        for t, n in zip([r['t'] for r in json.load(open(os.path.join(folder, 'analysis.json')))],
+                        sorted(n for n in os.listdir(folder) if n.startswith('f0') and n.endswith('.png')))]
+    rows = analyse(before, after, frames)
+    path = sheet(label, before, after, frames, rows)
+    verdicts(label, style, rows, back, spread, rtl, edge, path, leftover=None, slide_frames=(frames, before, after))
+
 # endregion
 
 
@@ -302,7 +454,8 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False)
         'page_layout': 1 if double else 0,
         'pref_enable_transitions_key': True,
     })
-    c.rotate(double)
+    set_page(chapter, 0)  # the chapter opens at its first page
+    rotate(double)
     d.shell(f'am start -n {d.PKG}/{c.IMAGE_READER} --el manga {manga} --el chapter {chapter}')
     t = time.time()
     while c.IMAGE_READER.split('.')[-1] not in d.resumed() and time.time() - t < 120:
@@ -314,25 +467,43 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False)
         d.shell(f'input keyevent {KEY_PAGE_DOWN}')
         time.sleep(8)
     size = screen_size()
+    check('the screen is in ' + ('landscape' if double else 'portrait'), (size[0] > size[1]) == double, {'screen': size})
     size = (size[0] // 2, size[1] // 2)
-    page_before = reader_page()
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
-    page_after = reader_page()
     rows = analyse(before, after, frames)
     with open(os.path.join(OUT, 'rec', label, 'analysis.json'), 'w') as f:
         json.dump(rows, f, indent=1)
     path = sheet(label, before, after, frames, rows)
-    check('the page turned', page_before is not None and page_after is not None and page_after != page_before,
-          {'before': page_before, 'after': page_after})
+    logs = turn_logs(record_turn.since)
+    # the page the reader is on, as it saves it when it is left (the page indicator cannot be read here:
+    # the screen of the image reader never gets idle for uiautomator)
+    d.shell('input keyevent 4')
+    time.sleep(6)
+    c.stop_app()
+    page = chapter_row(chapter)[6]
+    check('the page turned' + (' back to the first page' if back else ''), page == 0 if back else page >= 1,
+          {'last_page_read after the turn': page, 'started at': 0, 'turned forward once first': back})
     if mode == 'webtoon' or curl == 'off':
         during = mid(rows)
-        layers = d.shell('dumpsys SurfaceFlinger --list')
-        check('no curl: the turn is drawn by the reader itself (no curl surface)', 'SurfaceView' not in layers,
-              {'frames during the turn': len(during), 'sheet': os.path.relpath(path, OUT)})
+        check('no curl: the App did not play a page turn of its own (debug log)', not logs,
+              {'log': logs, 'frames during the turn': len(during), 'sheet': os.path.relpath(path, OUT)})
     else:
+        check('the App logged the curl (debug log)', bool(logs), {'log': logs})
         verdicts(label, 'curl', rows, back, double, rtl=(mode == 'r2l'), edge='BOTTOM' if mode == 'vertical' else None,
                  sheet_path=path, leftover=no_overlay_left(after, late))
-    c.rotate(False)
+    rotate(False)
+
+
+def chapter_row(chapter):
+    db = c.pull_db('tachiyomi.db')
+    return db.execute('SELECT _id, manga_id, url, name, read, bookmark, last_page_read FROM chapters WHERE _id = ?',
+                      (chapter,)).fetchone()
+
+
+def set_page(chapter, page):
+    """With the App stopped: the chapter is unread and opens at [page]."""
+    row = chapter_row(chapter)
+    restore_chapter(chapter, 0, row[5], page)
 
 
 def hide_reader_menu():
@@ -360,7 +531,7 @@ def reader_page():
 def chapters_step(manga, first, other, image):
     c.STEP[0] = 'chapters'
     c.set_prefs({'pref_ebook_page_turn': 'none'}, reset_typesetting=True)
-    c.rotate(False)
+    rotate(False)
     rows = {r[0]: r for r in chapter_rows(manga)}
     if image == 0:  # the work's picture chapter (add_chapter)
         image = next(r[0] for r in rows.values() if r[2].lower().endswith('.cbz'))
@@ -487,7 +658,7 @@ def positions():
 def settings_ui(manga, chapter):
     c.STEP[0] = 'settings_ui'
     c.set_prefs({'pref_ebook_page_turn': None, 'pref_bookmania_pager_curl': None}, reset_typesetting=True)
-    c.rotate(False)
+    rotate(False)
     st = c.open_book(manga, chapter)
     if not st or not st.get('ready'):
         return check('the book opened', False, st)
@@ -534,11 +705,23 @@ def main():
     p.add_argument('--direction')
     p.add_argument('--curl', default='on')
     p.add_argument('--double', action='store_true')
+    p.add_argument('--edge')
+    p.add_argument('--file', default='zh-varied.epub')
     a = p.parse_args()
     try:
         if a.step == 'text':
             m, ch, style, label = a.args
-            text_step(int(m), int(ch), style, label, a.columns, a.back, a.landscape, a.direction)
+            ch = int(ch)
+            if ch == 0:  # the work's chapter whose file is --file
+                ch = next(r[0] for r in chapter_rows(int(m)) if r[2].endswith(a.file))
+            text_step(int(m), ch, style, label, a.columns, a.back, a.landscape, a.direction)
+        elif a.step == 'reanalyse':
+            label, style = a.args[:2]
+            c.STEP[0] = a.args[2] if len(a.args) > 2 else f'text:{label}'
+            reanalyse(label, style, a.back, a.columns == 'on', a.direction == 'rtl', a.edge)
+        elif a.step == 'rapid':
+            m, ch, style, label = a.args
+            rapid_step(int(m), int(ch), style, label)
         elif a.step == 'image':
             m, ch, mode, label = a.args
             image_step(int(m), int(ch), mode, label, a.curl, a.double, a.back)
@@ -555,7 +738,7 @@ def main():
             print(__doc__)
             sys.exit(2)
     finally:
-        c.rotate(False)
+        rotate(False)
 
 
 if __name__ == '__main__':

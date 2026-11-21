@@ -55,4 +55,6 @@ run image 10 12 l2r i-off-l2r --curl off
 run add_chapter 8 "$CBZ" zh-horizontal-vol3-pictures.cbz
 run chapters 8 10 18 0
 run settings_ui 8 10
+run rapid 8 10 curl r-curl
+run rapid 8 10 slide r-slide
 echo "RUN-ALL DONE $(date +%H:%M:%S)"
