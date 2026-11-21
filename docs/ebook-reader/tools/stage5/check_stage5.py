@@ -1100,13 +1100,20 @@ def step_slider(manga, chapter, label, fraction):
     if saved and span and total:
         before = sum(counts[:saved['spine']])
         start, end = before + span[0], before + span[1]
-    # The slider goes to the page that holds the character at that fraction of the book; where the finger
-    # was released is known to a few pixels of the track (0.5 % of the book).
+    # The slider goes to the page that holds the character at its value. The value is behind the finger by
+    # the touch slop (8 dp, about 2 % of the track here): a drag starts after that distance and the slider
+    # does not add it (seen: released at 25 %, value about 22.9 %). So the page shown must hold a character
+    # between the finger's fraction minus 3 % and plus 0.5 % (where the finger was released is known to a
+    # few pixels); the progress shown and saved is then checked exactly against that page.
     target = want * total
-    slack = 0.005 * total
-    check(f'released at {fraction:.2f} of the track ({"right to left" if rtl else "left to right"}): the page shown holds the character at {want:.2f} of the book',
-          start is not None and start - slack <= target < end + slack,
-          {'target character': round(target), 'page shown, characters': [start, end], 'of': total, 'status': st, 'page info': page_info(after)})
+    # The drag starts at 0.1 of the track: in the book, the value grows along the drag for a left-to-right
+    # slider and shrinks for a right-to-left one, and it stays behind the finger.
+    grows = (not rtl) == (fraction > 0.1)
+    lo, hi = (target - 0.03 * total, target + 0.005 * total) if grows else (target - 0.005 * total, target + 0.03 * total)
+    check(f'released at {fraction:.2f} of the track ({"right to left" if rtl else "left to right"}): the page shown holds a character near {want:.2f} of the book',
+          start is not None and start <= hi and end > lo,
+          {'finger at character': round(target), 'accepted characters': [round(lo), round(hi)], 'page shown, characters': [start, end], 'of': total,
+           'status': st, 'page info': page_info(after)})
     # The progress shown and saved is that of the page's first character (the reading position).
     check('percent shown and saved whole-book progress are those of the first character of that page',
           start is not None and pct is not None and abs(pct / 100 - start / total) <= 0.006 and saved.get('total') is not None
