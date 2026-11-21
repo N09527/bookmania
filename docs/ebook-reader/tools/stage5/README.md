@@ -8,7 +8,8 @@
 |---|---|
 | `shell_positions.mjs` | 在桌面版 Chromium（Playwright）直接測殼層的位置函式：以 DOM 位置、文字片段、百分比還原，`goProgress`，以及每一頁第一個字只靠百分比也能還原到同一頁。用法：`node shell_positions.mjs <解開的 EPUB 資料夾> <文件路徑> [直書 0或1] [雙欄 off或on]` |
 | `check_stage5.py` | 模擬器上的各項檢查，結果逐行寫入 `out/results.jsonl`，截圖在 `out/shots/`，資料庫副本在 `out/db/`。步驟見檔案開頭的說明 |
-| `run-all.sh` | 依序執行本階段在模擬器上的全部自動檢查（約 2 至 3 小時，未加速的模擬器） |
+| `run-all.sh` | 依序執行本階段在模擬器上的全部自動檢查（約 2 至 3 小時，未加速的模擬器）。`./run-all.sh 7` 從第 7 項開始；`STEPS="3 5 7-40" ./run-all.sh` 只跑指定的項目 |
+| `summarize.py` | 依 `out/results.jsonl` 列出每一項的通過數與失敗的檢查 |
 
 `check_stage5.py` 的做法：
 
@@ -17,3 +18,4 @@
 - 正常離開閱讀器用返回鍵（會觸發 `onPause` 的儲存與閱讀時間），不用強制停止。
 - 點擊區域的預期動作，是照 `app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/navigation/` 各類別的區域座標，在腳本中另外算出來再和實際翻頁結果比對。
 - 備份：`backup_check` 解開 `.tachibk`（gzip 的 protobuf），不依賴 App 的程式碼，直接讀 `BackupChapter` 的欄位 20101。建立與還原備份在 App 介面上操作（見階段 5 報告的步驟）。
+- 模擬器剛開機時第一次開書要好幾分鐘，先執行 `warmup`。每一項結束後，系統紀錄中的當機與「沒有回應」事件附加到 `out/system-events.log`。
