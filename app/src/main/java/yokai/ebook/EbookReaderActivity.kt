@@ -1,10 +1,12 @@
 package yokai.ebook
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.PointF
 import android.graphics.Color
 import android.net.Uri
@@ -61,6 +63,7 @@ import eu.kanade.tachiyomi.domain.manga.models.Manga
 import eu.kanade.tachiyomi.source.LocalSource
 import eu.kanade.tachiyomi.source.SourceManager
 import eu.kanade.tachiyomi.ui.base.activity.BaseActivity
+import eu.kanade.tachiyomi.ui.reader.ReaderActivity
 import eu.kanade.tachiyomi.ui.reader.settings.ReaderBackgroundColor
 import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation
 import eu.kanade.tachiyomi.ui.reader.viewer.navigation.DisabledNavigation
@@ -80,6 +83,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.json.JSONArray
@@ -111,6 +115,9 @@ import yokai.ebook.settings.FontStore
 import yokai.ebook.settings.ImportedFont
 import yokai.ebook.settings.SettingsScope
 import yokai.i18n.MR
+import yokai.pageturn.CurlEdge
+import yokai.pageturn.PageTurnPreferences
+import yokai.pageturn.PageTurner
 import yokai.presentation.theme.YokaiTheme
 import yokai.util.lang.getString
 
@@ -136,6 +143,15 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private val requestHandler by lazy { EbookRequestHandler(assets) }
     private val settingsStore by lazy { EbookSettingsStore(preferences.preferenceStore) }
     private val fontStore by lazy { FontStore(this, preferences.preferenceStore) }
+    private val pageTurnPreferences by lazy { PageTurnPreferences(preferences.preferenceStore) }
+    /** Plays the page turn animation (see [turnPage]). */
+    private var pageTurner: PageTurner? = null
+    /** Page turns run one after another, so a quick second tap waits for the first instead of being lost. */
+    private val turnLock = Mutex()
+    private var turnJob: Job? = null
+    /** A turn into the next or previous document, played once its layout is ready (see [awaitLayout]). */
+    private var pendingTurn: PageTurner.Turn? = null
+    private var pendingTurnJob: Job? = null
     private var webView: WebView? = null
     private var shellLoaded = false
 
@@ -230,6 +246,12 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         binding.toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp)
         binding.toolbar.setNavigationIconTint(getResourceColor(R.attr.colorOnSurface))
         binding.toolbar.setNavigationOnClickListener { finish() }
+        binding.toolbar.menu.add(Menu.NONE, MENU_CHAPTERS, Menu.NONE, getString(MR.strings.chapters)).apply {
+            setIcon(R.drawable.ic_view_list_24dp)
+            iconTintList = ColorStateList.valueOf(getResourceColor(R.attr.colorOnSurface))
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+            isVisible = false // until the chapter is known
+        }
         binding.toolbar.menu.add(Menu.NONE, MENU_TOC, Menu.NONE, getString(MR.strings.ebook_toc)).apply {
             setIcon(R.drawable.ic_format_list_numbered_24dp)
             iconTintList = ColorStateList.valueOf(getResourceColor(R.attr.colorOnSurface))
@@ -250,6 +272,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             when (item.itemId) {
                 MENU_SETTINGS -> openSettings()
                 MENU_TOC -> showToc()
+                MENU_CHAPTERS -> showChapters()
                 MENU_OPEN_AS_IMAGES -> {
                     val m = manga
                     val c = chapter
@@ -296,6 +319,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                                 onResetScope = ::resetScope,
                                 onImportFont = ::importFont,
                                 onDeleteFont = ::confirmDeleteFont,
+                                onPageTurn = ::onPageTurnChanged,
                                 onClose = { panel = null },
                             )
                         }
@@ -304,6 +328,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             },
         )
         requestHandler.fontFile = { id -> fontStore.file(id) }
+        pageTurner = PageTurner(window, binding.webContainer, binding.root)
 
         gestures = GestureDetector(this, TouchListener())
         binding.touchLayer.setOnTouchListener { _, event ->
@@ -335,6 +360,11 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         lifecycleScope.launch { load(mangaId, chapterId) }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        endTurn() // the copies of the page no longer fit
+        super.onConfigurationChanged(newConfig)
+    }
+
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         // Re-apply after dialogs and when the window is first shown (hiding in onCreate is not
@@ -348,6 +378,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     }
 
     override fun onPause() {
+        endTurn()
         // Write what is shown now and the reading time, also when the reader is being closed.
         saveJob?.cancel()
         persistPosition()
@@ -365,6 +396,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     override fun onDestroy() {
         waitJob?.cancel()
         resizeJob?.cancel()
+        endTurn()
+        pageTurner?.release()
         webView?.let {
             (it.parent as? android.view.ViewGroup)?.removeView(it)
             it.destroy()
@@ -407,6 +440,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         val (manga, chapter, file, pub) = loaded
         this.manga = manga
         this.chapter = chapter
+        // Also on the error screens below: another chapter of the work can be opened from there.
+        binding.toolbar.menu.findItem(MENU_CHAPTERS)?.isVisible = true
         bookFile = file
         publication = pub
         if (pub.spine.isEmpty()) {
@@ -642,6 +677,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                     busy = false
                     val error = status.optString("error").takeIf { !status.isNull("error") && it.isNotEmpty() }
                     if (error != null) {
+                        endPendingTurn()
                         showError(getString(MR.strings.ebook_cannot_open_title), error)
                     } else {
                         page = status.optInt("page")
@@ -649,10 +685,16 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                         columns = status.optInt("cols", 1)
                         updatePageInfo()
                         if (pendingRelayout) {
+                            endPendingTurn()
                             pendingRelayout = false
                             applySettings()
                         } else {
                             capturePosition()
+                            pendingTurn?.let {
+                                pendingTurn = null
+                                pendingTurnJob?.cancel()
+                                playTurn(it)
+                            }
                         }
                     }
                     return@launch
@@ -661,6 +703,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 if (now > progressAfter) binding.progress.isVisible = true
                 if (now > deadline) {
                     busy = false
+                    endPendingTurn()
                     binding.progress.isVisible = false
                     showError(getString(MR.strings.ebook_cannot_open_title), "Layout timed out")
                     return@launch
@@ -670,28 +713,115 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
     }
 
-    private fun nextPage() {
+    private fun nextPage() = turnPage(forward = true)
+
+    private fun previousPage() = turnPage(forward = false)
+
+    /**
+     * Turns the page, in the open document or into the next / previous one at its end. With a page turn
+     * animation the page shown now is held on top (a copy, see [PageTurner]) while the shell moves on, then
+     * slides or curls away: by the right edge for left-to-right pages, by the left edge for right-to-left
+     * pages; with two columns one page turns about the centre line.
+     */
+    private fun turnPage(forward: Boolean) {
         if (busy) return
         lifecycleScope.launch {
-            when (eval("window.__reader.next()")?.let(::parseString)) {
-                "ok" -> refreshPage()
-                "end" -> {
-                    val next = linearIndices().firstOrNull { it > spineIndex }
-                    if (next != null) openSpine(next, START) else toast(getString(MR.strings.ebook_end_of_book))
+            turnLock.withLock {
+                if (busy) return@withLock
+                turnJob?.cancel()
+                val turner = pageTurner
+                val style = turnStyle()
+                val held = turner != null && style != null && turner.hold()
+                val turn = if (held && style != null) {
+                    PageTurner.Turn(style, if (rtl) CurlEdge.LEFT else CurlEdge.RIGHT, columns == 2, forward, backgroundColor)
+                } else {
+                    null
+                }
+                val result = eval(if (forward) "window.__reader.next()" else "window.__reader.prev()")?.let(::parseString)
+                when (result) {
+                    "ok" -> {
+                        refreshPage()
+                        if (turn != null) playTurn(turn)
+                    }
+                    if (forward) "end" else "start" -> {
+                        val target = if (forward) {
+                            linearIndices().firstOrNull { it > spineIndex }
+                        } else {
+                            linearIndices().lastOrNull { it < spineIndex }
+                        }
+                        if (target != null) {
+                            if (turn != null) holdUntilLaidOut(turn)
+                            openSpine(target, if (forward) START else END)
+                        } else {
+                            turner?.end()
+                            toast(getString(if (forward) MR.strings.ebook_end_of_book else MR.strings.ebook_start_of_book))
+                        }
+                    }
+                    else -> turner?.end() // the shell is busy: the page did not change
                 }
             }
         }
     }
 
-    private fun previousPage() {
-        if (busy) return
-        lifecycleScope.launch {
-            when (eval("window.__reader.prev()")?.let(::parseString)) {
-                "ok" -> refreshPage()
-                "start" -> {
-                    val previous = linearIndices().lastOrNull { it < spineIndex }
-                    if (previous != null) openSpine(previous, END) else toast(getString(MR.strings.ebook_start_of_book))
-                }
+    /** The page turn animation, or null to turn at once (also while the menu or the settings are shown). */
+    private fun turnStyle(): PageTurner.Style? {
+        if (menuVisible || panel != null || binding.errorPanel.isVisible || !ValueAnimator.areAnimatorsEnabled()) return null
+        return when (pageTurnPreferences.textReader().get()) {
+            PageTurnPreferences.SLIDE -> PageTurner.Style.SLIDE
+            PageTurnPreferences.CURL -> PageTurner.Style.CURL
+            else -> null
+        }
+    }
+
+    /** Plays [turn] once the WebView has the new page ready to draw. */
+    private fun playTurn(turn: PageTurner.Turn) {
+        val turner = pageTurner ?: return
+        turnJob = lifecycleScope.launch {
+            awaitWebViewContent()
+            turner.play(turn)
+        }
+    }
+
+    /**
+     * Keeps the old page on top while the next document is laid out, and plays [turn] when it is ready
+     * ([awaitLayout]). A slow layout shows the reader (and its progress indicator) after a short while.
+     */
+    private fun holdUntilLaidOut(turn: PageTurner.Turn) {
+        pendingTurn = turn
+        pendingTurnJob?.cancel()
+        pendingTurnJob = lifecycleScope.launch {
+            delay(CROSS_DOCUMENT_HOLD_MS)
+            if (pendingTurn === turn) endPendingTurn()
+        }
+    }
+
+    private fun endPendingTurn() {
+        if (pendingTurn == null) return
+        pendingTurn = null
+        pendingTurnJob?.cancel()
+        pageTurner?.end()
+    }
+
+    private fun endTurn() {
+        pendingTurn = null
+        pendingTurnJob?.cancel()
+        turnJob?.cancel()
+        pageTurner?.end()
+    }
+
+    /** Waits until the WebView can draw what the shell shows now (or a short while). */
+    private suspend fun awaitWebViewContent() {
+        val wv = webView ?: return
+        withTimeoutOrNull(VISUAL_STATE_TIMEOUT_MS) {
+            suspendCancellableCoroutine { cont ->
+                wv.postVisualStateCallback(
+                    0L,
+                    object : WebView.VisualStateCallback() {
+                        override fun onComplete(requestId: Long) {
+                            if (cont.isActive) cont.resume(Unit)
+                        }
+                    },
+                )
             }
         }
     }
@@ -827,6 +957,26 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         }
         add(publication?.toc.orEmpty(), 0)
         items
+    }
+
+    /** The chapter panel: the other chapters (files) of the work. */
+    private fun showChapters() {
+        val m = manga ?: return
+        val c = chapter ?: return
+        setMenuVisible(false)
+        lifecycleScope.launch { ChapterPanel(this@EbookReaderActivity, m, c, ::openChapter).show() }
+    }
+
+    /** Opens [target] from the chapter panel, in the reader its file needs (ReaderActivity.newIntent). */
+    private fun openChapter(target: Chapter) {
+        val m = manga ?: return
+        lifecycleScope.launch {
+            writePosition() // this chapter's position is saved before the next one is read
+            startActivity(ReaderActivity.newIntent(this@EbookReaderActivity, m, target).addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION))
+            finish()
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
+        }
     }
 
     private fun showToc() {
@@ -1028,6 +1178,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     // region UI
 
     private fun setMenuVisible(visible: Boolean) {
+        if (visible) endTurn() // the turn is drawn above the window, so it would cover the menu
         menuVisible = visible
         binding.toolbar.isVisible = visible
         barVisible = visible && webView != null && publication != null && !binding.errorPanel.isVisible
@@ -1073,6 +1224,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     }
 
     private fun showError(title: String, message: String) {
+        endTurn()
         panel = null
         binding.toolbar.menu.findItem(MENU_SETTINGS)?.isVisible = false
         binding.toolbar.menu.findItem(MENU_TOC)?.isVisible = false
@@ -1167,6 +1319,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
 
     private fun openSettings() {
         val key = bookKey ?: return
+        endTurn()
         setMenuVisible(false)
         showPanel(settingsStore.initialScope(key))
     }
@@ -1180,7 +1333,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             scopeHasValues = settingsStore.levelValues(scope, key).isNotEmpty(),
             overridden = settingsStore.overriddenBelow(scope, key),
             fonts = fontStore.list(),
+            pageTurn = pageTurnPreferences.textReader().get(),
         )
+    }
+
+    /** The page turn animation is one setting for all books, outside the three levels. */
+    private fun onPageTurnChanged(value: String) {
+        pageTurnPreferences.textReader().set(value)
+        panel = panel?.copy(pageTurn = value)
     }
 
     private fun onSettingChanged(key: EbookSettings.Key, value: String) {
@@ -1209,6 +1369,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     /** Re-lays out the open document if what the shell uses changed; it returns to the same character. */
     private fun applySettings() {
         if (webView == null || !shellLoaded || binding.errorPanel.isVisible) return
+        endTurn()
         val json = settingsJson()
         if (json == appliedJson) return
         if (busy) {
@@ -1313,10 +1474,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         private const val RESIZE_POLL_MS = 200L
         private const val RESIZE_GRACE_MS = 15_000L
         private const val LAYOUT_TIMEOUT_MS = 60_000L
+        /** How long the old page stays on top while the next document is laid out. */
+        private const val CROSS_DOCUMENT_HOLD_MS = 700L
+        private const val VISUAL_STATE_TIMEOUT_MS = 500L
 
         private const val MENU_SETTINGS = 1
         private const val MENU_TOC = 2
         private const val MENU_OPEN_AS_IMAGES = 3
+        private const val MENU_CHAPTERS = 4
 
         private val EXTERNAL_SCHEMES = setOf("http", "https", "mailto")
 

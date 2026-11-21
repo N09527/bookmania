@@ -64,6 +64,7 @@ import kotlin.math.roundToInt
 import yokai.ebook.settings.EbookSettings.Companion.Range
 import yokai.ebook.settings.EbookSettings.Key
 import yokai.i18n.MR
+import yokai.pageturn.PageTurnPreferences
 
 /** What the settings panel shows. */
 data class EbookSettingsUiState(
@@ -75,6 +76,8 @@ data class EbookSettingsUiState(
     /** Keys a nearer level sets for this book; on the page those values are used. */
     val overridden: Map<Key, SettingsScope>,
     val fonts: List<ImportedFont>,
+    /** The page turn animation ([PageTurnPreferences.textReader]): one setting for all books. */
+    val pageTurn: String,
 )
 
 /**
@@ -97,6 +100,7 @@ fun EbookSettingsPanel(
     onResetScope: () -> Unit,
     onImportFont: () -> Unit,
     onDeleteFont: (ImportedFont) -> Unit,
+    onPageTurn: (String) -> Unit,
     onClose: () -> Unit,
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -249,6 +253,22 @@ fun EbookSettingsPanel(
                         StepSlider(MR.strings.ebook_margin_right, s.marginRight.toFloat(), margin, step, over[Key.MARGIN_RIGHT], dp) {
                             onSet(Key.MARGIN_RIGHT, it.roundToInt().toString())
                         }
+                        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                        Label(MR.strings.ebook_page_turn, null)
+                        Choices(
+                            options = listOf(
+                                PageTurnPreferences.NONE to MR.strings.ebook_page_turn_none,
+                                PageTurnPreferences.SLIDE to MR.strings.ebook_page_turn_slide,
+                                PageTurnPreferences.CURL to MR.strings.ebook_page_turn_curl,
+                            ),
+                            selected = state.pageTurn,
+                            onSelect = onPageTurn,
+                        )
+                        Text(
+                            stringResource(MR.strings.ebook_page_turn_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                        )
                     }
                 }
             }

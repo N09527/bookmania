@@ -112,6 +112,15 @@
             android:text="@string/animate_page_transitions"
             android:textColor="?attr/colorOnBackground" />
 
+        <!-- Bookmania: page curl for taps and keys (yokai.pageturn) -->
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/page_curl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/bookmania_page_curl"
+            android:textColor="?attr/colorOnBackground" />
+
         <!-- Webtoon Prefs -->
         <eu.kanade.tachiyomi.widget.MaterialSpinnerView
             android:id="@+id/webtoon_nav"

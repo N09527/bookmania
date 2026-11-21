@@ -65,4 +65,13 @@
     <string name="ebook_open_as_text">Open as text</string>
     <string name="ebook_open_as_images">Open as images</string>
     <string name="ebook_no_image_pages">This book has no pages the image reader can show, so it opens as text.</string>
+    <string name="ebook_page_turn">Page turn animation</string>
+    <string name="ebook_page_turn_none">None</string>
+    <string name="ebook_page_turn_slide">Slide</string>
+    <string name="ebook_page_turn_curl">Curl</string>
+    <string name="ebook_page_turn_hint">For all books; not affected by the level chosen above.</string>
+    <string name="ebook_chapters">Chapters</string>
+    <string name="ebook_chapters_current">Reading now</string>
+    <string name="bookmania_page_curl">Page curl</string>
+    <string name="bookmania_page_curl_summary">In the paged modes, a tap or a key turns the page with a curl. Swiping still drags the page; long strip mode is unchanged.</string>
 </resources>

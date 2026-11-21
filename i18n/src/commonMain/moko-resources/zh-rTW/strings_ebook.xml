@@ -64,4 +64,13 @@
     <string name="ebook_open_as_text">以文字模式開啟</string>
     <string name="ebook_open_as_images">以圖片模式開啟</string>
     <string name="ebook_no_image_pages">這本書沒有圖片閱讀器能顯示的頁面，因此以文字模式開啟。</string>
+    <string name="ebook_page_turn">翻頁動畫</string>
+    <string name="ebook_page_turn_none">無</string>
+    <string name="ebook_page_turn_slide">滑動</string>
+    <string name="ebook_page_turn_curl">捲曲</string>
+    <string name="ebook_page_turn_hint">所有書共用，不受上方選擇的範圍影響。</string>
+    <string name="ebook_chapters">章節</string>
+    <string name="ebook_chapters_current">正在閱讀</string>
+    <string name="bookmania_page_curl">捲曲翻頁</string>
+    <string name="bookmania_page_curl_summary">翻頁模式中，點擊或按鍵翻頁時以捲曲動畫翻頁。用手指滑動仍是拖動頁面；長條模式不變。</string>
 </resources>

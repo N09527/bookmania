@@ -24,6 +24,7 @@ import eu.kanade.tachiyomi.ui.reader.viewer.ViewerNavigation
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import uy.kohesive.injekt.injectLazy
+import yokai.pageturn.PagerPageCurl
 
 /**
  * Implementation of a [BaseViewer] to display pages with a [ViewPager].
@@ -45,6 +46,9 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      * Configuration used by the pager, like allow taps, scale mode on images, page transitions...
      */
     val config = PagerConfig(scope, this)
+
+    /** Bookmania: the page curl for taps and keys (yokai.pageturn), off unless switched on. */
+    private val pageCurl by lazy { PagerPageCurl(this) }
 
     /**
      * Adapter of the pager.
@@ -406,12 +410,13 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      * Moves to the page at the right.
      */
     protected open fun moveRight() {
+        pageCurl.finishNow()
         if (pager.currentItem != adapter.count - 1) {
             hasMoved = true
             val holder = (currentPage as? ReaderPage)?.let { getPageHolder(it) }
             if (holder != null && config.navigateToPan && holder.canPanRight()) {
                 holder.panRight()
-            } else {
+            } else if (!pageCurl.turnTo(pager.currentItem + 1)) {
                 pager.setCurrentItem(pager.currentItem + 1, config.usePageTransitions)
             }
         }
@@ -421,12 +426,13 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
      * Moves to the page at the left.
      */
     protected open fun moveLeft() {
+        pageCurl.finishNow()
         if (pager.currentItem != 0) {
             hasMoved = true
             val holder = (currentPage as? ReaderPage)?.let { getPageHolder(it) }
             if (holder != null && config.navigateToPan && holder.canPanLeft()) {
                 holder.panLeft()
-            } else {
+            } else if (!pageCurl.turnTo(pager.currentItem - 1)) {
                 pager.setCurrentItem(pager.currentItem - 1, config.usePageTransitions)
             }
         }

@@ -15,6 +15,7 @@ import eu.kanade.tachiyomi.util.system.DeviceUtil
 import eu.kanade.tachiyomi.widget.BaseReaderSettingsView
 import yokai.i18n.MR
 import yokai.util.lang.getString
+import yokai.pageturn.PageTurnPreferences
 
 class ReaderPagedView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     BaseReaderSettingsView<ReaderPagedLayoutBinding>(context, attrs) {
@@ -34,6 +35,7 @@ class ReaderPagedView @JvmOverloads constructor(context: Context, attrs: Attribu
             zoomStart.bindToPreference(preferences.zoomStart(), 1)
             cropBorders.bindToPreference(preferences.cropBorders())
             pageTransitions.bindToPreference(preferences.pageTransitions())
+            pageCurl.bindToPreference(PageTurnPreferences(preferences.preferenceStore).pagerCurl()) // Bookmania
             pagerNav.bindToPreference(preferences.navigationModePager())
             pagerInvert.bindToPreference(preferences.pagerNavInverted())
             extendPastCutout.bindToPreference(readerPreferences.pagerCutoutBehavior())
@@ -84,6 +86,7 @@ class ReaderPagedView @JvmOverloads constructor(context: Context, attrs: Attribu
             binding.zoomStart,
             binding.cropBorders,
             binding.pageTransitions,
+            binding.pageCurl,
             binding.pagerNav,
             binding.pagerInvert,
             binding.pageLayout,

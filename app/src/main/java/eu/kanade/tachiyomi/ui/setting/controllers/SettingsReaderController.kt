@@ -36,6 +36,7 @@ import yokai.util.lang.getString
 import eu.kanade.tachiyomi.data.preference.PreferenceKeys as Keys
 import eu.kanade.tachiyomi.ui.setting.summaryMRes as summaryRes
 import eu.kanade.tachiyomi.ui.setting.titleMRes as titleRes
+import yokai.pageturn.PageTurnPreferences
 
 class SettingsReaderController : SettingsLegacyController() {
 
@@ -73,6 +74,13 @@ class SettingsReaderController : SettingsLegacyController() {
                 key = Keys.enableTransitions
                 titleRes = MR.strings.animate_page_transitions
                 defaultValue = true
+            }
+            // Bookmania (yokai.pageturn)
+            switchPreference {
+                key = PageTurnPreferences.KEY_PAGER_CURL
+                titleRes = MR.strings.bookmania_page_curl
+                summaryRes = MR.strings.bookmania_page_curl_summary
+                defaultValue = false
             }
             intListPreference(activity) {
                 key = Keys.preloadSize
