@@ -22,7 +22,7 @@ sys.path.insert(0, HERE)
 import check_stage5 as c  # noqa: E402
 
 d = c.d
-BACKUP_DIR = '/storage/emulated/0/BookmaniaTest/backup'  # the App's storage folder on the test emulator
+BACKUP_DIR = '/storage/emulated/0/BookmaniaStorage/backup'  # the App's storage location on the test emulator (set in Data and storage > Storage location)
 DOWNLOADS = '/storage/emulated/0/Download'
 
 
