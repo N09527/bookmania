@@ -982,7 +982,10 @@ def step_chapter_list(manga, chapter):
     d.shot('chapter-list')
     check('chapter list shows the page of the text book', hit is not None and not m['read'], {'expected': want, 'node': hit and hit['text'], 'read': m['read']})
     # Recents (the bottom navigation item 最新 in Traditional Chinese). The manga screen opened by the
-    # intent above sits on top of the library and hides the bottom navigation: back first.
+    # intent above sits on top of the library and hides the bottom navigation: back first (once the
+    # launch screen is gone, so that the key is not lost).
+    wait_app_drawn()
+    time.sleep(3)
     key(KEY_BACK, 4)
     tab = None
     for _ in range(5):
@@ -1120,18 +1123,31 @@ def step_end(manga, chapter, label):
     s = slider_node(ns)
     rtl = bool(d.cdp('window.__reader.status().mode') == 'V')
     st0 = d.status()
-    # The end of the book: the left end of a right-to-left slider. The slider takes touches on its track
-    # only (a tap in the padding at its very end does nothing, seen on the emulator), so the finger goes
-    # down on the track and is dragged past the end, where the value stops at the end of the book.
+    # Near the end of the book with the slider (the left end of a right-to-left slider), then page turns
+    # to the last page, as a reader would. The slider takes touches on its track only (a tap in the
+    # padding at its very end does nothing), and on this emulator the last moves of a drag past the end
+    # are not all applied (it stopped at 95-99 %), so the slider alone does not reach the last page.
     x_from = slider_x(s, 0.5)
     x_to = 0 if rtl else 1079
     d.swipe(x_from, s['y'], x_to, s['y'], 1500, 3)
     st = wait_change(st0, 120)
     time.sleep(4)
+    hide_menu()
+    near = st
+    turns = 0
+    for _ in range(12):
+        before = (doc_path(src()), d.status())
+        key(KEY_PAGE_DOWN, 4)
+        after = (doc_path(src()), d.status())
+        if after[0] == before[0] and after[1] and before[1] and after[1]['page'] == before[1]['page']:
+            break  # the last page: Page Down shows 已到本書結尾 and stays
+        turns += 1
+    st = d.status()
     p = pos()
     last_doc = doc_path(src())
     d.shot(label + '-1-end')
-    check('slider at the end: the last page of the book', st and st['page'] + st['cols'] > st['pages'] - 1, {'status': st, 'doc': last_doc, 'percent': percent(d.nodes())})
+    check('slider near the end, then page turns: the last page of the book', st and st['page'] + st['cols'] > st['pages'] - 1,
+          {'after the slider': near, 'page turns': turns, 'status': st, 'doc': last_doc, 'percent': percent(d.nodes())})
     leave_reader()
     stop_app()
     m = main_rows(chapter)
@@ -1508,9 +1524,13 @@ def step_classify(manga, chapter):
         row = None
         for _ in range(20):
             time.sleep(4)
+            if not wait_app_drawn():
+                note('the launch screen is still shown')
             clear_dialogs()
             row = d.find(m['chapter'], exact=True)
             if row:
+                time.sleep(3)  # the manga screen fades in (a touch during the transition is ignored)
+                row = d.find(m['chapter'], exact=True) or row
                 break
         if row is None:
             return None, None
