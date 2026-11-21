@@ -281,6 +281,8 @@ def key(code, wait=2.5):
 def turn(n, code=KEY_PAGE_DOWN):
     """Turns [n] pages with a key and waits for each (a new document takes a layout)."""
     for _ in range(n):
+        if READER not in d.resumed():
+            raise RuntimeError('the reader is not shown: ' + d.resumed())
         st = d.status()
         key(code, 1.5)
         st2 = wait_change(st)
@@ -314,10 +316,15 @@ def show_menu():
 
 
 def hide_menu():
+    """Centre tap hides the toolbar and the bottom bar. (Not the back key: if the screen dump still shows
+    the menu after it was hidden, a second back key would close the reader.)"""
     for _ in range(3):
-        if not menu_shown():
+        ns = d.nodes()
+        if not menu_shown(ns):
             return True
-        key(KEY_BACK, 3)
+        w = max((m['b'][2] for m in ns), default=1080)
+        h = max((m['b'][3] for m in ns), default=1920)
+        d.tap(w // 2, h // 2, 4)
     return not menu_shown()
 
 
