@@ -129,11 +129,25 @@ def extract(folder, size):
     names = sorted(n for n in os.listdir(folder) if n.startswith('f') and n.endswith('.png'))
     frames = []
     for i, n in enumerate(names):
-        img = Image.open(os.path.join(folder, n)).convert('RGB')
-        if img.size != size:
-            img = img.resize(size, Image.BILINEAR)
+        img = fit(Image.open(os.path.join(folder, n)).convert('RGB'), size)
         frames.append((times[i] if i < len(times) else float(i), img))
     return frames
+
+
+def fit(img, size):
+    """A video frame at [size]: screenrecord keeps the screen's proportions and fills the rest of the video
+    with black bars (the video size is rounded to multiples of 16), so the bars are cut off first."""
+    if img.size == size:
+        return img
+    vw, vh = img.size
+    aspect = size[0] / size[1]
+    if vw / vh > aspect:  # bars left and right
+        cw = vh * aspect
+        box = ((vw - cw) / 2, 0, (vw + cw) / 2, vh)
+    else:  # bars above and below
+        ch = vw / aspect
+        box = (0, (vh - ch) / 2, vw, (vh + ch) / 2)
+    return img.resize(size, Image.BILINEAR, box=box)
 
 
 def grey(img):
@@ -148,9 +162,10 @@ def cells(diff):
 
 
 def colour_diff(x, y):
-    """Per pixel, the largest difference of the three colour channels (two comic pages can differ only in
-    colour, which a grey picture hardly shows)."""
-    return np.abs(np.asarray(x, dtype=np.int16) - np.asarray(y, dtype=np.int16)).max(axis=2)
+    """Per pixel, the mean difference of the three colour channels: two comic pages can differ only in
+    colour, which a grey picture hardly shows; the mean (not the largest) keeps the video's colour
+    compression noise around black text small."""
+    return np.abs(np.asarray(x, dtype=np.int16) - np.asarray(y, dtype=np.int16)).mean(axis=2)
 
 
 def classify(frame, before, after):
@@ -438,7 +453,7 @@ def reanalyse(label, style, back=False, spread=False, rtl=False, edge=None):
     after = Image.open(os.path.join(folder, 'after.png')).convert('RGB')
     CELL[0] = max(10, min(before.size) // 27)
     frames = extract(folder, before.size) if not any(n.startswith('f0') for n in os.listdir(folder)) else [
-        (t, Image.open(os.path.join(folder, n)).convert('RGB').resize(before.size))
+        (t, fit(Image.open(os.path.join(folder, n)).convert('RGB'), before.size))
         for t, n in zip([r['t'] for r in json.load(open(os.path.join(folder, 'analysis.json')))],
                         sorted(n for n in os.listdir(folder) if n.startswith('f0') and n.endswith('.png')))]
     rows = analyse(before, after, frames)
