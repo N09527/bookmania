@@ -1,0 +1,12 @@
+PASS opens {"ready":true,"error":null,"page":0,"pages":15,"cols":2,"mode":"H","seq":1,"ms":235,"rubyFix":false}
+PASS position on a middle page {"chars":1847,"page":6,"pages":15,"cols":2,"location":[67,7],"text":"日期12月31日使用縱中橫。【第５８段】長一點的","before":773}
+PASS restore by location: same page and character {"st":{"ready":true,"error":null,"page":6,"pages":15,"cols":2,"mode":"H","seq":2,"ms":88,"rubyFix":false},"p":{"chars":1847,"page":6,"pages":15,"cols":2,"location":[67,7],"text":"日期12月31日使用縱中橫。【第５８段】長一點的","before":773}}
+PASS restore by text when the location does not match {"st":{"ready":true,"error":null,"page":6,"pages":15,"cols":2,"mode":"H","seq":3,"ms":72,"rubyFix":false},"p":{"chars":1847,"page":6,"pages":15,"cols":2,"location":[67,7],"text":"日期12月31日使用縱中橫。【第５８段】長一點的","before":773}}
+PASS restore by fraction {"st":{"ready":true,"error":null,"page":6,"pages":15,"cols":2,"mode":"H","seq":4,"ms":51,"rubyFix":false},"p":{"chars":1847,"page":6,"pages":15,"cols":2,"location":[67,7],"text":"日期12月31日使用縱中橫。【第５８段】長一點的","before":773},"progression":0.41851651326475364}
+PASS restore by fraction, first character of every page {"pages":8,"wrong":[]}
+PASS font size change keeps the restored character {"st":{"ready":true,"error":null,"page":10,"pages":25,"cols":2,"mode":"H","seq":22,"ms":10,"rubyFix":false},"p":{"chars":1847,"page":10,"pages":25,"cols":2,"location":[67,7],"text":"日期12月31日使用縱中橫。【第５８段】長一點的","before":773}}
+PASS goProgress(0) is the first page {"chars":1847,"page":0,"pages":15,"cols":2,"location":[1,0],"text":"第２章測試章節【第４１段】英文單字WebView","before":0}
+PASS goProgress(1) is the last page {"p":{"chars":1847,"page":14,"pages":15,"cols":2,"location":[153,28],"text":"號』、（括號）與全形標點：逗號，句號。驚嘆號！問","before":1821},"last":14}
+PASS goProgress(0.5) shows the page with the middle character {"p":{"chars":1847,"page":6,"pages":15,"cols":2,"location":[67,7],"text":"日期12月31日使用縱中橫。【第５８段】長一點的","before":773},"nextPage":{"chars":1847,"page":8,"pages":15,"cols":2,"location":[92,23],"text":"者的設定調整字級、行距、字距、首行縮排與段落間距","before":1040},"middle":923}
+PASS unknown text falls back to the fraction {"st":{"ready":true,"error":null,"page":6,"pages":15,"cols":2,"mode":"H","seq":24,"ms":55,"rubyFix":false},"p":{"chars":1847,"page":6,"pages":15,"cols":2,"location":[77,50],"text":"！問號？【第６１段】英文單字WebView與阿拉","before":923}}
+11/11 passed

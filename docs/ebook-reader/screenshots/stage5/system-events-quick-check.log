@@ -1,0 +1,36 @@
+--- 05:09:12 after warmup 14 16
+11-21 04:31:01.888  1661  1676 I am_anr  : [0,1777,com.android.systemui,952647181,executing service com.android.systemui/.keyguard.KeyguardService]
+11-21 04:31:51.024  1661  1676 I am_anr  : [0,2252,com.google.android.gms,-1194836411,executing service com.google.android.gms/.chimera.GmsIntentOperationService]
+--- 05:24:16 after switch 8 10 epub-without-pictures no-images
+11-21 05:21:24.845  7476  7224 F google-breakpad: Microdump skipped (uninteresting)
+11-21 05:21:24.922  7170  7224 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 7224 (RenderThread)
+11-21 05:21:25.841  7480  7480 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 05:21:25.842  7480  7480 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 05:21:25.842  7480  7480 F DEBUG   : Revision: '0'
+11-21 05:21:25.843  7480  7480 F DEBUG   : ABI: 'x86_64'
+11-21 05:21:25.843  7480  7480 F DEBUG   : pid: 7170, tid: 7224, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 05:21:25.843  7480  7480 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 05:21:25.850  7480  7480 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a77a0879010, eglErr = EGL_BAD_ALLOC'
+11-21 05:21:25.852  7480  7480 F DEBUG   :     rax 0000000000000000  rbx 0000000000001c38  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 05:21:25.852  7480  7480 F DEBUG   :     rsi 0000000000001c38  rdi 0000000000001c02
+11-21 05:21:25.853  7480  7480 F DEBUG   :     r8  00007a77a0518e50  r9  00007a77a0518e50  r10 0000000000000008  r11 0000000000000206
+11-21 05:21:25.853  7480  7480 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 0000000000001c02  r15 00007a77a0518d58
+11-21 05:21:25.853  7480  7480 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 05:21:25.853  7480  7480 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a77a0879010  rsp 00007a77a0518d28  eflags 0000000000000206
+11-21 05:21:26.004  7480  7480 F DEBUG   : 
+11-21 05:21:26.004  7480  7480 F DEBUG   : backtrace:
+11-21 05:21:26.004  7480  7480 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 05:21:26.005  7480  7480 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 05:21:26.006  7480  7480 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 05:21:26.006  7480  7480 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 05:21:26.007  7480  7480 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 05:21:26.007  7480  7480 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 05:21:26.007  7480  7480 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 05:21:29.944  1661  7488 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]

@@ -1,0 +1,12 @@
+PASS opens {"ready":true,"error":null,"page":0,"pages":6,"cols":1,"mode":"V","seq":1,"ms":117,"rubyFix":false}
+PASS position on a middle page {"chars":1880,"page":3,"pages":6,"cols":1,"location":[55,0],"text":"【第１３段】長一點的段落：閱讀程式需要依照使用者","before":546}
+PASS restore by location: same page and character {"st":{"ready":true,"error":null,"page":3,"pages":6,"cols":1,"mode":"V","seq":2,"ms":41,"rubyFix":false},"p":{"chars":1880,"page":3,"pages":6,"cols":1,"location":[55,0],"text":"【第１３段】長一點的段落：閱讀程式需要依照使用者","before":546}}
+PASS restore by text when the location does not match {"st":{"ready":true,"error":null,"page":3,"pages":6,"cols":1,"mode":"V","seq":3,"ms":37,"rubyFix":false},"p":{"chars":1880,"page":3,"pages":6,"cols":1,"location":[55,0],"text":"【第１３段】長一點的段落：閱讀程式需要依照使用者","before":546}}
+PASS restore by fraction {"st":{"ready":true,"error":null,"page":3,"pages":6,"cols":1,"mode":"V","seq":4,"ms":39,"rubyFix":false},"p":{"chars":1880,"page":3,"pages":6,"cols":1,"location":[55,0],"text":"【第１３段】長一點的段落：閱讀程式需要依照使用者","before":546},"progression":0.2904255319148936}
+PASS restore by fraction, first character of every page {"pages":5,"wrong":[]}
+PASS font size change keeps the restored character {"st":{"ready":true,"error":null,"page":3,"pages":8,"cols":1,"mode":"V","seq":17,"ms":7,"rubyFix":false},"p":{"chars":1880,"page":3,"pages":8,"cols":1,"location":[55,0],"text":"【第１３段】長一點的段落：閱讀程式需要依照使用者","before":546}}
+PASS goProgress(0) is the first page {"chars":1880,"page":0,"pages":6,"cols":1,"location":[1,0],"text":"第１章測試章節【第１段】英文單字WebView與","before":0}
+PASS goProgress(1) is the last page {"p":{"chars":1880,"page":5,"pages":6,"cols":1,"location":[131,0],"text":"【第３３段】長一點的段落：閱讀程式需要依照使用者","before":1466},"last":5}
+PASS goProgress(0.5) shows the page with the middle character {"p":{"chars":1880,"page":3,"pages":6,"cols":1,"location":[55,0],"text":"【第１３段】長一點的段落：閱讀程式需要依照使用者","before":546},"nextPage":{"chars":1880,"page":4,"pages":6,"cols":1,"location":[93,0],"text":"【第２３段】長一點的段落：閱讀程式需要依照使用者","before":1006},"middle":940}
+PASS unknown text falls back to the fraction {"st":{"ready":true,"error":null,"page":3,"pages":6,"cols":1,"mode":"V","seq":19,"ms":31,"rubyFix":false},"p":{"chars":1880,"page":3,"pages":6,"cols":1,"location":[80,27],"text":"1混在其中；年份寫成二〇二六年；省略號……與破折","before":940}}
+11/11 passed

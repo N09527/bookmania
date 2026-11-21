@@ -1,0 +1,471 @@
+--- 05:57:39 after restore 9 11 mobi6-horizontal
+11-21 05:55:04.136 11830 11740 F google-breakpad: Microdump skipped (uninteresting)
+11-21 05:55:04.176 11682 11740 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 11740 (RenderThread)
+11-21 05:55:04.435 11833 11833 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 05:55:04.435 11833 11833 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 05:55:04.435 11833 11833 F DEBUG   : Revision: '0'
+11-21 05:55:04.436 11833 11833 F DEBUG   : ABI: 'x86_64'
+11-21 05:55:04.436 11833 11833 F DEBUG   : pid: 11682, tid: 11740, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 05:55:04.436 11833 11833 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 05:55:04.445 11833 11833 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779dd92010, eglErr = EGL_BAD_ALLOC'
+11-21 05:55:04.446 11833 11833 F DEBUG   :     rax 0000000000000000  rbx 0000000000002ddc  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 05:55:04.446 11833 11833 F DEBUG   :     rsi 0000000000002ddc  rdi 0000000000002da2
+11-21 05:55:04.446 11833 11833 F DEBUG   :     r8  00007a779fdfee50  r9  00007a779fdfee50  r10 0000000000000008  r11 0000000000000206
+11-21 05:55:04.447 11833 11833 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 0000000000002da2  r15 00007a779fdfed58
+11-21 05:55:04.447 11833 11833 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 05:55:04.447 11833 11833 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779dd92010  rsp 00007a779fdfed28  eflags 0000000000000206
+11-21 05:55:04.524 11833 11833 F DEBUG   : 
+11-21 05:55:04.524 11833 11833 F DEBUG   : backtrace:
+11-21 05:55:04.525 11833 11833 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 05:55:04.525 11833 11833 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 05:55:04.525 11833 11833 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 05:55:04.525 11833 11833 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 05:55:04.526 11833 11833 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 05:55:04.527 11833 11833 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 05:55:09.092  1661 11839 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 06:00:20 after restore 7 9 azw3-horizontal
+11-21 05:57:49.130 12051 11969 F google-breakpad: Microdump skipped (uninteresting)
+11-21 05:57:49.193 11914 11969 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 11969 (RenderThread)
+11-21 05:57:49.683 12054 12054 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 05:57:49.684 12054 12054 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 05:57:49.685 12054 12054 F DEBUG   : Revision: '0'
+11-21 05:57:49.685 12054 12054 F DEBUG   : ABI: 'x86_64'
+11-21 05:57:49.686 12054 12054 F DEBUG   : pid: 11914, tid: 11969, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 05:57:49.688 12054 12054 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 05:57:49.705 12054 12054 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779c7b4010, eglErr = EGL_BAD_ALLOC'
+11-21 05:57:49.706 12054 12054 F DEBUG   :     rax 0000000000000000  rbx 0000000000002ec1  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 05:57:49.706 12054 12054 F DEBUG   :     rsi 0000000000002ec1  rdi 0000000000002e8a
+11-21 05:57:49.706 12054 12054 F DEBUG   :     r8  00007a77a02ade50  r9  00007a77a02ade50  r10 0000000000000008  r11 0000000000000206
+11-21 05:57:49.707 12054 12054 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 0000000000002e8a  r15 00007a77a02add58
+11-21 05:57:49.707 12054 12054 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 05:57:49.707 12054 12054 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779c7b4010  rsp 00007a77a02add28  eflags 0000000000000206
+11-21 05:57:49.839 12054 12054 F DEBUG   : 
+11-21 05:57:49.839 12054 12054 F DEBUG   : backtrace:
+11-21 05:57:49.843 12054 12054 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 05:57:49.843 12054 12054 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 05:57:49.843 12054 12054 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 05:57:49.844 12054 12054 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 05:57:49.844 12054 12054 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 05:57:49.844 12054 12054 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 05:57:49.844 12054 12054 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 05:57:49.844 12054 12054 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 05:57:49.844 12054 12054 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 05:57:49.845 12054 12054 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 05:57:49.845 12054 12054 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 05:57:49.845 12054 12054 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 05:57:49.845 12054 12054 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 05:57:49.845 12054 12054 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+--- 06:06:37 after restore 14 16 epub-vertical-2col-landscape
+11-21 06:04:02.217 12735 12658 F google-breakpad: Microdump skipped (uninteresting)
+11-21 06:04:02.322 12603 12658 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 12658 (RenderThread)
+11-21 06:04:02.784 12738 12738 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 06:04:02.785 12738 12738 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 06:04:02.785 12738 12738 F DEBUG   : Revision: '0'
+11-21 06:04:02.785 12738 12738 F DEBUG   : ABI: 'x86_64'
+11-21 06:04:02.786 12738 12738 F DEBUG   : pid: 12603, tid: 12658, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 06:04:02.786 12738 12738 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 06:04:02.805 12738 12738 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779bba1010, eglErr = EGL_BAD_ALLOC'
+11-21 06:04:02.806 12738 12738 F DEBUG   :     rax 0000000000000000  rbx 0000000000003172  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 06:04:02.806 12738 12738 F DEBUG   :     rsi 0000000000003172  rdi 000000000000313b
+11-21 06:04:02.806 12738 12738 F DEBUG   :     r8  00007a77a02f3e50  r9  00007a77a02f3e50  r10 0000000000000008  r11 0000000000000206
+11-21 06:04:02.806 12738 12738 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 000000000000313b  r15 00007a77a02f3d58
+11-21 06:04:02.807 12738 12738 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 06:04:02.807 12738 12738 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779bba1010  rsp 00007a77a02f3d28  eflags 0000000000000206
+11-21 06:04:02.941 12738 12738 F DEBUG   : 
+11-21 06:04:02.941 12738 12738 F DEBUG   : backtrace:
+11-21 06:04:02.942 12738 12738 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 06:04:02.943 12738 12738 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 06:04:02.943 12738 12738 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 06:04:02.944 12738 12738 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 06:04:02.945 12738 12738 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 06:04:02.945 12738 12738 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 06:04:02.945 12738 12738 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 06:04:02.945 12738 12738 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 06:04:02.945 12738 12738 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 06:04:02.945 12738 12738 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 06:04:02.946 12738 12738 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 06:04:02.946 12738 12738 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 06:04:02.946 12738 12738 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 06:04:02.946 12738 12738 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 06:04:07.237  1661 12743 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 06:13:23 after restore 8 10 epub-horizontal-2col
+11-21 06:10:49.255 13484 13409 F google-breakpad: Microdump skipped (uninteresting)
+11-21 06:10:49.310 13358 13409 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 13409 (RenderThread)
+11-21 06:10:49.579 13488 13488 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 06:10:49.580 13488 13488 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 06:10:49.580 13488 13488 F DEBUG   : Revision: '0'
+11-21 06:10:49.580 13488 13488 F DEBUG   : ABI: 'x86_64'
+11-21 06:10:49.583 13488 13488 F DEBUG   : pid: 13358, tid: 13409, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 06:10:49.584 13488 13488 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 06:10:49.593 13488 13488 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779bf84010, eglErr = EGL_BAD_ALLOC'
+11-21 06:10:49.594 13488 13488 F DEBUG   :     rax 0000000000000000  rbx 0000000000003461  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 06:10:49.594 13488 13488 F DEBUG   :     rsi 0000000000003461  rdi 000000000000342e
+11-21 06:10:49.594 13488 13488 F DEBUG   :     r8  00007a77a02d2e50  r9  00007a77a02d2e50  r10 0000000000000008  r11 0000000000000206
+11-21 06:10:49.594 13488 13488 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 000000000000342e  r15 00007a77a02d2d58
+11-21 06:10:49.594 13488 13488 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 06:10:49.594 13488 13488 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779bf84010  rsp 00007a77a02d2d28  eflags 0000000000000206
+11-21 06:10:49.669 13488 13488 F DEBUG   : 
+11-21 06:10:49.669 13488 13488 F DEBUG   : backtrace:
+11-21 06:10:49.669 13488 13488 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 06:10:49.669 13488 13488 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 06:10:49.669 13488 13488 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 06:10:49.670 13488 13488 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 06:10:49.675 13488 13488 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 06:10:49.675 13488 13488 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 06:10:49.676 13488 13488 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 06:10:53.469  1661 13493 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 06:28:57 after settings 8 10 epub-horizontal
+11-21 06:26:18.757 15296 15218 F google-breakpad: Microdump skipped (uninteresting)
+11-21 06:26:18.801 15169 15218 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 15218 (RenderThread)
+11-21 06:26:19.202 15299 15299 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 06:26:19.203 15299 15299 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 06:26:19.203 15299 15299 F DEBUG   : Revision: '0'
+11-21 06:26:19.203 15299 15299 F DEBUG   : ABI: 'x86_64'
+11-21 06:26:19.203 15299 15299 F DEBUG   : pid: 15169, tid: 15218, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 06:26:19.204 15299 15299 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 06:26:19.210 15299 15299 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779d5cd010, eglErr = EGL_BAD_ALLOC'
+11-21 06:26:19.212 15299 15299 F DEBUG   :     rax 0000000000000000  rbx 0000000000003b72  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 06:26:19.212 15299 15299 F DEBUG   :     rsi 0000000000003b72  rdi 0000000000003b41
+11-21 06:26:19.212 15299 15299 F DEBUG   :     r8  00007a77a03dde50  r9  00007a77a03dde50  r10 0000000000000008  r11 0000000000000206
+11-21 06:26:19.212 15299 15299 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 0000000000003b41  r15 00007a77a03ddd58
+11-21 06:26:19.213 15299 15299 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 06:26:19.213 15299 15299 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779d5cd010  rsp 00007a77a03ddd28  eflags 0000000000000206
+11-21 06:26:19.287 15299 15299 F DEBUG   : 
+11-21 06:26:19.287 15299 15299 F DEBUG   : backtrace:
+11-21 06:26:19.288 15299 15299 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 06:26:19.288 15299 15299 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 06:26:19.288 15299 15299 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 06:26:19.288 15299 15299 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 06:26:19.289 15299 15299 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 06:26:23.453  1661 15304 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 06:35:32 after incognito 14 16
+11-21 06:34:23.585 16302 16303 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 16303 (Binder:16302_1)
+--- 06:50:48 after toc 14 16 epub-vertical 2
+11-21 06:48:09.097 18320 18249 F google-breakpad: Microdump skipped (uninteresting)
+11-21 06:48:09.147 18200 18249 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 18249 (RenderThread)
+11-21 06:48:09.429 18323 18323 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 06:48:09.430 18323 18323 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 06:48:09.432 18323 18323 F DEBUG   : Revision: '0'
+11-21 06:48:09.432 18323 18323 F DEBUG   : ABI: 'x86_64'
+11-21 06:48:09.432 18323 18323 F DEBUG   : pid: 18200, tid: 18249, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 06:48:09.433 18323 18323 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 06:48:09.439 18323 18323 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779ffcc010, eglErr = EGL_BAD_ALLOC'
+11-21 06:48:09.440 18323 18323 F DEBUG   :     rax 0000000000000000  rbx 0000000000004749  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 06:48:09.440 18323 18323 F DEBUG   :     rsi 0000000000004749  rdi 0000000000004718
+11-21 06:48:09.440 18323 18323 F DEBUG   :     r8  00007a77a02f9e50  r9  00007a77a02f9e50  r10 0000000000000008  r11 0000000000000206
+11-21 06:48:09.440 18323 18323 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 0000000000004718  r15 00007a77a02f9d58
+11-21 06:48:09.440 18323 18323 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 06:48:09.440 18323 18323 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779ffcc010  rsp 00007a77a02f9d28  eflags 0000000000000206
+11-21 06:48:09.513 18323 18323 F DEBUG   : 
+11-21 06:48:09.513 18323 18323 F DEBUG   : backtrace:
+11-21 06:48:09.514 18323 18323 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 06:48:09.514 18323 18323 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 06:48:09.516 18323 18323 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 06:48:09.517 18323 18323 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 06:48:09.517 18323 18323 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 06:48:09.517 18323 18323 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 06:48:09.517 18323 18323 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 06:48:09.517 18323 18323 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 06:48:13.552  1661 18328 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 07:01:50 after slider 14 16 epub-vertical 0.25
+11-21 06:59:10.922 19392 19318 F google-breakpad: Microdump skipped (uninteresting)
+11-21 06:59:10.957 19259 19318 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 19318 (RenderThread)
+11-21 06:59:11.264 19395 19395 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 06:59:11.265 19395 19395 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 06:59:11.265 19395 19395 F DEBUG   : Revision: '0'
+11-21 06:59:11.265 19395 19395 F DEBUG   : ABI: 'x86_64'
+11-21 06:59:11.265 19395 19395 F DEBUG   : pid: 19259, tid: 19318, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 06:59:11.266 19395 19395 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 06:59:11.283 19395 19395 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7a779b828010, eglErr = EGL_BAD_ALLOC'
+11-21 06:59:11.284 19395 19395 F DEBUG   :     rax 0000000000000000  rbx 0000000000004b76  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 06:59:11.284 19395 19395 F DEBUG   :     rsi 0000000000004b76  rdi 0000000000004b3b
+11-21 06:59:11.284 19395 19395 F DEBUG   :     r8  00007a779fec9e50  r9  00007a779fec9e50  r10 0000000000000008  r11 0000000000000206
+11-21 06:59:11.284 19395 19395 F DEBUG   :     r12 0000000000000000  r13 00007a77c25720c4  r14 0000000000004b3b  r15 00007a779fec9d58
+11-21 06:59:11.285 19395 19395 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 06:59:11.285 19395 19395 F DEBUG   :     rip 00007a77c46c2817  rbp 00007a779b828010  rsp 00007a779fec9d28  eflags 0000000000000206
+11-21 06:59:11.380 19395 19395 F DEBUG   : 
+11-21 06:59:11.380 19395 19395 F DEBUG   : backtrace:
+11-21 06:59:11.382 19395 19395 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 06:59:11.382 19395 19395 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 06:59:11.382 19395 19395 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 06:59:11.382 19395 19395 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 06:59:11.383 19395 19395 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 06:59:11.384 19395 19395 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 06:59:16.762  1661 19400 I am_crash: [1661,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 07:19:18 after tapzones 14 16 epub-vertical 2 NONE
+11-21 07:14:54.947 21166 21167 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 21167 (Binder:21166_1)
+--- 08:04:09 after switch_back 14 16 epub-one-picture 12
+11-21 08:03:04.215 27181 27182 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 27182 (Binder:27181_1)
+--- 08:09:14 after switch_comic 11 13
+11-21 08:03:04.215 27181 27182 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 27182 (Binder:27181_1)
+--- emulator restarted 08:16 (fresh instance) before the reruns
+--- 08:23:03 after warmup 14 16
+11-21 08:17:22.535  1674  1691 I am_anr  : [0,1792,com.android.systemui,952647181,executing service com.android.systemui/.keyguard.KeyguardService]
+11-21 08:18:10.882  1674  1691 I am_anr  : [0,2088,com.google.android.gms.persistent,-1194836411,executing service com.google.android.gms/.backup.component.D2dTransportService]
+11-21 08:18:21.618  1674  1691 I am_anr  : [0,2344,com.google.android.gms,-1194836411,executing service com.google.android.gms/.chimera.GmsIntentOperationService]
+--- 08:37:38 after restore 14 16 epub-vertical-2col-landscape
+11-21 08:35:25.999  6141  6061 F google-breakpad: Microdump skipped (uninteresting)
+11-21 08:35:26.063  6005  6061 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 6061 (RenderThread)
+11-21 08:35:26.396  6145  6145 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 08:35:26.397  6145  6145 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 08:35:26.397  6145  6145 F DEBUG   : Revision: '0'
+11-21 08:35:26.397  6145  6145 F DEBUG   : ABI: 'x86_64'
+11-21 08:35:26.398  6145  6145 F DEBUG   : pid: 6005, tid: 6061, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 08:35:26.398  6145  6145 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 08:35:26.409  6145  6145 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7cdbba66c010, eglErr = EGL_BAD_ALLOC'
+11-21 08:35:26.413  6145  6145 F DEBUG   :     rax 0000000000000000  rbx 00000000000017ad  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 08:35:26.413  6145  6145 F DEBUG   :     rsi 00000000000017ad  rdi 0000000000001775
+11-21 08:35:26.413  6145  6145 F DEBUG   :     r8  00007cdbb9fbee50  r9  00007cdbb9fbee50  r10 0000000000000008  r11 0000000000000206
+11-21 08:35:26.414  6145  6145 F DEBUG   :     r12 0000000000000000  r13 00007cdbdb1d30c4  r14 0000000000001775  r15 00007cdbb9fbed58
+11-21 08:35:26.414  6145  6145 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 08:35:26.414  6145  6145 F DEBUG   :     rip 00007cdbdedbf817  rbp 00007cdbba66c010  rsp 00007cdbb9fbed28  eflags 0000000000000206
+11-21 08:35:26.502  6145  6145 F DEBUG   : 
+11-21 08:35:26.502  6145  6145 F DEBUG   : backtrace:
+11-21 08:35:26.503  6145  6145 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 08:35:26.503  6145  6145 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 08:35:26.503  6145  6145 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 08:35:26.504  6145  6145 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 08:35:26.505  6145  6145 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 08:35:26.505  6145  6145 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 08:35:26.505  6145  6145 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+--- 08:42:03 after restore 8 10 epub-horizontal-2col
+11-21 08:39:53.699  6652  6576 F google-breakpad: Microdump skipped (uninteresting)
+11-21 08:39:53.749  6525  6576 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 6576 (RenderThread)
+11-21 08:39:54.026  6655  6655 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 08:39:54.027  6655  6655 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 08:39:54.027  6655  6655 F DEBUG   : Revision: '0'
+11-21 08:39:54.027  6655  6655 F DEBUG   : ABI: 'x86_64'
+11-21 08:39:54.027  6655  6655 F DEBUG   : pid: 6525, tid: 6576, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 08:39:54.028  6655  6655 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 08:39:54.036  6655  6655 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7cdbb9bf6010, eglErr = EGL_BAD_ALLOC'
+11-21 08:39:54.037  6655  6655 F DEBUG   :     rax 0000000000000000  rbx 00000000000019b0  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 08:39:54.037  6655  6655 F DEBUG   :     rsi 00000000000019b0  rdi 000000000000197d
+11-21 08:39:54.037  6655  6655 F DEBUG   :     r8  00007cdbb9dfee50  r9  00007cdbb9dfee50  r10 0000000000000008  r11 0000000000000206
+11-21 08:39:54.037  6655  6655 F DEBUG   :     r12 0000000000000000  r13 00007cdbdb1d30c4  r14 000000000000197d  r15 00007cdbb9dfed58
+11-21 08:39:54.037  6655  6655 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 08:39:54.037  6655  6655 F DEBUG   :     rip 00007cdbdedbf817  rbp 00007cdbb9bf6010  rsp 00007cdbb9dfed28  eflags 0000000000000206
+11-21 08:39:54.112  6655  6655 F DEBUG   : 
+11-21 08:39:54.112  6655  6655 F DEBUG   : backtrace:
+11-21 08:39:54.113  6655  6655 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 08:39:54.113  6655  6655 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 08:39:54.113  6655  6655 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 08:39:54.113  6655  6655 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 08:39:54.113  6655  6655 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 08:39:54.114  6655  6655 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 08:39:58.273  1674  6660 I am_crash: [1674,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 09:02:55 after toc 14 16 epub-vertical 2
+11-21 09:00:34.124  9299  9224 F google-breakpad: Microdump skipped (uninteresting)
+11-21 09:00:34.175  9170  9224 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 9224 (RenderThread)
+11-21 09:00:34.432  9302  9302 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 09:00:34.433  9302  9302 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 09:00:34.433  9302  9302 F DEBUG   : Revision: '0'
+11-21 09:00:34.433  9302  9302 F DEBUG   : ABI: 'x86_64'
+11-21 09:00:34.433  9302  9302 F DEBUG   : pid: 9170, tid: 9224, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 09:00:34.434  9302  9302 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 09:00:34.443  9302  9302 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7cdbb5a7e010, eglErr = EGL_BAD_ALLOC'
+11-21 09:00:34.444  9302  9302 F DEBUG   :     rax 0000000000000000  rbx 0000000000002408  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 09:00:34.444  9302  9302 F DEBUG   :     rsi 0000000000002408  rdi 00000000000023d2
+11-21 09:00:34.444  9302  9302 F DEBUG   :     r8  00007cdbb9bfee50  r9  00007cdbb9bfee50  r10 0000000000000008  r11 0000000000000206
+11-21 09:00:34.444  9302  9302 F DEBUG   :     r12 0000000000000000  r13 00007cdbdb1d30c4  r14 00000000000023d2  r15 00007cdbb9bfed58
+11-21 09:00:34.444  9302  9302 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 09:00:34.444  9302  9302 F DEBUG   :     rip 00007cdbdedbf817  rbp 00007cdbb5a7e010  rsp 00007cdbb9bfed28  eflags 0000000000000206
+11-21 09:00:34.519  9302  9302 F DEBUG   : 
+11-21 09:00:34.519  9302  9302 F DEBUG   : backtrace:
+11-21 09:00:34.521  9302  9302 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 09:00:34.521  9302  9302 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 09:00:34.521  9302  9302 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 09:00:34.521  9302  9302 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 09:00:34.522  9302  9302 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 09:00:34.523  9302  9302 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 09:00:39.101  1674  9307 I am_crash: [1674,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- rerun of 7 8 15 18 (attempt 2) 09:12:19
+--- 09:27:59 after warmup 14 16
+11-21 09:12:50.523 10519 10430 F google-breakpad: Microdump skipped (uninteresting)
+11-21 09:12:50.561 10355 10430 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 10430 (RenderThread)
+11-21 09:12:50.857 10522 10522 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 09:12:50.859 10522 10522 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 09:12:50.859 10522 10522 F DEBUG   : Revision: '0'
+11-21 09:12:50.859 10522 10522 F DEBUG   : ABI: 'x86_64'
+11-21 09:12:50.859 10522 10522 F DEBUG   : pid: 10355, tid: 10430, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 09:12:50.865 10522 10522 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 09:12:50.879 10522 10522 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7cdbb5c98010, eglErr = EGL_BAD_ALLOC'
+11-21 09:12:50.881 10522 10522 F DEBUG   :     rax 0000000000000000  rbx 00000000000028be  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 09:12:50.881 10522 10522 F DEBUG   :     rsi 00000000000028be  rdi 0000000000002873
+11-21 09:12:50.881 10522 10522 F DEBUG   :     r8  00007cdbba160e50  r9  00007cdbba160e50  r10 0000000000000008  r11 0000000000000206
+11-21 09:12:50.882 10522 10522 F DEBUG   :     r12 0000000000000000  r13 00007cdbdb1d30c4  r14 0000000000002873  r15 00007cdbba160d58
+11-21 09:12:50.882 10522 10522 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 09:12:50.882 10522 10522 F DEBUG   :     rip 00007cdbdedbf817  rbp 00007cdbb5c98010  rsp 00007cdbba160d28  eflags 0000000000000206
+11-21 09:12:50.969 10522 10522 F DEBUG   : 
+11-21 09:12:50.969 10522 10522 F DEBUG   : backtrace:
+11-21 09:12:50.972 10522 10522 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 09:12:50.972 10522 10522 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 09:12:50.972 10522 10522 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 09:12:50.972 10522 10522 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 09:12:50.972 10522 10522 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 09:12:50.972 10522 10522 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 09:12:50.973 10522 10522 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-21 09:12:55.831  1674 10527 I am_crash: [1674,0,io.github.n09527.bookmania.debug,687390278,Native crash,Aborted,unknown,0]
+--- 09:33:53 after restore 14 16 epub-vertical-2col-landscape
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: UiAutomatorHandlerThread
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: java.lang.RuntimeException: Bad file descriptor
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.os.BinderProxy.transactNative(Native Method)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.os.BinderProxy.transact(Binder.java:748)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.accessibilityservice.IAccessibilityServiceConnection$Stub$Proxy.findAccessibilityNodeInfoByAccessibilityId(IAccessibilityServiceConnection.java:446)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.view.accessibility.AccessibilityInteractionClient.findAccessibilityNodeInfoByAccessibilityId(AccessibilityInteractionClient.java:290)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.view.accessibility.AccessibilityNodeInfo.refresh(AccessibilityNodeInfo.java:862)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.view.accessibility.AccessibilityCache$AccessibilityNodeRefresher.refreshNode(AccessibilityCache.java:564)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.view.accessibility.AccessibilityCache.refreshCachedNodeLocked(AccessibilityCache.java:206)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.view.accessibility.AccessibilityCache.onAccessibilityEvent(AccessibilityCache.java:170)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.view.accessibility.AccessibilityInteractionClient.onAccessibilityEvent(AccessibilityInteractionClient.java:570)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.accessibilityservice.AccessibilityService$IAccessibilityServiceClientWrapper.executeMessage(AccessibilityService.java:1709)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at com.android.internal.os.HandlerCaller$MyHandler.handleMessage(HandlerCaller.java:37)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:105)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:164)
+11-21 09:28:51.659 11452 11462 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:65)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: Error reporting crash
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: java.lang.RuntimeException: Bad file descriptor
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.os.BinderProxy.transactNative(Native Method)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.os.BinderProxy.transact(Binder.java:748)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.os.ServiceManagerProxy.getService(ServiceManagerNative.java:123)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.os.ServiceManager.getService(ServiceManager.java:56)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.app.ActivityManager$1.create(ActivityManager.java:4214)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.app.ActivityManager$1.create(ActivityManager.java:4212)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.util.Singleton.get(Singleton.java:34)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at android.app.ActivityManager.getService(ActivityManager.java:4207)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$KillApplicationHandler.uncaughtException(RuntimeInit.java:115)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1068)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1063)
+11-21 09:28:51.699 11452 11462 E AndroidRuntime: 	at java.lang.Thread.dispatchUncaughtException(Thread.java:1953)
+11-21 09:31:28.455 11782 11783 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 11783 (Binder:11782_1)
+--- 09:42:16 after toc 14 16 epub-vertical 2
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: *** FATAL EXCEPTION IN SYSTEM PROCESS: UiAutomatorHandlerThread
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: java.lang.RuntimeException: Bad file descriptor
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.os.BinderProxy.transactNative(Native Method)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.os.BinderProxy.transact(Binder.java:748)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.accessibilityservice.IAccessibilityServiceConnection$Stub$Proxy.findAccessibilityNodeInfoByAccessibilityId(IAccessibilityServiceConnection.java:446)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.view.accessibility.AccessibilityInteractionClient.findAccessibilityNodeInfoByAccessibilityId(AccessibilityInteractionClient.java:290)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.view.accessibility.AccessibilityNodeInfo.refresh(AccessibilityNodeInfo.java:862)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.view.accessibility.AccessibilityCache$AccessibilityNodeRefresher.refreshNode(AccessibilityCache.java:564)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.view.accessibility.AccessibilityCache.refreshCachedNodeLocked(AccessibilityCache.java:206)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.view.accessibility.AccessibilityCache.onAccessibilityEvent(AccessibilityCache.java:170)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.view.accessibility.AccessibilityInteractionClient.onAccessibilityEvent(AccessibilityInteractionClient.java:570)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.accessibilityservice.AccessibilityService$IAccessibilityServiceClientWrapper.executeMessage(AccessibilityService.java:1709)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at com.android.internal.os.HandlerCaller$MyHandler.handleMessage(HandlerCaller.java:37)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:105)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:164)
+11-21 09:39:30.536 12871 12882 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:65)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: Error reporting crash
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: java.lang.RuntimeException: Bad file descriptor
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.os.BinderProxy.transactNative(Native Method)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.os.BinderProxy.transact(Binder.java:748)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.os.ServiceManagerProxy.getService(ServiceManagerNative.java:123)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.os.ServiceManager.getService(ServiceManager.java:56)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.app.ActivityManager$1.create(ActivityManager.java:4214)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.app.ActivityManager$1.create(ActivityManager.java:4212)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.util.Singleton.get(Singleton.java:34)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at android.app.ActivityManager.getService(ActivityManager.java:4207)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$KillApplicationHandler.uncaughtException(RuntimeInit.java:115)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1068)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1063)
+11-21 09:39:30.538 12871 12882 E AndroidRuntime: 	at java.lang.Thread.dispatchUncaughtException(Thread.java:1953)
+--- rerun of 1 14 10:13:02
+--- 10:28:59 after warmup 14 16
+11-21 10:14:01.637 16778 16690 F google-breakpad: Microdump skipped (uninteresting)
+11-21 10:14:01.694 16602 16690 F libc    : Fatal signal 6 (SIGABRT), code -6 in tid 16690 (RenderThread)
+11-21 10:14:02.234 16781 16781 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-21 10:14:02.234 16781 16781 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-21 10:14:02.235 16781 16781 F DEBUG   : Revision: '0'
+11-21 10:14:02.235 16781 16781 F DEBUG   : ABI: 'x86_64'
+11-21 10:14:02.235 16781 16781 F DEBUG   : pid: 16602, tid: 16690, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-21 10:14:02.236 16781 16781 F DEBUG   : signal 6 (SIGABRT), code -6 (SI_TKILL), fault addr --------
+11-21 10:14:02.251 16781 16781 F DEBUG   : Abort message: 'Failed to create EGLSurface for window 0x7cdbb6b09010, eglErr = EGL_BAD_ALLOC'
+11-21 10:14:02.252 16781 16781 F DEBUG   :     rax 0000000000000000  rbx 0000000000004132  rcx ffffffffffffffff  rdx 0000000000000006
+11-21 10:14:02.252 16781 16781 F DEBUG   :     rsi 0000000000004132  rdi 00000000000040da
+11-21 10:14:02.252 16781 16781 F DEBUG   :     r8  00007cdbba3c4e50  r9  00007cdbba3c4e50  r10 0000000000000008  r11 0000000000000206
+11-21 10:14:02.252 16781 16781 F DEBUG   :     r12 0000000000000000  r13 00007cdbdb1d30c4  r14 00000000000040da  r15 00007cdbba3c4d58
+11-21 10:14:02.252 16781 16781 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-21 10:14:02.252 16781 16781 F DEBUG   :     rip 00007cdbdedbf817  rbp 00007cdbb6b09010  rsp 00007cdbba3c4d28  eflags 0000000000000206
+11-21 10:14:02.348 16781 16781 F DEBUG   : 
+11-21 10:14:02.348 16781 16781 F DEBUG   : backtrace:
+11-21 10:14:02.349 16781 16781 F DEBUG   :     #00 pc 000000000007a817  /system/lib64/libc.so (tgkill+7)
+11-21 10:14:02.349 16781 16781 F DEBUG   :     #01 pc 000000000002779e  /system/lib64/libc.so (abort+94)
+11-21 10:14:02.349 16781 16781 F DEBUG   :     #02 pc 0000000000007ddd  /system/lib64/liblog.so (__android_log_assert+365)
+11-21 10:14:02.349 16781 16781 F DEBUG   :     #03 pc 00000000000534d1  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager13createSurfaceEP13ANativeWindow+209)
+11-21 10:14:02.352 16781 16781 F DEBUG   :     #04 pc 00000000000518cb  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline10setSurfaceEPNS_7SurfaceENS1_12SwapBehaviorE+59)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #05 pc 000000000004e62d  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext10setSurfaceEPNS_7SurfaceE+125)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #06 pc 00000000000567af  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthreadL17Bridge_initializeEPNS1_14initializeArgsE+15)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #07 pc 000000000005820a  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread22MethodInvokeRenderTask3runEv+10)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #08 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #09 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #10 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #11 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #12 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-21 10:14:02.353 16781 16781 F DEBUG   :     #13 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
