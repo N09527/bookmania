@@ -360,6 +360,31 @@ def percent(ns):
     n = next((m for m in ns if re.fullmatch(r'\d+%', m['text'])), None)
     return int(n['text'][:-1]) if n else None
 
+
+def page_span():
+    """(first, after): index of the first non-whitespace character on the page (or spread) shown and of the
+    first one after it in the document (the document's length when nothing follows). The pages after it are
+    read through the shell and the page shown is shown again; the App does not see these moves (it saved
+    the position shown before)."""
+    st = d.status()
+    p = pos()
+    if not st or not p or p.get('before') is None:
+        return None
+    after = p['chars']
+    k = st['page'] + st['cols']
+    while k < st['pages']:
+        d.cdp(f'window.__reader.goPage({k})')
+        q = pos()
+        if q and q.get('before') is not None:
+            after = q['before']
+            break
+        k += st['cols']
+    d.cdp(f'window.__reader.goPage({st["page"]})')
+    back = pos()
+    if not back or back.get('before') != p['before']:
+        note(f'page_span: the page shown again is not the same: {back}')
+    return p['before'], after
+
 # endregion
 
 # region Backup (.tachibk: gzip of the Backup protobuf message)
@@ -1048,7 +1073,9 @@ def step_slider(manga, chapter, label, fraction):
     mid = d.nodes()
     t.join()
     d.shot(label + '-1-dragging')
-    bar_texts = [n['text'] for n in mid if n['text'] and n['y'] > 1500 and not re.fullmatch(r'\d+%', n['text'])]
+    # The bar's texts are TextView nodes (the book's text in the WebView is in View nodes).
+    bar_texts = [n['text'] for n in mid if n['text'] and n['y'] > 1500 and n['cls'].endswith('TextView')
+                 and not re.fullmatch(r'\d+%', n['text'])]
     check('while dragging, the bar shows a table of contents title instead of the page', bar_texts and not any(PAGE_INFO.match(x) for x in bar_texts),
           {'bar texts while dragging': bar_texts, 'page info before': page_info(ns)})
     st = wait_change(st0, 120)
@@ -1056,14 +1083,30 @@ def step_slider(manga, chapter, label, fraction):
     after = d.nodes()
     pct = percent(after)
     want = (1 - fraction) if rtl else fraction
+    span = page_span()
     d.shot(label + '-2-released')
-    check(f'released at {fraction:.2f} of the track ({"right to left" if rtl else "left to right"}): book progress near {want:.2f}',
-          pct is not None and abs(pct / 100 - want) <= 0.06, {'percent shown': pct, 'expected': want, 'status': st, 'page info': page_info(after)})
     leave_reader()
     stop_app()
     m = main_rows(chapter)
-    saved, _ = ebook_rows(m['key'])
-    check('saved whole-book progress matches', saved and saved.get('total') is not None and abs(saved['total'] - want) <= 0.06, saved)
+    saved, book = ebook_rows(m['key'])
+    counts = (book or {}).get('char_counts') or []
+    total = sum(counts)
+    start = end = None
+    if saved and span and total:
+        before = sum(counts[:saved['spine']])
+        start, end = before + span[0], before + span[1]
+    # The slider goes to the page that holds the character at that fraction of the book; where the finger
+    # was released is known to a few pixels of the track (0.5 % of the book).
+    target = want * total
+    slack = 0.005 * total
+    check(f'released at {fraction:.2f} of the track ({"right to left" if rtl else "left to right"}): the page shown holds the character at {want:.2f} of the book',
+          start is not None and start - slack <= target < end + slack,
+          {'target character': round(target), 'page shown, characters': [start, end], 'of': total, 'status': st, 'page info': page_info(after)})
+    # The progress shown and saved is that of the page's first character (the reading position).
+    check('percent shown and saved whole-book progress are those of the first character of that page',
+          start is not None and pct is not None and abs(pct / 100 - start / total) <= 0.006 and saved.get('total') is not None
+          and abs(saved['total'] - start / total) < 0.002,
+          {'percent shown': pct, 'saved total': saved and saved.get('total'), 'first character / book': start and round(start / total, 4)})
 
 
 def step_end(manga, chapter, label):
