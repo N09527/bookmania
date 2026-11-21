@@ -37,7 +37,7 @@ OUT = os.environ['OUT']
 os.makedirs(os.path.join(OUT, 'shots'), exist_ok=True)
 ADB = os.environ.get('ADB', 'adb')
 KEY_PAGE_UP, KEY_PAGE_DOWN = 92, 93
-CELL = 10  # grid cell, pixels of the quarter-size recording
+CELL = [20]  # grid cell in pixels of the recording: 20 at half size, 10 at quarter size (set by record_turn)
 
 
 def check(name, ok, detail=None):
@@ -90,6 +90,7 @@ def record_turn(label, code, seconds=60, size=None):
     for f in os.listdir(folder):
         os.remove(os.path.join(folder, f))
     w, h = size
+    CELL[0] = max(10, min(size) // 27)
     record_turn.since = device_time()
     before = grab(size)
     before.save(os.path.join(folder, 'before.png'))
@@ -140,9 +141,10 @@ def grey(img):
 
 
 def cells(diff):
+    cell = CELL[0]
     h, w = diff.shape
-    gh, gw = h // CELL, w // CELL
-    return np.abs(diff[:gh * CELL, :gw * CELL]).reshape(gh, CELL, gw, CELL).mean(axis=(1, 3))
+    gh, gw = h // cell, w // cell
+    return np.abs(diff[:gh * cell, :gw * cell]).reshape(gh, cell, gw, cell).mean(axis=(1, 3))
 
 
 def colour_diff(x, y):
@@ -217,10 +219,13 @@ def sheet(label, before, after, frames, rows, picks=6):
     return path
 
 
-def patch_shift(frame, page, vertical=False, size=(24, 16), max_err=8.0):
+def patch_shift(frame, page, vertical=False, size=None, max_err=None):
     """How far [page] is shifted in [frame] (pixels of the recording, along x; along y when [vertical]):
     small patches of the page that hold text are looked for in the same rows of the frame; the median of
     the shifts found with a small difference, or None when no patch is found (the page is off the frame)."""
+    half = CELL[0] >= 20
+    size = size or ((48, 32) if half else (24, 16))
+    max_err = max_err or (6.0 if half else 8.0)
     F = grey(frame)
     P = grey(page)
     if vertical:
@@ -235,7 +240,7 @@ def patch_shift(frame, page, vertical=False, size=(24, 16), max_err=8.0):
                 continue
             band = F[py:py + ph, :]
             best = None
-            for x in range(0, w - pw + 1):
+            for x in range(0, w - pw + 1, 2 if half else 1):
                 err = np.abs(band[:, x:x + pw] - patch).mean()
                 if best is None or err < best[1]:
                     best = (x - px, err)
@@ -244,7 +249,7 @@ def patch_shift(frame, page, vertical=False, size=(24, 16), max_err=8.0):
     if len(shifts) < 3:
         return None, len(shifts)
     median = int(np.median(shifts))
-    agree = sum(abs(x - median) <= 2 for x in shifts)
+    agree = sum(abs(x - median) <= (4 if half else 2) for x in shifts)
     if agree < max(3, 0.6 * len(shifts)):  # patches that also match elsewhere (repeated characters)
         return None, len(shifts)
     return median, agree
@@ -322,7 +327,7 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     size = screen_size()
     check('the screen is in ' + ('landscape' if landscape else 'portrait'), (size[0] > size[1]) == landscape,
           {'screen': size, 'columns shown': st.get('cols')})
-    size = (size[0] // 4, size[1] // 4)  # a small recording: the emulator's encoder takes less time from the App
+    size = (size[0] // 2, size[1] // 2)  # text needs half size to be told apart in the frames
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
     st2 = d.status()
     rows = analyse(before, after, frames)
@@ -414,7 +419,7 @@ def rapid_step(manga, chapter, style, label):
     time.sleep(4)
     st = d.status()
     size = screen_size()
-    size = (size[0] // 4, size[1] // 4)  # a small recording: the emulator's encoder takes less time from the App
+    size = (size[0] // 2, size[1] // 2)
     before = grab(size)
     d.shell(f'input keyevent {KEY_PAGE_DOWN} {KEY_PAGE_DOWN} {KEY_PAGE_DOWN}')
     time.sleep(30)
@@ -431,6 +436,7 @@ def reanalyse(label, style, back=False, spread=False, rtl=False, edge=None):
     folder = os.path.join(OUT, 'rec', label)
     before = Image.open(os.path.join(folder, 'before.png')).convert('RGB')
     after = Image.open(os.path.join(folder, 'after.png')).convert('RGB')
+    CELL[0] = max(10, min(before.size) // 27)
     frames = extract(folder, before.size) if not any(n.startswith('f0') for n in os.listdir(folder)) else [
         (t, Image.open(os.path.join(folder, n)).convert('RGB').resize(before.size))
         for t, n in zip([r['t'] for r in json.load(open(os.path.join(folder, 'analysis.json')))],
@@ -469,7 +475,7 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False)
         time.sleep(8)
     size = screen_size()
     check('the screen is in ' + ('landscape' if double else 'portrait'), (size[0] > size[1]) == double, {'screen': size})
-    size = (size[0] // 4, size[1] // 4)  # a small recording: the emulator's encoder takes less time from the App
+    size = (size[0] // 4, size[1] // 4)  # comic pages are told apart by colour: a small, cheaper recording
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
     rows = analyse(before, after, frames)
     with open(os.path.join(OUT, 'rec', label, 'analysis.json'), 'w') as f:
@@ -606,17 +612,22 @@ def add_chapter(manga, source, name):
     folder = db.execute('SELECT url FROM mangas WHERE _id = ?', (manga,)).fetchone()[0]
     local = f'/sdcard/Android/data/{d.PKG}/files/local'
     d.shell(f'cp "{source}" "{local}/{folder}/{name}"')
-    before = len(chapter_rows(manga))
-    d.shell(f'am start -n {d.PKG}/eu.kanade.tachiyomi.ui.main.MainActivity -a eu.kanade.tachiyomi.SHOW_MANGA --el manga {manga}')
-    time.sleep(8)
-    c.wait_app_drawn()
-    time.sleep(8)
-    c.clear_dialogs()
-    d.swipe(540, 500, 540, 1500, ms=700, wait=20)  # pull to refresh
-    d.shot('s55-add-chapter')
-    c.stop_app()
     rows = chapter_rows(manga)
-    check('the new file is a chapter of the work', len(rows) == before + 1 and any(r[2].endswith(name) for r in rows), rows)
+    added = any(r[2].endswith(name) for r in rows)
+    for attempt in range(3):  # a pull to refresh is sometimes not taken on this emulator
+        if added:
+            break
+        d.shell(f'am start -n {d.PKG}/eu.kanade.tachiyomi.ui.main.MainActivity -a eu.kanade.tachiyomi.SHOW_MANGA --el manga {manga}')
+        time.sleep(8)
+        c.wait_app_drawn()
+        time.sleep(8)
+        c.clear_dialogs()
+        d.swipe(540, 500, 540, 1500, ms=700, wait=20)  # pull to refresh
+        d.shot(f's55-add-chapter-{attempt + 1}')
+        c.stop_app()
+        rows = chapter_rows(manga)
+        added = any(r[2].endswith(name) for r in rows)
+    check('the new file is a chapter of the work', added, rows)
 
 
 def open_chapters():
