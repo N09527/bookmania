@@ -470,15 +470,33 @@ def step_backup_setting_verify():
     check('per-file setting restored from the backup', got == want['value'], {'key': want['key'], 'value': got})
 
 
+def backed_up_manga():
+    """(source, url) of the manga that a backup with the default options holds (BackupCreator): the library
+    (favorite = 1) and, with "all read manga" on, the others that have a chapter read or with a page
+    (mangas.sq findReadNotFavorites)."""
+    c = pull_db('tachiyomi.db')
+    rows = c.execute('SELECT source, url FROM mangas WHERE favorite = 1 OR _id IN '
+                     '(SELECT manga_id FROM chapters WHERE read = 1 OR last_page_read != 0)').fetchall()
+    c.close()
+    return {(r[0], r[1]) for r in rows}
+
+
 def step_backup_check(path):
-    """The backup file holds the positions in ebook.db (App stopped)."""
+    """The backup file holds the positions in ebook.db of the manga the backup holds (App stopped)."""
     STEP[0] = 'backup:file'
     stop_app(0)
     b = read_backup(path)
     device = all_positions()
-    note(f"{len(b['positions'])} positions in the backup, {len(device)} in ebook.db, {b['chapters']} chapters")
-    check('every position of ebook.db is in the backup (field 20101), unchanged', device and all(b['positions'].get(k) == v for k, v in device.items()),
-          {'in ebook.db': len(device), 'in backup': len(b['positions']), 'missing or different': [list(k) for k, v in device.items() if b['positions'].get(k) != v]})
+    manga = backed_up_manga()
+    expected = {k: v for k, v in device.items() if (k[0], k[1]) in manga}
+    outside = sorted(list(k) for k in device if (k[0], k[1]) not in manga)
+    note(f"{len(b['positions'])} positions in the backup, {len(device)} in ebook.db ({len(expected)} of manga the backup holds), "
+         f"{b['chapters']} chapters")
+    check('every position of ebook.db is in the backup (field 20101), unchanged, for the manga the backup holds',
+          expected and all(b['positions'].get(k) == v for k, v in expected.items()),
+          {'in ebook.db': len(device), 'of manga in the backup': len(expected), 'in backup': len(b['positions']),
+           'missing or different': [list(k) for k, v in expected.items() if b['positions'].get(k) != v],
+           'not in the backup by the existing rules (not in the library, no page, nothing read)': outside})
     want = None
     if os.path.exists(os.path.join(OUT, 'backup-setting.json')):
         with open(os.path.join(OUT, 'backup-setting.json'), encoding='utf-8') as f:
