@@ -580,9 +580,7 @@ def ensure_unread(manga, chapter):
     m = main_rows(chapter)
     if m['read']:
         note(f"chapter {chapter} is read; marking it unread in the chapter list")
-        swipe_chapter_left(manga, m['chapter'])
-        stop_app(3)
-        m = main_rows(chapter)
+        m = set_read(manga, chapter, False)
         if m['read']:
             raise RuntimeError(f'chapter {chapter} is still read')
     return m
@@ -786,9 +784,14 @@ def open_manga(manga):
     d.shell(f'am start -n {d.PKG}/eu.kanade.tachiyomi.ui.main.MainActivity -a eu.kanade.tachiyomi.SHOW_MANGA --el manga {manga}')
 
 
+SWIPES = [0]
+
+
 def swipe_chapter_left(manga, name):
     """In the chapter list a swipe to the left toggles read / unread (MangaDetailsAdapter.onItemSwiped);
-    "unread" also clears last_page_read and pages_left (MangaDetailsPresenter.markChaptersRead)."""
+    "unread" also clears last_page_read and pages_left (MangaDetailsPresenter.markChaptersRead).
+    Returns the snackbar text the swipe shows (標示為已讀 / 標示為未讀), or None when none was seen. A
+    screenshot after each swipe is kept (swipe-N.png)."""
     open_manga(manga)
     row = None
     for _ in range(20):
@@ -797,10 +800,40 @@ def swipe_chapter_left(manga, name):
         row = d.find(name, exact=True)
         if row:
             break
+    SWIPES[0] += 1
     if row is None:
-        return False
-    d.swipe(980, row['y'], 120, row['y'], 300, 6)
-    return True
+        note(f'swipe {SWIPES[0]}: chapter row {name} not found')
+        d.shot(f'swipe-{SWIPES[0]}-no-row')
+        return None
+    d.swipe(980, row['y'], 120, row['y'], 300, 1)
+    snack = None
+    for _ in range(4):
+        ns = d.nodes()
+        snack = d.find('標示為已讀', ns, exact=True) or d.find('標示為未讀', ns, exact=True)
+        if snack:
+            break
+        time.sleep(1)
+    d.shot(f'swipe-{SWIPES[0]}')
+    note(f"swipe {SWIPES[0]} on {name} at y={row['y']}: snackbar {snack and snack['text']}")
+    time.sleep(4)
+    return snack and snack['text']
+
+
+def set_read(manga, chapter, want):
+    """Marks [chapter] read (want=True) or unread in the chapter list, checking the database after each
+    swipe (App stopped) and swiping again only while the state is not [want]: a swipe that was not
+    taken is retried, a swipe that was taken is never repeated. Returns the chapter's rows."""
+    stop_app(0)
+    m = main_rows(chapter)
+    for attempt in range(3):
+        if bool(m['read']) == want:
+            return m
+        if attempt:
+            note(f'chapter {chapter} is still {"unread" if want else "read"}; swiping again')
+        swipe_chapter_left(manga, m['chapter'])
+        stop_app(3)
+        m = main_rows(chapter)
+    return m
 
 
 def at_start():
@@ -819,12 +852,8 @@ def step_parity(manga, chapter, first_doc):
     check('starting point: unread, a saved position past the first page', not m0['read'] and saved0 and (saved0.get('chapterPage') or 0) > 0,
           {'chapter': {k: m0[k] for k in ('read', 'last_page_read', 'pages_left')}, 'saved': saved0})
     # 1. read, then unread again in the chapter list: the page is cleared
-    swipe_chapter_left(manga, m0['chapter'])
-    stop_app(3)
-    m1 = main_rows(chapter)
-    swipe_chapter_left(manga, m0['chapter'])
-    stop_app(3)
-    m2 = main_rows(chapter)
+    m1 = set_read(manga, chapter, True)
+    m2 = set_read(manga, chapter, False)
     check('chapter list: marked read, then unread (page cleared)', m1['read'] == 1 and m2['read'] == 0 and m2['last_page_read'] == 0 and m2['pages_left'] == 0,
           {'after first swipe': {k: m1[k] for k in ('read', 'last_page_read', 'pages_left')},
            'after second swipe': {k: m2[k] for k in ('read', 'last_page_read', 'pages_left')}})
@@ -839,9 +868,7 @@ def step_parity(manga, chapter, first_doc):
     mid_doc = doc_path(src())
     leave_reader()
     stop_app()
-    swipe_chapter_left(manga, m0['chapter'])
-    stop_app(3)
-    m3 = main_rows(chapter)
+    m3 = set_read(manga, chapter, True)
     saved3, _ = ebook_rows(m3['key'])
     st = open_book(manga, chapter)
     s = doc_path(src())
@@ -851,8 +878,7 @@ def step_parity(manga, chapter, first_doc):
     leave_reader()
     stop_app()
     # back to unread for the later steps
-    swipe_chapter_left(manga, m0['chapter'])
-    stop_app(3)
+    set_read(manga, chapter, False)
 
 
 def step_incognito(manga, chapter, pages=3):
@@ -890,8 +916,15 @@ def step_chapter_list(manga, chapter):
             break
     d.shot('chapter-list')
     check('chapter list shows the page of the text book', hit is not None and not m['read'], {'expected': want, 'node': hit and hit['text'], 'read': m['read']})
-    # Recents (the bottom navigation item 最新 in Traditional Chinese)
-    tab = d.find('最新', exact=True)
+    # Recents (the bottom navigation item 最新 in Traditional Chinese). The manga screen opened by the
+    # intent above sits on top of the library and hides the bottom navigation: back first.
+    key(KEY_BACK, 4)
+    tab = None
+    for _ in range(5):
+        tab = d.find('最新', exact=True)
+        if tab:
+            break
+        time.sleep(2)
     found = None
     if tab:
         d.tap(tab['x'], tab['y'], 6)

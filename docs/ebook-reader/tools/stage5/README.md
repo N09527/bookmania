@@ -16,6 +16,7 @@
 - 位置與進度：讀取 App 的 `ebook.db`（`position`、`book` 兩個表）與主資料庫 `tachiyomi.db`（`chapters`、`history`），都在 App 停止後以 `run-as` 複製出來讀。
 - 改壞已存位置（測試還原的備援順序）時，App 停止中，複製 `ebook.db` 出來修改後放回。
 - 正常離開閱讀器用返回鍵（會觸發 `onPause` 的儲存與閱讀時間），不用強制停止。
+- 章節清單的已讀／未讀用滑動切換（既有的章節滑動操作）。每次滑動後停止 App 讀資料庫確認，狀態沒有改變才再滑一次（最多 3 次），所以不會把一次已生效的滑動重複執行；每次滑動後的畫面存為 `swipe-N.png`。
 - 點擊區域的預期動作，是照 `app/src/main/java/eu/kanade/tachiyomi/ui/reader/viewer/navigation/` 各類別的區域座標，在腳本中另外算出來再和實際翻頁結果比對。
 - 備份：`backup_check` 解開 `.tachibk`（gzip 的 protobuf），不依賴 App 的程式碼，直接讀 `BackupChapter` 的欄位 20101。建立與還原備份在 App 介面上操作（見階段 5 報告的步驟）。
 - 模擬器剛開機時第一次開書要好幾分鐘，先執行 `warmup`。每一項結束後，系統紀錄中的當機與「沒有回應」事件附加到 `out/system-events.log`。
