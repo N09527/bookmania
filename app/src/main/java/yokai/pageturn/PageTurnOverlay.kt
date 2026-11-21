@@ -89,6 +89,6 @@ internal class PageTurnOverlay(context: Context) : SurfaceView(context), Surface
     }
 
     companion object {
-        private const val OPEN_TIMEOUT_MS = 500L
+        private const val OPEN_TIMEOUT_MS = 1_000L
     }
 }

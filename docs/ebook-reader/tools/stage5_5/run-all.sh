@@ -31,6 +31,10 @@ run() {
 }
 START=${1:-1}
 
+# work 8 (horizontal EPUB) gets two more files: an EPUB whose pages do not repeat (make_varied_epub.py; the
+# test book repeats the same sentences, so its spreads look almost alike in landscape) and a picture chapter
+run add_chapter 8 /sdcard/Download/zh-varied.epub zh-varied.epub
+run add_chapter 8 "$CBZ" zh-horizontal-vol3-pictures.cbz
 # text reader: horizontal EPUB (left to right), vertical EPUB (right to left)
 run text 8 10 none t-none
 run text 8 10 slide t-slide-ltr
@@ -39,20 +43,22 @@ run text 8 10 curl t-curl-ltr-back --back
 run text 14 16 slide t-slide-rtl
 run text 14 16 curl t-curl-rtl
 run text 14 16 curl t-curl-rtl-back --back
-run text 8 10 curl t-curl-ltr-2col --columns on --landscape
+run text 8 0 curl t-curl-ltr-2col --columns on --landscape --file zh-varied.epub
+run text 8 0 curl t-curl-ltr-2col-back --columns on --landscape --back --file zh-varied.epub
 run text 14 16 curl t-curl-rtl-2col --columns on --landscape
-run text 8 10 curl t-curl-ltr-2col-back --columns on --landscape --back
-run text 8 10 slide t-slide-ltr-2col --columns on --landscape
+run text 14 16 curl t-curl-rtl-2col-back --columns on --landscape --back
+run text 8 0 slide t-slide-ltr-2col --columns on --landscape --file zh-varied.epub
 # image reader: comic CBZ
 run image 10 12 l2r i-curl-l2r
-run image 10 12 r2l i-curl-r2l
-run image 10 12 vertical i-curl-vertical
 run image 10 12 l2r i-curl-l2r-back --back
+run image 10 12 r2l i-curl-r2l
+run image 10 12 r2l i-curl-r2l-back --back
+run image 10 12 vertical i-curl-vertical
+run image 10 12 vertical i-curl-vertical-back --back
 run image 10 12 l2r i-curl-l2r-double --double
 run image 10 12 webtoon i-webtoon
 run image 10 12 l2r i-off-l2r --curl off
-# chapter panel: work 8 gets a picture chapter as its third file
-run add_chapter 8 "$CBZ" zh-horizontal-vol3-pictures.cbz
+# chapter panel (work 8: two text EPUBs of the original set, the EPUB and the CBZ added above)
 run chapters 8 10 18 0
 run settings_ui 8 10
 run rapid 8 10 curl r-curl

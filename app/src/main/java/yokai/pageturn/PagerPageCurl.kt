@@ -4,6 +4,7 @@ import android.animation.ValueAnimator
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.ViewGroup
+import co.touchlab.kermit.Logger
 import eu.kanade.tachiyomi.core.preference.PreferenceStore
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.PagerViewer
 import eu.kanade.tachiyomi.ui.reader.viewer.pager.R2LPagerViewer
@@ -34,7 +35,10 @@ class PagerPageCurl(private val viewer: PagerViewer) {
         finishNow()
         val pager = viewer.pager
         val parent = pager.parent as? ViewGroup ?: return false
-        if (viewer.activity.menuVisible || !ValueAnimator.areAnimatorsEnabled() || pager.width == 0 || pager.height == 0) return false
+        if (viewer.activity.menuVisible || !ValueAnimator.areAnimatorsEnabled() || pager.width == 0 || pager.height == 0) {
+            Logger.d { "page curl: not used (menu shown ${viewer.activity.menuVisible}, animations ${ValueAnimator.areAnimatorsEnabled()})" }
+            return false
+        }
         val current = pager.currentItem
         if (item == current) return false
         val turn = PageTurner.Turn(

@@ -94,14 +94,22 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         val start = SystemClock.uptimeMillis()
         var copiedAt = 0L
         var openedAt = 0L
-        val ok = coroutineScope {
-            val copied = async { copy(bitmap).also { copiedAt = SystemClock.uptimeMillis() } }
-            val opened = overlay.open().also { openedAt = SystemClock.uptimeMillis() }
-            copied.await() && opened
+        var copied = false
+        var opened = false
+        coroutineScope {
+            val copy = async { copy(bitmap).also { copiedAt = SystemClock.uptimeMillis() } }
+            opened = overlay.open()
+            openedAt = SystemClock.uptimeMillis()
+            copied = copy.await()
         }
         if (id != generation) return false
-        if (!ok || !overlay.draw { renderer.drawStill(it, bitmap) }) {
+        val drawn = copied && opened && overlay.draw { renderer.drawStill(it, bitmap) }
+        if (!drawn) {
             overlay.close()
+            Logger.d {
+                "page turn: not animated (copied $copied after ${copiedAt - start} ms, overlay $opened after " +
+                    "${openedAt - start} ms)"
+            }
             return false
         }
         val drawnAt = SystemClock.uptimeMillis()

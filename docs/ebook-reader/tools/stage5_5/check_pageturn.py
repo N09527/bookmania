@@ -37,7 +37,7 @@ OUT = os.environ['OUT']
 os.makedirs(os.path.join(OUT, 'shots'), exist_ok=True)
 ADB = os.environ.get('ADB', 'adb')
 KEY_PAGE_UP, KEY_PAGE_DOWN = 92, 93
-CELL = 20  # grid cell, pixels of the half-size recording
+CELL = 10  # grid cell, pixels of the quarter-size recording
 
 
 def check(name, ok, detail=None):
@@ -78,7 +78,7 @@ def screen_size():
     return img.size  # (width, height) in the current orientation
 
 
-SLOW = 20  # animator duration scale while recording: more frames of each turn on the slow emulator
+SLOW = 40  # animator duration scale while recording: more frames of each turn on the slow emulator
 
 
 def record_turn(label, code, seconds=60, size=None):
@@ -95,7 +95,8 @@ def record_turn(label, code, seconds=60, size=None):
     before.save(os.path.join(folder, 'before.png'))
     d.shell('rm -f /sdcard/turn.mp4')
     d.shell(f'settings put global animator_duration_scale {SLOW}')
-    rec = subprocess.Popen([ADB, 'shell', 'screenrecord', '--time-limit', str(seconds), '--size', f'{w}x{h}',
+    rw, rh = w // 16 * 16, h // 16 * 16  # video encoders want multiples of 16; frames are scaled back to size
+    rec = subprocess.Popen([ADB, 'shell', 'screenrecord', '--time-limit', str(seconds), '--size', f'{rw}x{rh}',
                             '--bit-rate', '8000000', '/sdcard/turn.mp4'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(2.5)  # screenrecord has started
     t_key = time.time()
@@ -216,7 +217,7 @@ def sheet(label, before, after, frames, rows, picks=6):
     return path
 
 
-def patch_shift(frame, page, vertical=False, size=(48, 32), max_err=6.0):
+def patch_shift(frame, page, vertical=False, size=(24, 16), max_err=8.0):
     """How far [page] is shifted in [frame] (pixels of the recording, along x; along y when [vertical]):
     small patches of the page that hold text are looked for in the same rows of the frame; the median of
     the shifts found with a small difference, or None when no patch is found (the page is off the frame)."""
@@ -227,14 +228,14 @@ def patch_shift(frame, page, vertical=False, size=(48, 32), max_err=6.0):
     h, w = P.shape
     pw, ph = size
     shifts = []
-    for py in range(20, h - ph - 20, ph * 2):
+    for py in range(10, h - ph - 10, ph * 2):
         for px in range(0, w - pw, pw):
             patch = P[py:py + ph, px:px + pw]
-            if patch.std() < 25:  # blank: matches anywhere
+            if patch.std() < 20:  # blank: matches anywhere
                 continue
             band = F[py:py + ph, :]
             best = None
-            for x in range(0, w - pw + 1, 2):
+            for x in range(0, w - pw + 1):
                 err = np.abs(band[:, x:x + pw] - patch).mean()
                 if best is None or err < best[1]:
                     best = (x - px, err)
@@ -243,7 +244,7 @@ def patch_shift(frame, page, vertical=False, size=(48, 32), max_err=6.0):
     if len(shifts) < 3:
         return None, len(shifts)
     median = int(np.median(shifts))
-    agree = sum(abs(x - median) <= 4 for x in shifts)
+    agree = sum(abs(x - median) <= 2 for x in shifts)
     if agree < max(3, 0.6 * len(shifts)):  # patches that also match elsewhere (repeated characters)
         return None, len(shifts)
     return median, agree
@@ -321,7 +322,7 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     size = screen_size()
     check('the screen is in ' + ('landscape' if landscape else 'portrait'), (size[0] > size[1]) == landscape,
           {'screen': size, 'columns shown': st.get('cols')})
-    size = (size[0] // 2, size[1] // 2)
+    size = (size[0] // 4, size[1] // 4)  # a small recording: the emulator's encoder takes less time from the App
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
     st2 = d.status()
     rows = analyse(before, after, frames)
@@ -413,7 +414,7 @@ def rapid_step(manga, chapter, style, label):
     time.sleep(4)
     st = d.status()
     size = screen_size()
-    size = (size[0] // 2, size[1] // 2)
+    size = (size[0] // 4, size[1] // 4)  # a small recording: the emulator's encoder takes less time from the App
     before = grab(size)
     d.shell(f'input keyevent {KEY_PAGE_DOWN} {KEY_PAGE_DOWN} {KEY_PAGE_DOWN}')
     time.sleep(30)
@@ -468,7 +469,7 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False)
         time.sleep(8)
     size = screen_size()
     check('the screen is in ' + ('landscape' if double else 'portrait'), (size[0] > size[1]) == double, {'screen': size})
-    size = (size[0] // 2, size[1] // 2)
+    size = (size[0] // 4, size[1] // 4)  # a small recording: the emulator's encoder takes less time from the App
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
     rows = analyse(before, after, frames)
     with open(os.path.join(OUT, 'rec', label, 'analysis.json'), 'w') as f:
