@@ -342,7 +342,11 @@ def leave_reader():
 
 
 def slider_node(ns):
-    return next((n for n in ns if n['cls'].endswith('SeekBar') and n['desc'] == '全書進度'), None)
+    """The whole-book slider (an enabled Compose Slider is a SeekBar in the accessibility tree; a disabled
+    one is a ProgressBar). Its label 全書進度 is on a separate node with the same bounds."""
+    bars = [n for n in ns if n['cls'].endswith('SeekBar')]
+    label = next((n for n in ns if n['desc'] == '全書進度'), None)
+    return next((n for n in bars if n['desc'] == '全書進度' or (label and n['b'] == label['b'])), None)
 
 
 def slider_x(s, fraction):
