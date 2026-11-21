@@ -232,7 +232,11 @@ App 停止時改壞 `ebook.db` 中存的位置，再開書：
 
 ### 3.11 當機、「沒有回應」與 LeakCanary【已查證】
 
-- 系統紀錄（每一項檢查後存下，`system-events.log`）：模擬器開機時 System UI 與 Google Play 服務「沒有回應」（01:03–01:06）；測試工具 uiautomator 當機 1 次（01:29）。**本 App 沒有當機或「沒有回應」的紀錄。**
+- 系統紀錄（每一項檢查後存下，`system-events.log`）中本 App 的當機：
+  1. 04:19，修正前的第一輪：`IndexOutOfBoundsException`（文字書切到圖片模式），App 的問題，已修正（第 4 節第 7 項）。
+  2. 05:21，修正後的快速檢查（第 33 項，圖片閱讀器交給文字閱讀器時）：原生當機 `Failed to create EGLSurface … EGL_BAD_ALLOC`（繪圖執行緒建立視窗的繪圖面失敗），與第 3、4 階段在這部模擬器上出現過的相同，原因未查明【推論：模擬器的軟體繪圖（SwiftShader）資源問題，沒有在實機確認】。
+  3. 最終版本的完整執行：（待填）
+- 其他：模擬器開機時 System UI 與 Google Play 服務「沒有回應」（每次開機都有）；測試工具 uiautomator 當機 1 次（01:29）。
 - **LeakCanary**：上游的 debug 版內建記憶體洩漏偵測工具 LeakCanary（`debugImplementation`，release 版沒有）。它的紀錄（App 內的 `leaks.db`）從 11-18 起共 125 次分析：90 次完成、35 次因堆積檔遺失或不完整而失敗；找到的洩漏只有 **1 種**，LeakCanary 自己歸類為「程式庫洩漏」（Android 框架造成，App 無法修正）：`android.app.ActivityThread#mNewActivities` 暫時保留了已關閉的既有圖片閱讀器 `ReaderActivity`（文字書從圖片閱讀器的入口開啟時，交接後馬上關閉它）。沒有任何洩漏與文字閱讀器的程式（`yokai.ebook`）有關。
 - **對測試的影響**：LeakCanary 每次認為有物件被保留，就把整個記憶體寫成堆積檔並在背景分析；在這部模擬器上，寫入時 App 會暫停，分析要好幾分鐘、佔用大部分 CPU，而且測試腳本每一步都會強制停止 App，分析做不完，下次啟動又重來。第 13 項之後累積了 8 個待分析的堆積檔，App 越來越慢：第 18 項開書 2 分鐘內排版沒有完成【推論：當時 App 程序的 CPU 大多用在 LeakCanary 的分析工作（WorkManager 執行緒），這點已查證；與失敗的因果是推論】。第 19–20 項的失敗則是腳本找滑桿的方式不對（第 4 節第 13 項），與 LeakCanary 無關。因此在 03:09 停下這一輪，刪除待分析的堆積檔，並在模擬器上把 LeakCanary 的堆積檔資料夾換成唯讀檔案（只改這部測試用模擬器上的 App 資料，沒有改程式；無法用 `pm disable` 關閉，系統不允許），再重跑第 12、14、18–35 項（3.6 起的結果都來自重跑）。
 
