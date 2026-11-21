@@ -14,7 +14,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.animation.DecelerateInterpolator
+import android.os.SystemClock
 import androidx.annotation.ColorInt
+import co.touchlab.kermit.Logger
 import kotlin.coroutines.resume
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -89,9 +91,12 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         if (width <= 0 || height <= 0 || !page.isAttachedToWindow || !overlay.isAttachedToWindow) return false
         val bitmap = bitmap(before, width, height)?.also { before = it } ?: return false
         val id = ++generation
+        val start = SystemClock.uptimeMillis()
+        var copiedAt = 0L
+        var openedAt = 0L
         val ok = coroutineScope {
-            val copied = async { copy(bitmap) }
-            val opened = overlay.open()
+            val copied = async { copy(bitmap).also { copiedAt = SystemClock.uptimeMillis() } }
+            val opened = overlay.open().also { openedAt = SystemClock.uptimeMillis() }
             copied.await() && opened
         }
         if (id != generation) return false
@@ -99,8 +104,13 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
             overlay.close()
             return false
         }
+        val drawnAt = SystemClock.uptimeMillis()
         holding = true
         awaitFrames(FRAMES_BEFORE_CHANGE) // the copy is on the screen before the page changes under it
+        Logger.d {
+            "page turn: the page is held after ${SystemClock.uptimeMillis() - start} ms (copy ${copiedAt - start}, " +
+                "overlay ${openedAt - start}, first frame ${drawnAt - start})"
+        }
         return id == generation && holding
     }
 
@@ -112,6 +122,7 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         val id = generation
         if (!holding) return
         try {
+            val start = SystemClock.uptimeMillis()
             awaitWindowFrame()
             val current = before
             if (id != generation || current == null || current.isRecycled) return
@@ -123,6 +134,7 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
                 null
             }
             if (id != generation) return
+            Logger.d { "page turn: ${turn.style} starts ${SystemClock.uptimeMillis() - start} ms after the page changed" }
             animate(turn, current, next)
         } finally {
             if (id == generation) close()
@@ -156,11 +168,14 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
 
     private suspend fun animate(turn: Turn, current: Bitmap, next: Bitmap?) {
         val leaf = CurlLeaf.of(current.width.toFloat(), current.height.toFloat(), turn.edge, turn.spread)
+        var frames = 0
+        val start = SystemClock.uptimeMillis()
         suspendCancellableCoroutine { cont ->
             val animation = ValueAnimator.ofFloat(0f, 1f).apply {
                 duration = if (turn.style == Style.CURL) CURL_MS else SLIDE_MS
                 interpolator = DecelerateInterpolator(if (turn.style == Style.CURL) 1.2f else 2f)
                 addUpdateListener { a ->
+                    frames++
                     val progress = a.animatedValue as Float
                     overlay.draw { canvas ->
                         if (turn.style == Style.SLIDE) {
@@ -174,6 +189,7 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
                 addListener(
                     object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator) {
+                            Logger.d { "page turn: $frames frames in ${SystemClock.uptimeMillis() - start} ms" }
                             if (animator === animation) animator = null
                             if (cont.isActive) cont.resume(Unit)
                         }
@@ -205,20 +221,25 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         val location = IntArray(2)
         page.getLocationInWindow(location)
         val rect = Rect(location[0], location[1], location[0] + into.width, location[1] + into.height)
-        return suspendCancellableCoroutine { cont ->
-            try {
-                PixelCopy.request(window, rect, into, { result -> if (cont.isActive) cont.resume(result == PixelCopy.SUCCESS) }, handler)
-            } catch (e: IllegalArgumentException) {
-                cont.resume(false) // the window has no surface (yet)
+        return withTimeoutOrNull(COPY_TIMEOUT_MS) {
+            suspendCancellableCoroutine { cont ->
+                try {
+                    PixelCopy.request(window, rect, into, { result -> if (cont.isActive) cont.resume(result == PixelCopy.SUCCESS) }, handler)
+                } catch (e: IllegalArgumentException) {
+                    cont.resume(false) // the window has no surface (yet)
+                }
             }
-        }
+        } ?: false
     }
 
-    private suspend fun awaitFrames(count: Int) = repeat(count) {
-        suspendCancellableCoroutine { cont ->
-            val callback = Choreographer.FrameCallback { if (cont.isActive) cont.resume(Unit) }
-            Choreographer.getInstance().postFrameCallback(callback)
-            cont.invokeOnCancellation { handler.post { Choreographer.getInstance().removeFrameCallback(callback) } }
+    /** Waits for [count] frames (or a while: no frames come while the screen is off). */
+    private suspend fun awaitFrames(count: Int) = withTimeoutOrNull(FRAMES_TIMEOUT_MS) {
+        repeat(count) {
+            suspendCancellableCoroutine { cont ->
+                val callback = Choreographer.FrameCallback { if (cont.isActive) cont.resume(Unit) }
+                Choreographer.getInstance().postFrameCallback(callback)
+                cont.invokeOnCancellation { handler.post { Choreographer.getInstance().removeFrameCallback(callback) } }
+            }
         }
     }
 
@@ -235,10 +256,15 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
                     val l = Window.OnFrameMetricsAvailableListener { _, metrics, _ ->
                         if (metrics.getMetric(FrameMetrics.INTENDED_VSYNC_TIMESTAMP) >= since && cont.isActive) cont.resume(Unit)
                     }
-                    listener = l
-                    window.addOnFrameMetricsAvailableListener(l, handler)
+                    try {
+                        window.addOnFrameMetricsAvailableListener(l, handler)
+                        listener = l
+                    } catch (e: IllegalStateException) {
+                        cont.resume(Unit) // no frame metrics for this window: waits for frames below
+                    }
                 }
             }
+            if (listener == null) awaitFrames(2)
         } finally {
             listener?.let { runCatching { window.removeOnFrameMetricsAvailableListener(it) } }
         }
@@ -249,5 +275,7 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         private const val SLIDE_MS = 260L
         private const val FRAMES_BEFORE_CHANGE = 2
         private const val WINDOW_FRAME_TIMEOUT_MS = 400L
+        private const val COPY_TIMEOUT_MS = 1_000L
+        private const val FRAMES_TIMEOUT_MS = 500L
     }
 }

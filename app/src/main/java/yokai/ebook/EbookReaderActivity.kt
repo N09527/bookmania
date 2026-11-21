@@ -731,6 +731,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                 turnJob?.cancel()
                 val turner = pageTurner
                 val style = turnStyle()
+                if (style == null) turner?.end() // a turn still playing ends before the page changes again
                 val held = turner != null && style != null && turner.hold()
                 val turn = if (held && style != null) {
                     PageTurner.Turn(style, if (rtl) CurlEdge.LEFT else CurlEdge.RIGHT, columns == 2, forward, backgroundColor)
