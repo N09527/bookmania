@@ -111,14 +111,16 @@
 
 ## 2. 建置與單元測試
 
-【已查證】2026-11-21 02:28–02:38，與模擬器驗證同時執行（以較低的優先權 `nice -n 19`、`--max-workers=2`，以免拖慢模擬器）。
+【已查證：最終版本】2026-11-21 05:29–05:35，程式碼為 commit `3b776c3`（之後的 commit 只改了文件與測試腳本）；與模擬器驗證同時執行（以較低的優先權 `nice -n 19`、`--max-workers=2`，以免拖慢模擬器）。
 
 | 指令 | 結果 |
 |---|---|
-| `./gradlew testDebugUnitTest testBookmaniaDebugUnitTest :app:assembleBookmaniaRelease --continue --max-workers=2` | BUILD SUCCESSFUL（8 分 37 秒）。`:app` 56 個測試全部通過（第 4 階段 37 個，新增 `ReadingSessionTest` 11 個、`ReadingProgressTest` 5 個、`EbookBackupTest` 3 個） |
+| `./gradlew testDebugUnitTest testBookmaniaDebugUnitTest :app:assembleBookmaniaRelease --continue --max-workers=2` | BUILD SUCCESSFUL（5 分 34 秒）。`:app` 61 個測試全部通過（第 4 階段 37 個；新增 `ReadingSessionTest` 12 個、`ReadingProgressTest` 5 個、`ImageReaderPageTest` 4 個、`EbookBackupTest` 3 個） |
 | `./gradlew :core:ebook:testDebugUnitTest --rerun :domain:testDebugUnitTest --rerun` | BUILD SUCCESSFUL。強制重跑：`:core:ebook` 39 個（第 4 階段 36 個，新增 `BookStatsTest` 2 個、MOBI 6 NCX 目錄 1 個）、`:domain` 34 個全部通過 |
 | `:app:assembleBookmaniaRelease` | 成功，產出 arm64-v8a、armeabi-v7a、x86、x86_64、universal 五個 APK，套件 `io.github.n09527.bookmania`，版本 1.10.3（162）；`apksigner verify`：簽署者 `CN=Bookmania`，憑證 SHA-256 與第 2 階段 7.2 的金鑰相同 |
 | （R8 警告） | 「Missing class androidx.window…」與 Kotlin metadata 的警告，與先前階段相同 |
+
+修正前（commit `d093e14` 的程式碼）也跑過一次同樣的指令（02:28–02:38），當時 `:app` 56 個全部通過；之後修正了第 4 節第 7 項，新增 5 個測試。
 
 - 殼層的 JavaScript、進度列、目錄等介面用桌面 Chromium 與模擬器驗證（第 3 節）。
 
