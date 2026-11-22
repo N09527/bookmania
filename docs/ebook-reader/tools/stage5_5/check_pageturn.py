@@ -285,7 +285,14 @@ def slide_check(rows, frames, before, after, expect_old_sign, vertical=False):
             continue  # the page before or after the turn
         dx_old, n_old = patch_shift(img, before, vertical)
         dx_new, n_new = patch_shift(img, after, vertical)
-        found.append({'t': r['t'], 'old page shifted by': dx_old, 'patches': n_old, 'new page shifted by': dx_new, 'patches new': n_new})
+        # In a slide the two pages are one page apart, so they are never shifted by the same amount. Patches of
+        # the new page found where the old page is (stage 6: the vertical test book repeats its sentences on
+        # every page) matched the old page's text: the new page is not found in this frame.
+        same = dx_old is not None and dx_new is not None and abs(dx_new - dx_old) <= (4 if CELL[0] >= 20 else 2)
+        if same:
+            dx_new = None
+        found.append({'t': r['t'], 'old page shifted by': dx_old, 'patches': n_old, 'new page shifted by': dx_new,
+                      'patches new': n_new, **({'new page matched where the old page is': True} if same else {})})
     # judged on the first frame where each page is found moved: later frames show mostly the new page, and
     # the test book repeats its sentences, so patches of the old page can also match the new page there
     moved_old = [f['old page shifted by'] for f in found if f['old page shifted by'] not in (None, 0)]
@@ -293,6 +300,55 @@ def slide_check(rows, frames, before, after, expect_old_sign, vertical=False):
     ok = bool(moved_old or moved_new) and (not moved_old or moved_old[0] * expect_old_sign > 0) and \
         (not moved_new or moved_new[0] * expect_old_sign < 0)
     return ok, found
+
+
+def incoming_fit(frame, before, after, sign, vertical=False):
+    """What comes in during a slide. The frame is fitted with the old page moved by dx and, one page away,
+    either the new page or another copy of the old page, for every dx in the direction the old page leaves
+    ([sign]: -1 left / up, 1 right / down). At the dx that fits best, the strip that came in is compared with
+    the new page and with the old page. Returns {dx, width of the strip, error against the new page, against
+    the old page} in pixels of the recording (halved here), or None when the strip is too narrow."""
+    F, B, A = grey(frame)[::2, ::2], grey(before)[::2, ::2], grey(after)[::2, ::2]
+    if vertical:
+        F, B, A = F.T, B.T, A.T
+    h, w = F.shape
+    best = None
+    for dx in range(2, w - 2, 2):
+        if sign < 0:  # the old page shows its columns dx.. at 0..; the page coming in shows its first dx columns at the right
+            shared = np.abs(F[:, :w - dx] - B[:, dx:]).mean()
+            strip_f, strip_new, strip_old = F[:, w - dx:], A[:, :dx], B[:, :dx]
+        else:         # the old page shows at dx..; the page coming in shows its last dx columns at the left
+            shared = np.abs(F[:, dx:] - B[:, :w - dx]).mean()
+            strip_f, strip_new, strip_old = F[:, :dx], A[:, w - dx:], B[:, w - dx:]
+        e_new = np.abs(strip_f - strip_new).mean()
+        e_old = np.abs(strip_f - strip_old).mean()
+        total = (shared * (w - dx) + min(e_new, e_old) * dx) / w
+        if best is None or total < best[0]:
+            best = (total, dx, e_new, e_old)
+    if best is None or best[1] < 0.1 * w:
+        return None
+    return {'dx': best[1] * 2 * sign, 'strip': best[1] * 2, 'error against the new page': round(float(best[2]), 2),
+            'error against the old page': round(float(best[3]), 2)}
+
+
+def incoming_check(rows, frames, before, after, expect_old_sign, vertical=False):
+    """The page that comes in during a slide is the new page, not a copy of the old one (stage 6: the copy of
+    the new page was made before the WebView showed it, and the old page came in again). Judged on the frames
+    of the turn where a strip of at least a tenth of the page came in."""
+    old_most = max(r['old'] for r in rows)
+    new_most = max(r['new'] for r in rows)
+    fits = []
+    for r, (t, img) in zip(rows, frames):
+        if r['old'] >= 0.95 * old_most or r['new'] >= 0.95 * new_most:
+            continue
+        fit_ = incoming_fit(img, before, after, expect_old_sign, vertical)
+        if fit_:
+            e_new, e_old = fit_['error against the new page'], fit_['error against the old page']
+            fit_['t'] = r['t']
+            fit_['shows'] = 'new page' if e_new < 0.7 * e_old else 'old page' if e_old < 0.7 * e_new else 'unclear'
+            fits.append(fit_)
+    ok = any(f['shows'] == 'new page' for f in fits) and not any(f['shows'] == 'old page' for f in fits)
+    return ok, fits
 
 
 def device_time():
@@ -405,8 +461,10 @@ def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover, 
             return check('the new page slides in from the ' + ('right' if expect_right else 'left'),
                          side is not None and ((side > 0.5) if expect_right else (side < 0.5)), {**detail, 'first': first})
         ok, found = slide_check(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
-        return check('the old page moves ' + ('left' if expect_right else 'right') + ' and the new page comes in from the '
-                     + ('right' if expect_right else 'left'), ok, {**detail, 'shifts': found})
+        check('the old page moves ' + ('left' if expect_right else 'right') + ' and the new page comes in from the '
+              + ('right' if expect_right else 'left'), ok, {**detail, 'shifts': found})
+        ok, fits = incoming_check(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
+        return check('the page that comes in is the new page, not a copy of the old one', ok, {'frames': fits})
     # curl: the part of the page that has not turned yet is the copy of the page that was on the screen (a
     # copy of an earlier page would show here instead, see the stage 5.5 report)
     check('during the curl, part of the page that was on the screen is still shown',

@@ -138,11 +138,7 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
             if (page.width != current.width || page.height != current.height) return // resized meanwhile
             val needsNext = turn.style == Style.SLIDE || (turn.spread && turn.forward)
             after = null
-            val next = if (needsNext) {
-                newBitmap(current.width, current.height)?.also { after = it }?.takeIf { copy(it) }
-            } else {
-                null
-            }
+            val next = if (needsNext) copyNext(current, id) else null
             if (id != generation) return
             Logger.d { "page turn: ${turn.style} starts ${SystemClock.uptimeMillis() - start} ms after the page changed" }
             animate(turn, current, next)
@@ -227,6 +223,32 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         }
     }
 
+    /**
+     * Copies the new page, for a slide or for the back of the leaf of a spread. The window may not have drawn
+     * the new page yet when the first frame after the change comes: on a slow emulator a slide showed the old
+     * page coming in again (stage 6). A copy that is the same as [current] is therefore made again after the
+     * next frame, for up to [NEXT_PAGE_MS]. Null when no copy shows another page: the turn then shows the
+     * page view itself where the new page comes in, never an old copy.
+     */
+    private suspend fun copyNext(current: Bitmap, id: Int): Bitmap? {
+        val start = SystemClock.uptimeMillis()
+        var copies = 0
+        while (id == generation) {
+            val bitmap = newBitmap(current.width, current.height) ?: return null
+            after = bitmap
+            copies++
+            if (!copy(bitmap)) break
+            if (!bitmap.sameAs(current)) return bitmap
+            if (SystemClock.uptimeMillis() - start >= NEXT_PAGE_MS) break
+            awaitWindowFrame()
+        }
+        after = null
+        if (id == generation) {
+            Logger.d { "page turn: no copy of the new page after ${SystemClock.uptimeMillis() - start} ms ($copies copies)" }
+        }
+        return null
+    }
+
     /** Copies what the window shows in the page view's bounds. */
     private suspend fun copy(into: Bitmap): Boolean {
         if (!page.isAttachedToWindow) return false
@@ -289,5 +311,6 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         private const val WINDOW_FRAME_TIMEOUT_MS = 400L
         private const val COPY_TIMEOUT_MS = 1_000L
         private const val FRAMES_TIMEOUT_MS = 500L
+        private const val NEXT_PAGE_MS = 1_500L
     }
 }

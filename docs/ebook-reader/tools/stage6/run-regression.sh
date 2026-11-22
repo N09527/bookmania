@@ -31,7 +31,7 @@ run_part() {
     warmup)
       (cd "$TOOLS/stage5" && OUT="$HERE/out/warmup" timeout 1800 python3 -I check_stage5.py warmup 8 10) ;;
     s55new)  # the user's decisions of the stage 5.5 report 6.1, and the settings check with the new default
-      (cd "$TOOLS/stage5_5" && OUT="$TOOLS/stage5_5/out6" STEPS="30-36 27" ./run-all.sh) ;;
+      (cd "$TOOLS/stage5_5" && OUT="$TOOLS/stage5_5/out6" STEPS="30-39 27" ./run-all.sh) ;;
     s55)
       (cd "$TOOLS/stage5_5" && OUT="$TOOLS/stage5_5/out6" STEPS="1-26 28-29" ./run-all.sh) ;;
     s5)

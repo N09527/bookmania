@@ -78,4 +78,9 @@ run image 10 12 vertical i-swipe-vertical --swipe
 # The long strip is scrolled up (the first run's i-swipe-webtoon swiped sideways, which the strip ignores).
 run image 10 12 l2r i-swipe-off-drag --swipe --curl off
 run image 10 12 webtoon i-swipe-webtoon-up --swipe
+# stage 6: slides of the book whose pages do not repeat, so that the page coming in can be told from a copy of
+# the old one (the slides of the books above showed the old page coming in, and the checks could not tell)
+run text 8 0 slide t-slide-ltr-varied --file zh-varied.epub
+run text 8 0 slide t-slide-ltr-varied-second --warm --file zh-varied.epub
+run text 8 0 slide t-slide-rtl-varied --direction rtl --file zh-varied.epub
 echo "RUN-ALL DONE $(date +%H:%M:%S)"
