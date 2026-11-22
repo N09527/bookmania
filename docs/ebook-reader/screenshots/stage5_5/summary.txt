@@ -1,0 +1,61 @@
+Runs:
+  00:25:33  add_chapter                              2/2
+  00:26:40  text:t-none                              6/6
+  00:28:59  text:t-slide-ltr                         7/7
+  00:31:27  text:t-curl-ltr                          9/9
+  00:33:44  text:t-curl-ltr-back                     8/8
+  00:36:18  text:t-curl-ltr-second                   9/9
+  00:38:54  text:t-slide-ltr-second                  6/7
+  00:41:18  text:t-slide-rtl                         7/7
+  00:43:40  text:t-curl-rtl                          9/9
+  00:46:01  text:t-curl-rtl-back                     8/8
+  00:49:25  text:t-curl-ltr-2col                     9/9
+  00:52:51  text:t-curl-ltr-2col-back                8/8
+  00:56:11  text:t-curl-rtl-2col                     9/9
+  00:59:30  text:t-curl-rtl-2col-back                8/8
+  01:02:50  text:t-slide-ltr-2col                    7/7
+  01:05:03  image:i-curl-l2r                         9/9
+  01:07:32  image:i-curl-l2r-back                    8/8
+  01:09:49  image:i-curl-r2l                         9/9
+  01:12:15  image:i-curl-r2l-back                    8/8
+  01:14:32  image:i-curl-vertical                    8/8
+  01:16:57  image:i-curl-vertical-back               8/8
+  01:20:13  image:i-curl-l2r-double                  9/9
+  01:22:32  image:i-webtoon                          3/3
+  01:24:50  image:i-off-l2r                          3/3
+  01:27:47  chapters                                 5/5
+  01:35:31  text:t-slide-ltr-second                  3/3
+  01:46:03  chapters                                 6/6
+  01:54:05  settings_ui                              5/5
+  01:57:53  rapid:r-curl                             2/2
+  01:59:57  rapid:r-slide                            2/2
+Final (last result of each check):
+  add_chapter                              1/1
+  text:t-none                              6/6
+  text:t-slide-ltr                         7/7
+  text:t-curl-ltr                          9/9
+  text:t-curl-ltr-back                     8/8
+  text:t-curl-ltr-second                   9/9
+  text:t-slide-ltr-second                  7/7
+  text:t-slide-rtl                         7/7
+  text:t-curl-rtl                          9/9
+  text:t-curl-rtl-back                     8/8
+  text:t-curl-ltr-2col                     9/9
+  text:t-curl-ltr-2col-back                8/8
+  text:t-curl-rtl-2col                     9/9
+  text:t-curl-rtl-2col-back                8/8
+  text:t-slide-ltr-2col                    7/7
+  image:i-curl-l2r                         9/9
+  image:i-curl-l2r-back                    8/8
+  image:i-curl-r2l                         9/9
+  image:i-curl-r2l-back                    8/8
+  image:i-curl-vertical                    8/8
+  image:i-curl-vertical-back               8/8
+  image:i-curl-l2r-double                  9/9
+  image:i-webtoon                          3/3
+  image:i-off-l2r                          3/3
+  chapters                                 6/6
+  settings_ui                              5/5
+  rapid:r-curl                             2/2
+  rapid:r-slide                            2/2
+192/192 checks passed (201 results in 30 runs)

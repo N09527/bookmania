@@ -1,0 +1,1 @@
+11-22 01:03:36.825 23385 23386 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 23386 (Binder:23385_1)

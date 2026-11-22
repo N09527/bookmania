@@ -9,6 +9,7 @@
 | `check_pageturn.py` | 模擬器上的各項檢查，結果逐行寫入 `out/results.jsonl`；每次翻頁的錄影、逐格畫面與分析在 `out/rec/<名稱>/`，挑出的畫面並排成 `out/shots/<名稱>-frames.png`。步驟見檔案開頭的說明 |
 | `run-all.sh` | 依序執行本階段的全部檢查。`./run-all.sh 7` 從第 7 項開始；`STEPS="3 5 7-9" ./run-all.sh` 只跑指定的項目 |
 | `summarize.py` | 依 `out/results.jsonl` 列出每次執行，以及每個檢查最後一次的結果 |
+| `timings.py` | 依 `out/results.jsonl` 中 App 的 debug 紀錄，列出每次翻頁的準備時間、開始播放的時間與每秒格數 |
 | `make_varied_epub.py` | 產生內容不重複的測試 EPUB（`python3 -I make_varied_epub.py zh-varied.epub`）。原有的橫排測試書段落文字相同、只有段落編號不同，橫向雙欄時前後跨頁的畫面幾乎一樣，逐格分析分辨不出來 |
 
 做法：

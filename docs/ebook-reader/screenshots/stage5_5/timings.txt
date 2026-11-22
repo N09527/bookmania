@@ -1,0 +1,24 @@
+step                                  style    held  copy   ovl   1st  start  frames     ms   fps
+text:t-slide-ltr                      SLIDE    1843   312   130  1817   1425      12  12316  0.97
+text:t-curl-ltr                       CURL      902   320    97   819    427      19  25791  0.74
+text:t-curl-ltr-back                  CURL     2191   350   169  2142    419      20  23227  0.86
+text:t-curl-ltr-second                CURL     1106   352   130  1064    444      19  22607  0.84
+text:t-slide-ltr-second               SLIDE     770   272   113   738   1119      11  12563  0.88
+text:t-slide-rtl                      SLIDE    3167   350   113  3086   2007      11  12969  0.85
+text:t-curl-rtl                       CURL     2173   313   135  2055    465      16  24040  0.67
+text:t-curl-rtl-back                  CURL     2250   275    95  2191    436      19  24058  0.79
+text:t-curl-ltr-2col                  CURL     1455   251    99  1414    846      26  21389  1.22
+text:t-curl-ltr-2col-back             CURL      648   221    79   615    404      26  21846  1.19
+text:t-curl-rtl-2col                  CURL      754   291   120   702    794      26  21313  1.22
+text:t-curl-rtl-2col-back             CURL     2859  1360  1154  2661    414      28  21289  1.32
+text:t-slide-ltr-2col                 SLIDE     815   286   129   782   1196      15  11029  1.36
+image:i-curl-l2r                      CURL      715   506   388   577    959      30  20977  1.43
+image:i-curl-l2r-back                 CURL      445   276   166   407    844      43  22039  1.95
+image:i-curl-r2l                      CURL     1514   616   381  1345    823      29  20917  1.39
+image:i-curl-r2l-back                 CURL      554   413   228   516    466      37  21054  1.76
+image:i-curl-vertical                 CURL      454   370   290   418   1360      30  21183  1.42
+image:i-curl-vertical-back            CURL      492   293    77   451    479      44  20915  2.10
+image:i-curl-l2r-double               CURL     1072   476   425   994    935      65  20470  3.18
+held: 445-3167 ms, median 1072 ms (20 turns)
+start: 404-2007 ms, median 823 ms (20 turns)
+frames per second while recording: 0.67-3.18, median 1.22
