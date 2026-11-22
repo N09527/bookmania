@@ -79,7 +79,16 @@
 
 ### 3.3 系統紀錄（當機與「沒有回應」）
 
-【待填】
+修正前的第一輪（舊版 APK，3.2 開頭說明）：
+
+1. **App 的原生當機 `EGL_BAD_ALLOC` 共 3 次**（10:03、11:00、11:03，tombstone_00～02）：
+   - 都是 App 的繪圖執行緒建立視窗繪圖面失敗（`Failed to create EGLSurface … EGL_BAD_ALLOC`），與第 3～5 階段相同。
+   - 11:00 與 11:03 兩次，當機前後 App 的紀錄都有 LeakCanary「Failed to dump heap … Could not create heap dump file」，符合第 5 階段查出的觸發順序。10:03 那次的 tombstone 沒有查這一點。
+   - 它們使第 4、5 項開書失敗；11:03 那次的當機提示框一直留在畫面上，使第 6 項的按鍵沒有送到閱讀器（4.2 第 5 點）。
+   - 11:03:51 關閉 LeakCanary 的自動堆積檔之後（3.4），沒有再發生。【待填：最終輪的結果】
+2. **10:54:31 一個 `SIGSEGV`**：當機的程序（pid 10780）是測試腳本用來停止 App 的 `am force-stop` 指令本身。系統紀錄中 10:54:31.013「Force stopping io.github.n09527.bookmania.debug … from pid 10780」，App 的程序（pid 10593）在 .015 被它停止，180 毫秒後這個指令的程序結束時當機。沒有留下 tombstone。不是 App 的當機。
+
+最終輪：【待填】
 
 ### 3.4 測試環境的變更
 
@@ -142,7 +151,25 @@
 
 ## 5. 沒有驗證的項目
 
-【待填】
+整個專案到現在仍沒有驗證的（前幾個階段報告第 5 節列過、到現在仍成立的，也一併列在這裡）：
+
+1. **實機**：全部只在 Android 8.0（API 26）模擬器、WebView 69、軟體繪圖上驗證。
+   - 實機上的速度、流暢度、記憶體與耗電都沒有量測，包括開書時間（驗收第 9 項，第 0–1 階段報告已註明必須在實機量測）。
+   - 模擬器上的耗時（App 的紀錄）只說明這部模擬器，不能代表手機。
+2. **其他 Android 與 WebView 版本**：沒有測試。較新的 WebView 支援 `column-wrap`，雙欄的「做法 A」沒有實作（第 4 階段報告第 6 節，你決定先不做）。
+3. **release 版**：【待填：release 煙霧測試的結果】
+4. **上游既有功能**：沒有逐一手動回歸（線上來源、下載、追蹤服務、擴充套件等）。有驗證的是：上游原有的單元測試都通過；漫畫閱讀器（CBZ、漫畫型 EPUB）開啟與翻頁；設定畫面中 Bookmania 新增的開關。這些功能的程式 Bookmania 沒有修改，只修改了第 6.4 節所列的 19 個上游檔案。
+5. **手指操作**：漫畫閱讀器的滑動只用模擬器的 `input swipe` 測試（實際的觸控事件間隔與手指不同，見 4.2 第 2 點）。放大頁面後的拖動、捲曲進行中再用手指拖動都沒有測試。
+6. **追蹤服務**：這個環境沒有任何追蹤服務的帳號，「讀完後更新追蹤」沒有實際執行，只有單元測試（第 5 階段）。
+7. **備份**：含欄位 20101 的備份給其他 App（上游 Yōkai）讀取，沒有實測（依 protobuf 規則會略過不認識的欄位）。翻頁動畫等新設定隨備份還原，沒有測試。
+8. **無障礙**：TalkBack 沒有測試。
+9. **顯示細節**（前幾個階段列過）：
+   - 在這部模擬器上「系統襯線」對繁中書看不出差異（系統沒有中文襯線字型）。
+   - 書籍以 px 等絕對單位指定字級時，字級設定不影響那些文字（依程式推論）。
+   - 分割畫面、深色主題下的進度列外觀沒有測試。
+   - 漫畫閱讀器開啟色彩濾鏡時，捲曲頁背的紙色不會套用濾鏡（依程式推論）。
+   - 雙頁模式中單獨顯示一頁的跨頁（例如封面）以中線翻頁的樣子沒有測試。
+10. **滑動動畫在實機上是否需要等待**：模擬器上新頁的複本常常複製不到（逾時），滑動因此改為「舊頁移開、露出新頁」（4.1 第 1 點）。【推論】實機上複製通常只要幾毫秒，多半是新頁滑進來；沒有實機可以確認。
 
 ---
 
@@ -213,7 +240,31 @@
    - 沒有 Firebase 設定，所以不會把當機報告或分析資料送到上游的 Firebase 專案（第 2 階段報告第 5 節；最終 APK 再查一次，見 6.2）。
    - 修正上游兩個既有問題：漫畫型 EPUB「No pages found」、以作品 id 開啟詳細頁時當機（第 2 階段報告 7.6）。
 7. **程式碼的位置**：新功能在新模組 `:core:ebook`，以及 `:app` 的新 package `yokai.ebook`、`yokai.pageturn`。
-   - 【已查證：`git diff --name-status 843a59b`，不含 `docs/`】新增 107 個檔案；修改 19 個上游檔案，合計新增 166 行、刪除 15 行；沒有刪除檔案。
+   - 【已查證：`git diff --name-status 843a59b`，不含 `docs/`】新增 107 個檔案；修改 19 個上游檔案，合計新增 166 行、刪除 15 行；沒有刪除檔案。【待填：最終提交時再查一次】修改的上游檔案：
+
+     | 檔案 | 行數 |
+     |---|---|
+     | `app/build.gradle.kts` | +45／−0 |
+     | `app/src/main/AndroidManifest.xml` | +5／−0 |
+     | `app/.../data/backup/create/creators/MangaBackupCreator.kt` | +2／−0 |
+     | `app/.../data/backup/models/BackupChapter.kt` | +4／−0 |
+     | `app/.../data/backup/restore/restorers/MangaBackupRestorer.kt` | +2／−0 |
+     | `app/.../source/LocalSource.kt` | +18／−1 |
+     | `app/.../ui/main/MainActivity.kt` | +1／−1 |
+     | `app/.../ui/manga/MangaDetailsPresenter.kt` | +3／−1 |
+     | `app/.../ui/reader/ReaderActivity.kt` | +10／−0 |
+     | `app/.../ui/reader/ReaderViewModel.kt` | +11／−0 |
+     | `app/.../ui/reader/loader/ChapterLoader.kt` | +10／−1 |
+     | `app/.../ui/reader/settings/ReaderPagedView.kt` | +3／−0 |
+     | `app/.../ui/reader/viewer/pager/Pager.kt` | +6／−0 |
+     | `app/.../ui/reader/viewer/pager/PagerViewer.kt` | +9／−2 |
+     | `app/.../ui/setting/controllers/SettingsReaderController.kt` | +8／−0 |
+     | `app/src/main/java/yokai/presentation/onboarding/steps/PermissionStep.kt` | +14／−7 |
+     | `app/src/main/res/layout/reader_paged_layout.xml` | +9／−0 |
+     | `core/archive/.../EpubReader.kt` | +5／−2 |
+     | `settings.gradle.kts` | +1／−0 |
+
+     （`app/...` 是 `app/src/main/java/eu/kanade/tachiyomi/`；`core/archive/...` 是 `core/archive/src/main/java/yokai/core/archive/`。）
    - 沒有修改或新增 migration（`.sqm`、`.sq` 都沒有動）。
    - 備份 protobuf 只新增欄位 20101，沒有更動或重複使用既有編號。
    - 沒有改變既有偏好設定鍵的意義；minSdk 26。
