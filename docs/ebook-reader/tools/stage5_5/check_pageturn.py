@@ -653,9 +653,11 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False,
     time.sleep(25)  # pages decoded
     c.clear_dialogs()
     hide_reader_menu()
+    note(f'{label}: the screen was still after {wait_still()} s more')
     if back:
         d.shell(f'input keyevent {KEY_PAGE_DOWN}')
         time.sleep(8)
+        note(f'{label}: after the first turn, the screen was still after {wait_still()} s more')
     size = screen_size()
     action = swipe_action(mode, back, size, curl) if swipe else None
     check('the screen is in ' + ('landscape' if double else 'portrait'), (size[0] > size[1]) == double, {'screen': size})
@@ -695,6 +697,21 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False,
         verdicts(label, 'curl', rows, back, double, rtl=(mode == 'r2l'), edge='BOTTOM' if mode == 'vertical' else None,
                  sheet_path=path, leftover=no_overlay_left(after, late))
     rotate(False)
+
+
+def wait_still(timeout=120, pause=3.0):
+    """Waits until the screen stops changing: a page that is still loading shows an animated spinner (stage 6:
+    on a slow run a comic page took more than 25 s, and the picture "before the turn" was the spinner).
+    Returns the seconds waited, or None when the screen still changed after [timeout]."""
+    t = time.time()
+    last = grey(grab((270, 480)))
+    while time.time() - t < timeout:
+        time.sleep(pause)
+        now = grey(grab((270, 480)))
+        if float(np.abs(now - last).mean()) < 0.5:
+            return round(time.time() - t, 1)
+        last = now
+    return None
 
 
 def chapter_row(chapter):
