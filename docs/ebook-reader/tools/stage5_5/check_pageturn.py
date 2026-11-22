@@ -303,38 +303,42 @@ def slide_check(rows, frames, before, after, expect_old_sign, vertical=False):
 
 
 def incoming_fit(frame, before, after, sign, vertical=False):
-    """What comes in during a slide. The frame is fitted with the old page moved by dx and, one page away,
-    either the new page or another copy of the old page, for every dx in the direction the old page leaves
-    ([sign]: -1 left / up, 1 right / down). At the dx that fits best, the strip that came in is compared with
-    the new page and with the old page. Returns {dx, width of the strip, error against the new page, against
-    the old page} in pixels of the recording (halved here), or None when the strip is too narrow."""
+    """What comes in during a slide. The frame is fitted with the old page moved by dx and, in the strip it
+    uncovered, one of three pictures, for every dx in the direction the old page leaves ([sign]: -1 left / up,
+    1 right / down):
+      - the new page sliding in, one page away from the old page (the App had a copy of the new page);
+      - the new page at its place, uncovered (no copy of the new page: the App shows its own view there);
+      - a copy of the old page sliding in (the problem found in stage 6).
+    At the dx that fits best, the strip is compared with each. Returns {dx, strip, errors} in pixels of the
+    recording (halved here), or None when the strip is too narrow."""
     F, B, A = grey(frame)[::2, ::2], grey(before)[::2, ::2], grey(after)[::2, ::2]
     if vertical:
         F, B, A = F.T, B.T, A.T
     h, w = F.shape
     best = None
     for dx in range(2, w - 2, 2):
-        if sign < 0:  # the old page shows its columns dx.. at 0..; the page coming in shows its first dx columns at the right
+        if sign < 0:  # the old page shows its columns dx.. at 0..; the strip is at the right
             shared = np.abs(F[:, :w - dx] - B[:, dx:]).mean()
-            strip_f, strip_new, strip_old = F[:, w - dx:], A[:, :dx], B[:, :dx]
-        else:         # the old page shows at dx..; the page coming in shows its last dx columns at the left
+            strip_f, slide, uncovered, old = F[:, w - dx:], A[:, :dx], A[:, w - dx:], B[:, :dx]
+        else:         # the old page shows at dx..; the strip is at the left
             shared = np.abs(F[:, dx:] - B[:, :w - dx]).mean()
-            strip_f, strip_new, strip_old = F[:, :dx], A[:, w - dx:], B[:, w - dx:]
-        e_new = np.abs(strip_f - strip_new).mean()
-        e_old = np.abs(strip_f - strip_old).mean()
-        total = (shared * (w - dx) + min(e_new, e_old) * dx) / w
+            strip_f, slide, uncovered, old = F[:, :dx], A[:, w - dx:], A[:, :dx], B[:, w - dx:]
+        errors = [float(np.abs(strip_f - x).mean()) for x in (slide, uncovered, old)]
+        total = (shared * (w - dx) + min(errors) * dx) / w
         if best is None or total < best[0]:
-            best = (total, dx, e_new, e_old)
+            best = (total, dx, errors)
     if best is None or best[1] < 0.1 * w:
         return None
-    return {'dx': best[1] * 2 * sign, 'strip': best[1] * 2, 'error against the new page': round(float(best[2]), 2),
-            'error against the old page': round(float(best[3]), 2)}
+    e_slide, e_uncovered, e_old = best[2]
+    return {'dx': best[1] * 2 * sign, 'strip': best[1] * 2, 'error against the new page sliding in': round(e_slide, 2),
+            'error against the new page uncovered': round(e_uncovered, 2), 'error against a copy of the old page': round(e_old, 2)}
 
 
 def incoming_check(rows, frames, before, after, expect_old_sign, vertical=False):
     """The page that comes in during a slide is the new page, not a copy of the old one (stage 6: the copy of
-    the new page was made before the WebView showed it, and the old page came in again). Judged on the frames
-    of the turn where a strip of at least a tenth of the page came in."""
+    the new page was made before the WebView showed it, and the old page came in again). The new page may
+    slide in (a copy of it) or be uncovered at its place (no copy). Judged on the frames of the turn where a
+    strip of at least a tenth of the page came in."""
     old_most = max(r['old'] for r in rows)
     new_most = max(r['new'] for r in rows)
     fits = []
@@ -343,11 +347,18 @@ def incoming_check(rows, frames, before, after, expect_old_sign, vertical=False)
             continue
         fit_ = incoming_fit(img, before, after, expect_old_sign, vertical)
         if fit_:
-            e_new, e_old = fit_['error against the new page'], fit_['error against the old page']
+            e_slide = fit_['error against the new page sliding in']
+            e_unc = fit_['error against the new page uncovered']
+            e_old = fit_['error against a copy of the old page']
             fit_['t'] = r['t']
-            fit_['shows'] = 'new page' if e_new < 0.7 * e_old else 'old page' if e_old < 0.7 * e_new else 'unclear'
+            if e_old < 0.7 * min(e_slide, e_unc):
+                fit_['shows'] = 'a copy of the old page'
+            elif min(e_slide, e_unc) < 0.7 * e_old:
+                fit_['shows'] = 'the new page sliding in' if e_slide <= e_unc else 'the new page uncovered'
+            else:
+                fit_['shows'] = 'unclear'
             fits.append(fit_)
-    ok = any(f['shows'] == 'new page' for f in fits) and not any(f['shows'] == 'old page' for f in fits)
+    ok = any(f['shows'].startswith('the new page') for f in fits) and not any(f['shows'] == 'a copy of the old page' for f in fits)
     return ok, fits
 
 

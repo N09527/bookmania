@@ -238,7 +238,10 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
             after = bitmap
             copies++
             if (!copy(bitmap)) break
-            if (!bitmap.sameAs(current)) return bitmap
+            if (!bitmap.sameAs(current)) {
+                Logger.d { "page turn: the new page is copied after ${SystemClock.uptimeMillis() - start} ms ($copies copies)" }
+                return bitmap
+            }
             if (SystemClock.uptimeMillis() - start >= NEXT_PAGE_MS) break
             awaitWindowFrame()
         }
