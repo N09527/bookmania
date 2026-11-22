@@ -59,7 +59,17 @@ class PagerSwipeTurn(
                 swiping = true
                 view.parent?.requestDisallowInterceptTouchEvent(true)
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> finish()
+            MotionEvent.ACTION_UP -> {
+                // The finger was lifted far from where it went down although no move along the pager came
+                // before (moves merged into the release, seen on a slow emulator): still a swipe.
+                val swiped = !swiping && !multiTouch && startsSwipe(ev) && abs(along(ev)) >= minDistance
+                finish()
+                if (swiped) {
+                    turn(along(ev) < 0)
+                    return true // the page gets a cancel instead of the release
+                }
+            }
+            MotionEvent.ACTION_CANCEL -> finish()
         }
         return swiping
     }

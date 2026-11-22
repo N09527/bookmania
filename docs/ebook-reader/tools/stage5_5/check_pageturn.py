@@ -485,18 +485,19 @@ MODES = {'l2r': 1, 'r2l': 2, 'vertical': 3, 'webtoon': 4}
 
 
 def swipe_action(mode, back, size):
-    """A quick swipe that turns to the next page (or back): the finger moves left in left-to-right pagers,
-    right in right-to-left ones, up in the vertical pager."""
+    """A swipe that turns to the next page (or back): the finger moves left in left-to-right pagers, right in
+    right-to-left ones, up in the vertical pager. Over 400 ms: with a shorter swipe, the slow emulator's
+    `input` sent the press, one move at the start and the release, and no move in between."""
     w, h = size
     if mode == 'vertical':
         y1, y2 = int(h * 0.75), int(h * 0.3)
         if back:
             y1, y2 = y2, y1
-        return f'input swipe {w // 2} {y1} {w // 2} {y2} 150'
+        return f'input swipe {w // 2} {y1} {w // 2} {y2} 400'
     x1, x2 = int(w * 0.8), int(w * 0.2)
     if (mode == 'r2l') != back:
         x1, x2 = x2, x1
-    return f'input swipe {x1} {h // 2} {x2} {h // 2} 150'
+    return f'input swipe {x1} {h // 2} {x2} {h // 2} 400'
 
 
 def image_step(manga, chapter, mode, label, curl='on', double=False, back=False, swipe=False):
