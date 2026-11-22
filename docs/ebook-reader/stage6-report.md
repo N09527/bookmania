@@ -107,7 +107,83 @@
 
 ## 6. 交付
 
+### 6.1 原始碼
+
+- 存放庫 https://github.com/N09527/bookmania，分支 `ebook-reader/stage1-design`。基礎是上游 Yōkai 的 `843a59b`。【待填：最終提交】
+- 從來沒有推送到上游 null2264/yokai。
+
+### 6.2 APK
+
 【待填】
+
+### 6.3 建置方式
+
+環境：JDK 21（這次用 OpenJDK 21.0.12.1）、Android SDK `platforms;android-36`、`build-tools;35.0.0`。
+
+1. 簽章：在 `~/.gradle/gradle.properties` 設定 `bookmaniaStoreFile`、`bookmaniaStorePassword`、`bookmaniaKeyAlias`、`bookmaniaKeyPassword`。金鑰檔與密碼在第 2 階段（報告 7.2）已交給你。沒有設定時，release 會產生未簽章的 APK。
+2. 建置 release：
+
+   ```bash
+   ./gradlew :app:assembleBookmaniaRelease
+   ```
+
+   產物在 `app/build/outputs/apk/bookmania/release/`：`app-bookmania-{arm64-v8a, armeabi-v7a, x86, x86_64, universal}-release.apk`。
+3. 單元測試：
+
+   ```bash
+   ./gradlew testDebugUnitTest testBookmaniaDebugUnitTest
+   ```
+
+4. 模擬器上的自動檢查（只用於測試，不屬於 App）：`docs/ebook-reader/tools/` 各階段的資料夾，第 6 階段的回歸測試用 `tools/stage6/run-regression.sh`，用法見各資料夾的 README。
+
+### 6.4 變更摘要（相對於上游 `843a59b`）
+
+各階段的細節見各階段的報告（`docs/ebook-reader/stage*-report.md`）。
+
+1. **格式**（第 2 階段）：
+   - Local Source 列出 `.epub`、`.mobi`、`.azw3`。文字書以新的文字閱讀器開啟；漫畫型 EPUB 與 CBZ 仍用既有的圖片閱讀器。判定是自動的，可手動切換（第 5 階段）。
+   - EPUB 2／3、MOBI 6、KF8（AZW3）、合併式 MOBI 由新模組 `:core:ebook` 解析。MOBI／KF8 的部分是 foliate-js `mobi.js` 的 Kotlin 移植（MIT，6.5）。
+   - 受 DRM 保護的檔案顯示說明畫面，不解密、不當機；損毀的檔案顯示錯誤，不當機。
+   - 書籍內容的隔離（第 0–1 階段報告設計 5.7）：
+     - 清除書內的 script、事件屬性、`javascript:` 網址等（單元測試）。
+     - iframe 沙箱不允許腳本；CSP 禁止腳本與連線。
+     - WebView 只回應虛擬網域下的殼層與書內資源，並設 `blockNetworkLoads`、不允許檔案與 content 存取。
+     - 驗證情形見 3.5。
+2. **排版設定**（第 3 階段）：
+   - 字體（含匯入 TTF／OTF，匯入時檢查直排資訊，不內建字型）、字級、行距、字距、首行縮排、段落間距、上下左右邊距、書寫方向、翻頁方向（右開／左開／自動）。
+   - 三層設定：全部書籍 → 這部作品 → 這個檔案，近的優先。
+   - 橫向畫面用側邊面板。
+3. **雙欄**（第 4 階段）：
+   - 關閉／開啟／僅橫向畫面（預設）。直書也是左右兩欄，先讀的一欄跟著翻頁方向；欄間距固定 40 dp。
+   - WebView 69 上頁首注音錯位的修正。
+4. **整合**（第 5 階段）：
+   - 閱讀位置存在獨立的 `ebook.db`（沒有新增主資料庫 migration）。
+   - 章節清單的頁數、已讀、閱讀紀錄與時間、追蹤、無痕模式，都照漫畫閱讀器的做法。
+   - 目錄與全書進度滑桿（含 MOBI 6 的 NCX 目錄）；點擊區與音量鍵沿用既有閱讀器的設定。
+   - 備份：精確位置放在新的 protobuf 欄位 20101；每本書的排版設定是 App 偏好設定，隨既有的「App 設定」備份。
+   - 外部連結先詢問，再以瀏覽器開啟。
+5. **翻頁動畫與章節面板**（第 5.5、6 階段）：
+   - 文字閱讀器可選捲曲／滑動／無，預設捲曲。漫畫閱讀器新增「捲曲翻頁」開關（預設關閉）；開啟時點擊、按鍵與手指滑動都以捲曲翻頁。
+   - 捲曲方向依左右開；漫畫的直向翻頁模式從下緣往上；雙欄與雙頁以中線為軸只翻一頁；長條模式不提供捲曲。
+   - 文字閱讀器的章節面板，列出同一作品的其他檔案。
+6. **App 本身**（第 2 階段的決定）：
+   - 名稱 Bookmania、套件 `io.github.n09527.bookmania`、新圖示（橘底）與 4 種替代圖示。
+   - 不顯示「Updated to／What's new」；導覽中的「安裝應用程式」權限改為選用；關閉自我更新。
+   - 沒有 Firebase 設定，所以不會把當機報告或分析資料送到上游的 Firebase 專案（第 2 階段報告第 5 節；最終 APK 再查一次，見 6.2）。
+   - 修正上游兩個既有問題：漫畫型 EPUB「No pages found」、以作品 id 開啟詳細頁時當機（第 2 階段報告 7.6）。
+7. **程式碼的位置**：新功能在新模組 `:core:ebook`，以及 `:app` 的新 package `yokai.ebook`、`yokai.pageturn`。
+   - 【已查證：`git diff --name-status 843a59b`，不含 `docs/`】新增 107 個檔案；修改 19 個上游檔案，合計新增 166 行、刪除 15 行；沒有刪除檔案。
+   - 沒有修改或新增 migration（`.sqm`、`.sq` 都沒有動）。
+   - 備份 protobuf 只新增欄位 20101，沒有更動或重複使用既有編號。
+   - 沒有改變既有偏好設定鍵的意義；minSdk 26。
+
+### 6.5 第三方元件與授權
+
+- 新增的第三方程式碼只有 foliate-js `mobi.js` 的移植（MIT）。完整授權在 `core/ebook/NOTICE-foliate-js.txt`；App 的開源授權清單以自訂項目列出（`app/aboutlibraries/`）。【待填：最終 APK 內的授權清單】
+- 新模組 `:core:ebook` 只依賴 jsoup，上游原本就使用它（同一個版本目錄）。沒有新增其他程式庫。
+- 沒有使用 GPL、AGPL、LGPL 的程式碼。Calibre 只在本機用來產生測試書，不隨 App 發佈。
+- 儲存庫中的測試字型與測試書是我寫的腳本產生的（`core/ebook/testbooks/make_testfonts.py`、`make_testbooks.py`），沒有第三方內容。
+- 上游的著作權與 Apache-2.0 聲明都保留，沒有修改。
 
 ---
 
