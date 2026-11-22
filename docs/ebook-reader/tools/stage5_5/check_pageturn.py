@@ -919,8 +919,16 @@ def settings_ui(manga, chapter):
     c.wait_app_drawn()
     time.sleep(3)
     c.clear_dialogs()
-    for label in ('其他', '設定', '閱讀'):
+    for label in ('其他', '設定'):
         d.tap_label(label, wait=3, exact=True)
+    # the tap on 閱讀 can be lost while the settings list is still moving in (stage 6, after a cold boot): tapped
+    # again while entries of the main settings list are still shown
+    for _ in range(3):
+        n = d.find('閱讀', exact=True)
+        if n:
+            d.tap(n['x'], n['y'], 4)
+        if not any(x['text'] in ('下載', '探索') for x in d.nodes()):
+            break
     found = transitions = None
     for _ in range(6):
         ns = d.nodes()
