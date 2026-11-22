@@ -6,6 +6,7 @@ Needs: drive.py (same folder), the debug APK with the stage 2 test books (see ..
 the app language set to Traditional Chinese (labels are matched in zh-TW).
 """
 import json
+import re
 import os
 import sys
 import time
@@ -599,8 +600,11 @@ def step_toolbar():
     bar = next((n for n in ns if n['res'].endswith('/toolbar')), None)
     check('subtitle inside the toolbar', bool(title and sub and bar and sub['b'][3] <= bar['b'][3]),
           [title and title['b'], sub and sub['b'], bar and bar['b']])
-    info = next((n for n in ns if n['res'].endswith('/page_info')), None)
-    check('page number above the navigation bar (y < 1794)', bool(info and info['b'][3] <= 1794), info and info['b'])
+    # Since stage 5 the page number ("1/3 · 1/35") is in the progress bar at the bottom, not a view with the
+    # id page_info (stage 6): it is found by its text.
+    info = next((n for n in ns if re.match(r'^\d+/\d+ · \d+(?:–\d+)?/\d+$', n['text'])), None)
+    check('page number above the navigation bar (y < 1794)', bool(info and info['b'][3] <= 1794),
+          info and {'text': info['text'], 'bounds': info['b']})
     d.tap(540, 960, 3)
 
 
