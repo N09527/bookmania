@@ -17,10 +17,16 @@ events() {  # crashes and "not responding" in the system log since the part star
   $ADB logcat -c 2>/dev/null
 }
 
+default_curl() {  # the image reader's page curl back to its default (off; a global setting the checks of
+  # stage 5.5 turn on and off), so that stages 2 to 5 run with the default settings
+  (cd "$TOOLS/stage5" && OUT="$HERE/out" python3 -I -c "import sys; sys.path.insert(0, '.'); import check_stage5 as c; c.set_prefs({'pref_bookmania_pager_curl': None})")
+}
+
 run_part() {
   local part=$1
   echo "=== $part start $(date +%H:%M:%S)" >> "$LOG"
   $ADB logcat -c 2>/dev/null
+  case $part in s5|s4checks|s4pages|s3|s2) default_curl ;; esac
   case $part in
     warmup)
       (cd "$TOOLS/stage5" && OUT="$HERE/out/warmup" timeout 1800 python3 -I check_stage5.py warmup 8 10) ;;

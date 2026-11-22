@@ -8,8 +8,8 @@ export OUT="${OUT:-$HERE/out}"  # results, logs and screenshots (out/shots)
 while read -r manga chapter label side opts; do
   [ -z "$manga" ] && continue
   python3 verify_columns.py $manga $chapter $label $opts < /dev/null 2>&1 | tail -2
-  python3 summarize2.py out/runs/$label.jsonl $side
-  [ -f out/runs/$label.ruby.jsonl ] && python3 summarize_ruby.py out/runs/$label.ruby.jsonl
+  python3 summarize2.py "$OUT/runs/$label.jsonl" $side
+  [ -f "$OUT/runs/$label.ruby.jsonl" ] && python3 summarize_ruby.py "$OUT/runs/$label.ruby.jsonl"
 done <<'LIST'
 14 16 v-epub-1col-default - --columns off
 8 10 h-epub-1col-default - --columns off
