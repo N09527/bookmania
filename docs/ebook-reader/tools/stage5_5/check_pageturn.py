@@ -567,18 +567,20 @@ def swipe_action(mode, back, size, curl='on'):
     `input` waits until the App has handled each move, so the moves come 20 to 130 ms apart, and Android 8
     measures the speed from the moves of the last 100 ms only (the release does not count): the quick swipe
     had no speed and was dragged about half the page, so the page sprang back (stage 6 report, events seen
-    with `dumpsys input`). With the curl off, the finger is therefore dragged slowly over most of the page."""
+    with `dumpsys input`). With the curl off, the finger is therefore dragged slowly over most of the page: over
+    4 s, as the last move `input` sends comes well before the end when the App is slow (over 1.5 s, the page
+    once got only half way)."""
     w, h = size
     drag = curl == 'off' and mode != 'webtoon'
     if mode in ('vertical', 'webtoon'):
         y1, y2 = (int(h * 0.93), int(h * 0.07)) if drag else (int(h * 0.75), int(h * 0.3))
         if back:
             y1, y2 = y2, y1
-        return f"input swipe {w // 2} {y1} {w // 2} {y2} {1500 if drag else 400}"
+        return f"input swipe {w // 2} {y1} {w // 2} {y2} {4000 if drag else 400}"
     x1, x2 = (int(w * 0.93), int(w * 0.07)) if drag else (int(w * 0.8), int(w * 0.2))
     if (mode == 'r2l') != back:
         x1, x2 = x2, x1
-    return f"input swipe {x1} {h // 2} {x2} {h // 2} {1500 if drag else 400}"
+    return f"input swipe {x1} {h // 2} {x2} {h // 2} {4000 if drag else 400}"
 
 
 def scroll_shift(before, after):
