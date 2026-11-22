@@ -432,7 +432,9 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     expected = st['page'] - step if back else st['page'] + step
     check('the page turned', st2 and st2['page'] == expected, {'before': st, 'after': st2, 'expected page': expected})
     logs = turn_logs(record_turn.since)
-    check('the App logged the turn (debug log)', (style == 'none') == (not logs), {'log': logs})
+    # the App's line that the turn started (a turn that was not animated logs why instead; stage 6)
+    started = {'slide': 'SLIDE starts', 'curl': 'CURL starts', 'default': 'CURL starts'}.get(style)
+    check('the App logged the turn (debug log)', any(started in l for l in logs) if started else not logs, {'log': logs})
     # the page direction: as set, else vertical text turns right to left (the shell's mode 'V')
     rtl = direction == 'rtl' or (direction is None and st.get('mode') == 'V')
     verdicts(label, style, rows, back, columns == 'on', rtl=rtl, edge=None, sheet_path=path,
@@ -689,7 +691,7 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False,
         check('no curl: the App did not play a page turn of its own (debug log)', not logs,
               {'log': logs, 'frames during the turn': len(during), 'sheet': os.path.relpath(path, OUT)})
     else:
-        check('the App logged the curl (debug log)', bool(logs), {'log': logs})
+        check('the App logged the curl (debug log)', any('CURL starts' in l for l in logs), {'log': logs})
         verdicts(label, 'curl', rows, back, double, rtl=(mode == 'r2l'), edge='BOTTOM' if mode == 'vertical' else None,
                  sheet_path=path, leftover=no_overlay_left(after, late))
     rotate(False)
