@@ -167,6 +167,17 @@ def edit_position(key, change):
     return new
 
 
+def forget_book(key):
+    """Removes [key]'s rows (classification, character counts, position) from ebook.db (App stopped), as if
+    the book had never been opened."""
+    c = pull_db('ebook.db')
+    c.execute('DELETE FROM book WHERE source = ? AND manga_url = ? AND chapter_url = ?', key)
+    c.execute('DELETE FROM position WHERE source = ? AND manga_url = ? AND chapter_url = ?', key)
+    c.commit()
+    c.close()
+    push_ebook_db()
+
+
 def estimate(counts, spine, page, pages, at_end):
     """The chapter list's page numbers as the App computes them (ReadingProgress.pages), to compare with
     what it wrote: (last_page_read, pages_left)."""
@@ -1523,6 +1534,12 @@ def step_classify(manga, chapter):
     stop_app(0)
     m = main_rows(chapter)
     _, book0 = ebook_rows(m['key'])
+    if book0 is not None and book0['kind_auto'] is not None:
+        # The book was opened by an earlier run on this emulator (the stage 6 regression runs the checks of
+        # stage 5 again): it is made "never opened" again by removing its rows from ebook.db.
+        forget_book(m['key'])
+        note(f'classify: the book had been opened before ({book0}); its rows in ebook.db were removed')
+        _, book0 = ebook_rows(m['key'])
     check('not classified yet', book0 is None or book0['kind_auto'] is None, book0)
 
     def open_from_chapter_list():
