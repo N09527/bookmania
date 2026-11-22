@@ -484,20 +484,41 @@ def reanalyse(label, style, back=False, spread=False, rtl=False, edge=None):
 MODES = {'l2r': 1, 'r2l': 2, 'vertical': 3, 'webtoon': 4}
 
 
-def swipe_action(mode, back, size):
+def swipe_action(mode, back, size, curl='on'):
     """A swipe that turns to the next page (or back): the finger moves left in left-to-right pagers, right in
-    right-to-left ones, up in the vertical pager. Over 400 ms: with a shorter swipe, the slow emulator's
-    `input` sent the press, one move at the start and the release, and no move in between."""
+    right-to-left ones, up in the vertical pager and in the long strip. Over 400 ms: with a shorter swipe, the
+    slow emulator's `input` sent the press, one move at the start and the release, and no move in between.
+
+    With the curl off, the pager follows the finger itself and turns by its own rule: when the finger is
+    lifted, the page turns if it moved fast enough, or if it was dragged past about 60 % of the page. Here
+    `input` waits until the App has handled each move, so the moves come 20 to 130 ms apart, and Android 8
+    measures the speed from the moves of the last 100 ms only (the release does not count): the quick swipe
+    had no speed and was dragged about half the page, so the page sprang back (stage 6 report, events seen
+    with `dumpsys input`). With the curl off, the finger is therefore dragged slowly over most of the page."""
     w, h = size
-    if mode == 'vertical':
-        y1, y2 = int(h * 0.75), int(h * 0.3)
+    drag = curl == 'off' and mode != 'webtoon'
+    if mode in ('vertical', 'webtoon'):
+        y1, y2 = (int(h * 0.93), int(h * 0.07)) if drag else (int(h * 0.75), int(h * 0.3))
         if back:
             y1, y2 = y2, y1
-        return f'input swipe {w // 2} {y1} {w // 2} {y2} 400'
-    x1, x2 = int(w * 0.8), int(w * 0.2)
+        return f"input swipe {w // 2} {y1} {w // 2} {y2} {1500 if drag else 400}"
+    x1, x2 = (int(w * 0.93), int(w * 0.07)) if drag else (int(w * 0.8), int(w * 0.2))
     if (mode == 'r2l') != back:
         x1, x2 = x2, x1
-    return f'input swipe {x1} {h // 2} {x2} {h // 2} 400'
+    return f"input swipe {x1} {h // 2} {x2} {h // 2} {1500 if drag else 400}"
+
+
+def scroll_shift(before, after):
+    """How far the picture moved up from [before] to [after], in pixels of the images (a scroll of the long
+    strip): the shift at which the two overlap best. Returns (shift, difference there, difference unmoved);
+    the page number at the bottom stays where it is, so the lowest tenth of the screen is left out."""
+    a = np.asarray(before.convert('L'), dtype=np.float32)
+    b = np.asarray(after.convert('L'), dtype=np.float32)
+    h = int(a.shape[0] * 0.9)
+    a, b = a[:h], b[:h]
+    diffs = [float(np.abs(a[s:] - b[:h - s]).mean()) for s in range(0, int(h * 0.6))]
+    shift = int(np.argmin(diffs))
+    return shift, diffs[shift], diffs[0]
 
 
 def image_step(manga, chapter, mode, label, curl='on', double=False, back=False, swipe=False):
@@ -521,7 +542,7 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False,
         d.shell(f'input keyevent {KEY_PAGE_DOWN}')
         time.sleep(8)
     size = screen_size()
-    action = swipe_action(mode, back, size) if swipe else None
+    action = swipe_action(mode, back, size, curl) if swipe else None
     check('the screen is in ' + ('landscape' if double else 'portrait'), (size[0] > size[1]) == double, {'screen': size})
     size = (size[0] // 4, size[1] // 4)  # comic pages are told apart by colour: a small, cheaper recording
     before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size, action=action)
@@ -536,8 +557,18 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False,
     time.sleep(6)
     c.stop_app()
     page = chapter_row(chapter)[6]
-    check('the page turned' + (' back to the first page' if back else ''), page == 0 if back else page >= 1,
-          {'last_page_read after the turn': page, 'started at': 0, 'turned forward once first': back})
+    if mode == 'webtoon' and swipe:
+        # The long strip follows the finger. Its page is the last one whose bottom edge is on the screen, so
+        # one swipe does not reach the next page (the pages here are almost as tall as the screen); the scroll
+        # is checked instead.
+        shift, diff, unmoved = scroll_shift(before, after)
+        check('the strip scrolled up with the finger', shift >= 0.1 * size[1] and diff < 0.5 * unmoved,
+              {'moved up (pixels of the screen)': shift * 4, 'difference there': round(diff, 2),
+               'difference unmoved': round(unmoved, 2), 'last_page_read': page, 'swipe': action})
+    else:
+        check('the page turned' + (' back to the first page' if back else ''), page == 0 if back else page >= 1,
+              {'last_page_read after the turn': page, 'started at': 0, 'turned forward once first': back,
+               'swipe': action})
     if mode == 'webtoon' or curl == 'off':
         during = mid(rows)
         check('no curl: the App did not play a page turn of its own (debug log)', not logs,

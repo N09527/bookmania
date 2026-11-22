@@ -73,6 +73,9 @@ run image 10 12 l2r i-swipe-l2r --swipe
 run image 10 12 l2r i-swipe-l2r-back --swipe --back
 run image 10 12 r2l i-swipe-r2l --swipe
 run image 10 12 vertical i-swipe-vertical --swipe
-run image 10 12 l2r i-swipe-off --swipe --curl off
-run image 10 12 webtoon i-swipe-webtoon --swipe
+# with the curl off the pager follows the finger and turns by its own rule; the quick swipe had no speed here
+# (stage 6 report), so a slow drag over most of the page: i-swipe-off-drag replaces the first run's i-swipe-off.
+# The long strip is scrolled up (the first run's i-swipe-webtoon swiped sideways, which the strip ignores).
+run image 10 12 l2r i-swipe-off-drag --swipe --curl off
+run image 10 12 webtoon i-swipe-webtoon-up --swipe
 echo "RUN-ALL DONE $(date +%H:%M:%S)"
