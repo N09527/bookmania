@@ -1,0 +1,97 @@
+"""Stage 6: the App's own notifications after a text book was open (Android 8.0 emulator).
+
+In the regression the debug App crashed once when LeakCanary (a debug-only tool) showed a notification:
+NotificationManager.getNotificationChannel threw "SecurityException: Calling uid 10079 gave package
+com.android.chrome", com.android.chrome being the WebView provider of this emulator. This checks whether
+the App's own notifications are affected in the same way once the WebView has been loaded in the App's
+process: a library update (pull to refresh in the library) posts a foreground notification.
+
+Two rounds, each from a stopped App:
+  - control: library update without opening a book;
+  - after a book: a text book is opened (WebView loaded), left with BACK, then the library is updated in
+    the same process.
+Each round: the App's process must be the same before and after the update, the crash buffer must stay
+empty, and the App's notification must show up in `dumpsys notification` during the update.
+
+Usage: ADB=/path/to/adb [PKG=io.github.n09527.bookmania(.debug)] python3 -I check_notification.py
+For the release App, PKG=io.github.n09527.bookmania (opening the book then needs no DevTools: the reader is
+waited for by its activity only). Results: out/notification/results.jsonl.
+"""
+import os
+import sys
+import time
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+os.environ.setdefault('OUT', os.path.join(HERE, 'out', 'notification'))
+os.makedirs(os.environ['OUT'], exist_ok=True)
+sys.path.insert(0, os.path.join(HERE, '..', 'stage5'))
+import check_stage5 as c  # noqa: E402
+
+d = c.d
+PKG = d.PKG
+MAIN = 'eu.kanade.tachiyomi.ui.main.MainActivity'
+TEXT = f'{PKG}/yokai.ebook.EbookReaderActivity'
+
+
+def pid():
+    return d.shell(f'pidof {PKG}').strip()
+
+
+def app_notifications():
+    out = d.shell('dumpsys notification --noredact')
+    return [ln.strip() for ln in out.splitlines() if 'NotificationRecord' in ln and f'pkg={PKG}' in ln]
+
+
+def open_library():
+    d.shell(f'am start -n {PKG}/{MAIN}')
+    time.sleep(8)
+    c.wait_app_drawn()
+    time.sleep(4)
+    c.clear_dialogs()
+
+
+def update_library(label):
+    """Pull to refresh in the library; watches for the App's notification for up to a minute."""
+    before = pid()
+    d.shell('logcat -b crash -c')
+    d.swipe(540, 600, 540, 1500, ms=700, wait=1)
+    seen = []
+    t = time.time()
+    while time.time() - t < 60 and not seen:
+        seen = app_notifications()
+        time.sleep(2)
+    time.sleep(10)
+    after = pid()
+    crashes = [ln for ln in d.shell('logcat -d -b crash').splitlines() if 'FATAL' in ln or 'Fatal signal' in ln]
+    d.shot(f'notification-{label}')
+    c.check('the App posted its notification', bool(seen), seen[:3])
+    c.check('the App was not restarted or killed (same process)', before != '' and before == after,
+            {'before': before, 'after': after})
+    c.check('no crash in the crash buffer', not crashes, crashes[:5])
+
+
+def main():
+    c.STEP[0] = 'notification:control'
+    c.stop_app(0)
+    open_library()
+    update_library('control')
+    c.STEP[0] = 'notification:after-a-text-book'
+    c.stop_app(0)
+    d.shell(f'am start -n {PKG}/{c.IMAGE_READER} --el manga 8 --el chapter 10')
+    t = time.time()
+    while TEXT not in d.resumed() and time.time() - t < 180:
+        time.sleep(3)
+    time.sleep(20)  # laid out: the WebView is loaded in the App's process
+    c.check('the text book opened (the WebView is loaded in the App process)', TEXT in d.resumed(), d.resumed())
+    d.shell('input keyevent 4')
+    time.sleep(4)
+    if TEXT in d.resumed():  # the menu took the first BACK
+        d.shell('input keyevent 4')
+        time.sleep(4)
+    open_library()
+    update_library('after-a-text-book')
+    c.stop_app(0)
+
+
+if __name__ == '__main__':
+    main()
