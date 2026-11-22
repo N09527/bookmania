@@ -38,6 +38,28 @@ def write_prefs(values):
     d.shell(f'run-as {d.PKG} cp /data/local/tmp/p.xml shared_prefs/{d.PKG}_preferences.xml')
 
 
+def start_at_beginning(chapter):
+    """Since stage 5 the reader reopens a book where it was left (ebook.db), or near the page of the chapter
+    list; a page-through must start at the first page (stage 6: three runs started in their second document).
+    Removes the chapter's saved position and sets its page in the chapter list to 0 (App stopped)."""
+    sys.path.insert(0, os.path.join(HERE, '..', 'stage5'))
+    import check_stage5 as c5  # here, not at the top: check_stage5 imports this module
+    key = c5.main_rows(chapter)['key']
+    con = c5.pull_db('ebook.db')
+    removed = con.execute('DELETE FROM position WHERE source = ? AND manga_url = ? AND chapter_url = ?', key).rowcount
+    con.commit()
+    con.close()
+    c5.push_ebook_db()
+    con = c5.pull_db('tachiyomi.db')
+    con.execute('UPDATE chapters SET last_page_read = 0 WHERE _id = ?', (chapter,))
+    con.commit()
+    con.close()
+    d.adb('push', os.path.join(c5.DB, 'tachiyomi.db'), '/data/local/tmp/tachiyomi.db')
+    d.shell(f'run-as {d.PKG} rm -f databases/tachiyomi.db-wal databases/tachiyomi.db-shm')
+    d.shell(f'run-as {d.PKG} cp /data/local/tmp/tachiyomi.db databases/tachiyomi.db')
+    print(f'start at the beginning: saved positions removed {removed}, page in the chapter list 0', flush=True)
+
+
 def clear_dialogs():
     """Closes a system "not responding" dialog that took the input focus, and logs it (dialogs.log)."""
     t = d.dismiss_anr()
@@ -80,6 +102,7 @@ def main():
     if a.font_size:
         prefs['fontSize'] = a.font_size
     write_prefs(prefs)
+    start_at_beginning(a.chapter)
     d.shell('settings put system accelerometer_rotation 0')
     d.shell(f'settings put system user_rotation {1 if a.landscape else 0}')
     time.sleep(3)
