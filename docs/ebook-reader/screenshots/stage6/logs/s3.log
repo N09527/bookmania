@@ -1,0 +1,90 @@
+PASS ebook prefs cleared {}
+PASS vertical book opens in V mode {"ready": true, "error": null, "page": 0, "pages": 10, "cols": 1, "mode": "V", "seq": 1, "ms": 2791, "rubyFix": false}
+PASS default font size 20px "20px"
+PASS default line height 1.8 (36px) "36px"
+PASS default margins 32/32/20/20 [12, 24, 388, 684]
+PASS letter spacing not overridden at 0 "normal"
+PASS book's own indent kept (1em = 20px) "20px"
+PASS panel starts on the global level "全部書籍"
+PASS font size 30px "30px"
+PASS stored as global pref_ebook_fontSize=30 {"pref_ebook_fontSize": "30"}
+PASS same text position after relayout {"before": {"node": 1, "offset": 0, "text": "第１章　測試章節"}, "after": {"node": 1, "offset": 0, "text": "第１章　測試章節"}}
+PASS line height 2.4 (72px) "72px"
+PASS letter spacing 0.1em (3px) "3px"
+PASS indent: "follow the book" switch on by default [890, 1510, 1027, 1636]
+PASS indent switched to 2 characters (60px) "60px"
+PASS indent 3 characters (90px) "90px"
+PASS paragraph spacing: "follow the book" switch on by default [890, 1647, 1027, 1773]
+PASS paragraph spacing 0.5em (15px, left side in vertical text) ["0px", "0px", "0px", "15px"]
+PASS paragraph spacing 1em (30px) ["0px", "0px", "0px", "30px"]
+PASS writing mode forced horizontal ["H", "horizontal-tb"]
+PASS writing mode back to the book (vertical) "V"
+PASS top margin set near 60 and the page box follows it (top = margin - 8) {"stored": 60, "frame": [12, 52, 388, 656]}
+PASS left margin set near 40 and the page box follows it (x = margin - 8, width = W - left - 20 + 16) {"stored": 38, "frame": [30, 52, 370, 656]}
+PASS auto, vertical: left tap = next page [0, 1]
+PASS left-opening: right tap = next page [1, 2]
+PASS left-opening: DPAD_RIGHT = next page [2, 3]
+PASS direction stored as auto again {"pref_ebook_paragraphSpacing": "1", "pref_ebook_fontSize": "30", "pref_ebook_marginTop": "60", "pref_ebook_letterSpacing": "0.1", "pref_ebook_indent": "3", "pref_ebook_lineHeight": "2.4", "pref_ebook_pageDirection": "auto", "pref_ebook_writingMode": "book", "pref_ebook_marginLeft": "38"}
+PASS after restart: font size 30 "30px"
+PASS after restart: line height 72px "72px"
+PASS after restart: indent 90px "90px"
+PASS after restart: paragraph spacing 30px ["0px", "0px", "0px", "30px"]
+PASS after restart: letter spacing 3px "3px"
+PASS after restart: page box from the stored margins [[30, 52, 370, 656], "38", "60"]
+{
+ "pref_ebook_paragraphSpacing": "1",
+ "pref_ebook_fontSize": "30",
+ "pref_ebook_marginTop": "60",
+ "pref_ebook_letterSpacing": "0.1",
+ "pref_ebook_indent": "3",
+ "pref_ebook_lineHeight": "2.4",
+ "pref_ebook_pageDirection": "auto",
+ "pref_ebook_writingMode": "book",
+ "pref_ebook_marginLeft": "38"
+}
+PASS other book (another work) uses the global font size ["30px", 30.0]
+PASS work level selected "這部作品"
+PASS work level font size stored (near 24) and applied {"stored": {"_source": "0", "_manga": "橫排測試書 EPUB", "fontSize": "24"}, "css": "24px"}
+PASS global value unchanged 30.0
+PASS global view notes the work-level override ["「這部作品」也有設定，這本書以那一層為準"]
+PASS file level line height stored (near 1.5) and applied {"stored": {"_source": "0", "_manga": "橫排測試書 EPUB", "_chapter": "橫排測試書 EPUB/zh-horizontal.epub", "lineHeight": "1.5"}, "css": "36px"}
+PASS override entries carry the identity (_source, _manga; file also _chapter) [{"_source": "0", "_manga": "橫排測試書 EPUB", "fontSize": "24"}, {"_source": "0", "_manga": "橫排測試書 EPUB", "_chapter": "橫排測試書 EPUB/zh-horizontal.epub", "lineHeight": "1.5"}]
+PASS after restart: work font size "24px"
+PASS after restart: file line height "36px"
+PASS panel starts on the file level "這個檔案"
+PASS other work keeps the global values ["30px", "72px"]
+PASS same work, other file: work font size ["24px", 24.0]
+PASS same work, other file: global line height (not the other file's) ["57.6px", 57.599999999999994]
+PASS panel starts on the file level "這個檔案"
+PASS file level cleared: line height back to global ["57.6px", 57.599999999999994]
+PASS work level selected for clearing "這部作品"
+PASS work level cleared: font size back to global ["30px", 30.0]
+PASS no override entries left ["pref_ebook_fontSize", "pref_ebook_indent", "pref_ebook_letterSpacing", "pref_ebook_lineHeight", "pref_ebook_marginLeft", "pref_ebook_marginTop", "pref_ebook_pageDirection", "pref_ebook_paragraphSpacing", "pref_ebook_writingMode"]
+PASS warning for a font without vertical data ["這個字型沒有直排資訊（vhea/vmtx, vert/vrt2），直書時標點與字距可能不正確。仍要匯入嗎？"]
+PASS imported font listed with its note ["這一層沒有設定的項目，沿用上一層。", "清除這一層的設定", "系統襯線", "DejaVu Sans", "沒有直排資訊", "匯入字型…", "字級", "30"]
+PASS no warning for a font with vertical data 
+PASS two fonts in the app-state list [{"id": "36dd2cf5274c4221b974b81289dfa86b", "name": "DejaVu Sans", "extension": "ttf", "vertical": false}, {"id": "3ee14f53a7974e4ab5d016ebdec618d4", "name": "Noto Serif CJK TC", "extension": "otf", "vertical": true}]
+PASS font files stored in files/ebook-fonts "total 25572\n-rw------- 1 u0_a79 u0_a79   759720 2026-11-22 20:48 36dd2cf5274c4221b974b81289dfa86b.ttf\n-rw------- 1 u0_a79 u0_a79 25420924 2026-11-22 20:48 3ee14f53a7974e4ab5d016ebdec618d4.otf\n"
+PASS vertical flags from the font tables [{"id": "36dd2cf5274c4221b974b81289dfa86b", "name": "DejaVu Sans", "extension": "ttf", "vertical": false}, {"id": "3ee14f53a7974e4ab5d016ebdec618d4", "name": "Noto Serif CJK TC", "extension": "otf", "vertical": true}]
+PASS imported font applied (font-family and FontFace loaded) ["BookmaniaUserFont, serif", ["BookmaniaUserFont:loaded"]]
+PASS relayout with a 25 MB font finished {"seconds_including_ui_wait": 21.4}
+PASS font URLs other than a listed id are refused {"/fonts/..%2F..%2Fshared_prefs%2Fio.github.n09527.bookmania.debug_preferences.xml": "error: NetworkError", "/fonts/0123456789abcdef0123456789abcdef": "error: NetworkError", "/fonts/ABCDEF0123456789ABCDEF0123456789": "error: NetworkError", "/fonts/3ee14f53a7974e4ab5d016ebdec618d4.ttf": "error: Netwo
+PASS the listed id loads from the shell {"/fonts/..%2F..%2Fshared_prefs%2Fio.github.n09527.bookmania.debug_preferences.xml": "error: NetworkError", "/fonts/0123456789abcdef0123456789abcdef": "error: NetworkError", "/fonts/ABCDEF0123456789ABCDEF0123456789": "error: NetworkError", "/fonts/3ee14f53a7974e4ab5d016ebdec618d4.ttf": "error: Netwo
+PASS after restart: imported font used ["BookmaniaUserFont:loaded"]
+PASS deleted font falls back to the book font "sans-serif"
+PASS font files deleted ""
+PASS font list empty "[]"
+PASS subtitle inside the toolbar [[157, 73, 447, 151], [157, 151, 482, 208], [0, 0, 1080, 210]]
+FAIL page number above the navigation bar (y < 1794) 
+PASS landscape: panel shown (close button found) 
+PASS landscape: page laid out again {"ready": true, "error": null, "page": 0, "pages": 76, "cols": 2, "mode": "V", "seq": 2, "ms": 5532, "rubyFix": false}
+PASS first chapter file with the imported font {"ms": 10752, "faces": ["BookmaniaUserFont:loaded"]}
+PASS next chapter file uses the shared font {"src": "OEBPS/text/ch02.xhtml", "ms": 2129, "faces": ["BookmaniaUserFont:loaded"]}
+PASS third chapter file too {"src": "OEBPS/text/ch03.xhtml", "ms": 1468}
+PASS timing without the imported font (comparison) {"first": 2985, "second": 1460, "third": 1173}
+PASS landscape: side panel on the left {"close": [802, 95, 865, 158], "tab": [156, 99, 229, 152]}
+PASS landscape (left): font changed from the side panel "serif"
+PASS landscape (left): tap on the page closes the panel 
+PASS landscape: side panel on the right {"close": [1700, 95, 1763, 158], "tab": [1149, 99, 1222, 152]}
+PASS landscape (right): font changed from the side panel "serif"
+PASS landscape (right): tap on the page closes the panel 

@@ -1,0 +1,82 @@
+Runs:
+  14:53:25  settings_ui                              3/5
+  14:57:26  text:t-default                           9/9
+  15:00:00  image:i-swipe-l2r                        10/10
+  15:02:47  image:i-swipe-l2r-back                   9/9
+  15:05:20  image:i-swipe-r2l                        10/10
+  15:07:56  image:i-swipe-vertical                   9/9
+  15:10:27  image:i-swipe-off-drag                   3/4
+  15:13:01  image:i-swipe-webtoon-up                 3/3
+  15:15:51  text:t-slide-ltr-varied                  8/8
+  15:18:52  text:t-slide-ltr-varied-second           7/8
+  15:21:30  text:t-slide-rtl-varied                  8/8
+  15:23:01  add_chapter                              2/2
+  15:24:24  text:t-none                              6/6
+  15:27:03  text:t-slide-ltr                         8/8
+  15:29:41  text:t-curl-ltr                          9/9
+  15:32:17  text:t-curl-ltr-back                     8/8
+  15:35:12  text:t-curl-ltr-second                   9/9
+  15:38:06  text:t-slide-ltr-second                  8/8
+  15:40:38  text:t-slide-rtl                         8/8
+  15:43:07  text:t-curl-rtl                          9/9
+  15:45:37  text:t-curl-rtl-back                     8/8
+  15:49:13  text:t-curl-ltr-2col                     9/9
+  15:52:44  text:t-curl-ltr-2col-back                8/8
+  15:56:16  text:t-curl-rtl-2col                     9/9
+  15:59:47  text:t-curl-rtl-2col-back                8/8
+  16:03:25  text:t-slide-ltr-2col                    8/8
+  16:06:06  image:i-curl-l2r                         9/9
+  16:08:59  image:i-curl-l2r-back                    8/8
+  16:11:30  image:i-curl-r2l                         9/9
+  16:14:21  image:i-curl-r2l-back                    8/8
+  16:16:54  image:i-curl-vertical                    8/8
+  16:19:36  image:i-curl-vertical-back               8/8
+  16:23:19  image:i-curl-l2r-double                  9/9
+  16:25:50  image:i-webtoon                          3/3
+  16:28:23  image:i-off-l2r                          3/3
+  16:31:37  chapters                                 6/6
+  16:38:04  rapid:r-curl                             2/2
+  16:39:54  rapid:r-slide                            2/2
+  21:19:52  settings_ui                              5/5
+  21:22:36  image:i-swipe-off-drag                   4/4
+  21:24:12  text:t-slide-ltr-varied-second           4/4
+Final (last result of each check):
+  settings_ui                              5/5
+  text:t-default                           9/9
+  image:i-swipe-l2r                        10/10
+  image:i-swipe-l2r-back                   9/9
+  image:i-swipe-r2l                        10/10
+  image:i-swipe-vertical                   9/9
+  image:i-swipe-off-drag                   4/4
+  image:i-swipe-webtoon-up                 3/3
+  text:t-slide-ltr-varied                  8/8
+  text:t-slide-ltr-varied-second           8/8
+  text:t-slide-rtl-varied                  8/8
+  add_chapter                              1/1
+  text:t-none                              6/6
+  text:t-slide-ltr                         8/8
+  text:t-curl-ltr                          9/9
+  text:t-curl-ltr-back                     8/8
+  text:t-curl-ltr-second                   9/9
+  text:t-slide-ltr-second                  8/8
+  text:t-slide-rtl                         8/8
+  text:t-curl-rtl                          9/9
+  text:t-curl-rtl-back                     8/8
+  text:t-curl-ltr-2col                     9/9
+  text:t-curl-ltr-2col-back                8/8
+  text:t-curl-rtl-2col                     9/9
+  text:t-curl-rtl-2col-back                8/8
+  text:t-slide-ltr-2col                    8/8
+  image:i-curl-l2r                         9/9
+  image:i-curl-l2r-back                    8/8
+  image:i-curl-r2l                         9/9
+  image:i-curl-r2l-back                    8/8
+  image:i-curl-vertical                    8/8
+  image:i-curl-vertical-back               8/8
+  image:i-curl-l2r-double                  9/9
+  image:i-webtoon                          3/3
+  image:i-off-l2r                          3/3
+  chapters                                 6/6
+  rapid:r-curl                             2/2
+  rapid:r-slide                            2/2
+274/274 checks passed (288 results in 41 runs)

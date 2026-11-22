@@ -6,9 +6,10 @@ library database and books (adb runs as root on this emulator), with onboarding 
 existing "external local source" option on, as stage 2 did for the debug App. Then each test book is opened
 through the image reader entry point (with the work and chapter ids, as the other checks do):
   - which reader ends up in front, what the screen says, and whether the App crashed;
-  - text books: the page indicator before and after a page key (the page turns, with the default curl).
+  - text books: the screen before and after a page key (the page turns, with the default curl).
 
-Usage: ADB=/path/to/adb python3 -I release_smoke.py <universal or x86_64 release APK>
+Usage: ADB=/path/to/adb python3 -I release_smoke.py <universal or x86_64 release APK> [label ...]
+       (labels: only those books, on the App already installed and set up)
 Results: out/release/results.jsonl and screenshots in out/release/shots/.
 """
 import os
@@ -30,7 +31,7 @@ KEY_PAGE_DOWN = 93
 IMAGE_CLASS = 'eu.kanade.tachiyomi.ui.reader.ReaderActivity'
 TEXT = f'{REL}/yokai.ebook.EbookReaderActivity'  # as dumpsys names it; the debug App's names start with
 IMAGE = f'{REL}/{IMAGE_CLASS}'                    # "io.github.n09527.bookmania.debug/", so they never match
-# (manga, chapter, label, expected reader: 'text', 'image' or 'message')
+# (manga, chapter, label, expected: 'text' / 'image' reader, 'message' in a reader screen, or 'closes')
 BOOKS = [
     (14, 16, 'vertical-epub', 'text'),
     (8, 10, 'horizontal-epub', 'text'),
@@ -39,7 +40,7 @@ BOOKS = [
     (3, 1, 'joint-mobi', 'text'),
     (1, 3, 'drm-adept-epub', 'message'),
     (1, 2, 'drm-flagged-mobi', 'message'),
-    (6, 8, 'corrupt-truncated', 'message'),
+    (6, 8, 'corrupt-truncated', 'closes'),  # handed to the image reader, which shows a toast and closes (stage 2 report)
     (10, 12, 'comic-cbz', 'image'),
     (11, 13, 'comic-fixed-epub', 'image'),
 ]
@@ -69,7 +70,8 @@ def copy_data():
     root(f'cp /data/data/{DEBUG}/databases/tachiyomi.db* /data/data/{REL}/databases/ 2>/dev/null; true')
     prefs = ("<?xml version='1.0' encoding='utf-8' standalone='yes' ?>\n<map>\n"
              '    <boolean name="__APP_STATE_onboarding_complete" value="true" />\n'
-             '    <boolean name="pref_external_local_source" value="true" />\n</map>\n')
+             '    <boolean name="pref_external_local_source" value="true" />\n'
+             '    <string name="app_language">zh-TW</string>\n</map>\n')  # as in the debug App's test setup
     tmp = os.path.join(OUT, 'prefs.xml')
     with open(tmp, 'w', encoding='utf-8') as f:
         f.write(prefs)
@@ -91,6 +93,28 @@ def page_of(texts):
     return next((t for t in texts if PAGE.match(t.replace(' ', ''))), None)
 
 
+def grab():
+    import io
+    import numpy as np
+    from PIL import Image
+    png = d.adb('exec-out', 'screencap', '-p', text=False, timeout=60)
+    return np.asarray(Image.open(io.BytesIO(png)).convert('L').resize((270, 480)), dtype=np.int16)
+
+
+def page_turn(label):
+    """A page key turns the page: the screen before and after the key differ. The release App has no DevTools
+    to ask the reader for its page, and its page number is in the menu, which did not open for the check on
+    this emulator (stage 6); the screen is compared instead (the reader shows a page and nothing else)."""
+    before = grab()
+    root(f'input keyevent {KEY_PAGE_DOWN}')
+    time.sleep(15)
+    after = grab()
+    changed = float((abs(after - before) > 30).mean())
+    d.shot(f'release-{label}-2')
+    c.check('a page key turns the page (the screen changed)', changed > 0.02,
+            {'share of the screen that changed': round(changed, 3)})
+
+
 def open_book(manga, chapter, label, kind):
     c.STEP[0] = f'release:{label}'
     root(f'am force-stop {REL}')
@@ -109,27 +133,17 @@ def open_book(manga, chapter, label, kind):
     front = d.resumed()
     texts = screen_texts()
     d.shot(f'release-{label}-1')
-    want = {'text': TEXT, 'image': IMAGE, 'message': None}[kind]
-    if kind == 'message':
+    want = {'text': TEXT, 'image': IMAGE, 'message': None, 'closes': None}[kind]
+    if kind == 'closes':
+        c.check('the reader closes again (no reader of the App in front)', TEXT not in front and IMAGE not in front,
+                {'front': front.split()[-2:] if front else None})
+    elif kind == 'message':
         c.check('the App shows a message in a reader screen', (TEXT in front or IMAGE in front) and bool(texts),
                 {'front': front.split()[-2:] if front else None, 'screen': texts[:8]})
     else:
         c.check(f'the book opens in the {kind} reader', want in front, {'front': front.split()[-2:] if front else None})
     if kind == 'text':
-        before = page_of(texts)
-        if before is None:  # the bottom bar is part of the menu
-            c.show_menu()
-            before = page_of(screen_texts())
-            c.hide_menu()
-        root(f'input keyevent {KEY_PAGE_DOWN}')
-        time.sleep(12)
-        after = page_of(screen_texts())
-        if after is None:
-            c.show_menu()
-            after = page_of(screen_texts())
-            c.hide_menu()
-        d.shot(f'release-{label}-2')
-        c.check('a page key turns the page', bool(before and after and before != after), {'before': before, 'after': after})
+        page_turn(label)
     log = root('logcat -d')
     crashes = [l for l in log.splitlines() if 'FATAL EXCEPTION' in l or ('Fatal signal' in l)]
     firebase = [l.split(': ', 1)[-1] for l in log.splitlines() if 'FirebaseApp' in l or 'FirebaseInitProvider' in l]
@@ -140,14 +154,16 @@ def open_book(manga, chapter, label, kind):
 
 
 def main():
-    apk = sys.argv[1]
+    apk, only = sys.argv[1], set(sys.argv[2:])
     os.makedirs(os.path.join(OUT, 'shots'), exist_ok=True)
     c.rotate(False)
-    if not install(apk):
-        return
-    copy_data()
+    if not only:  # labels given: those books again, on the App already installed and set up
+        if not install(apk):
+            return
+        copy_data()
     for m, ch, label, kind in BOOKS:
-        open_book(m, ch, label, kind)
+        if not only or label in only:
+            open_book(m, ch, label, kind)
 
 
 if __name__ == '__main__':

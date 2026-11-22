@@ -1,0 +1,41 @@
+16:43:40  restore:epub-vertical                         6/6
+16:48:27  restore:azw3-vertical                         6/6
+16:53:10  restore:mobi-joint-vertical                   6/6
+16:57:15  restore:epub-horizontal                       6/6
+17:01:23  restore:mobi6-horizontal                      6/6
+17:05:36  restore:azw3-horizontal                       6/6
+17:09:59  restore:epub-vertical-2col-landscape          6/6
+17:14:10  restore:epub-horizontal-2col                  6/6
+17:18:00  rotate:epub-vertical                          5/5
+17:24:43  settings:epub-horizontal                      3/3
+17:27:18  fallback:epub-vertical                        2/2
+17:29:48  chapter_list                                  2/2
+17:31:58  incognito                                     3/3
+17:32:09  parity                                        4/4
+17:41:25  toc:epub-vertical                             3/3
+17:44:04  toc:mobi6-horizontal                          3/3
+17:46:52  toc:azw3-vertical                             3/3
+17:49:19  slider:epub-vertical                          4/4
+17:51:55  slider:epub-horizontal                        4/4
+17:55:40  end:epub-horizontal                           3/3
+18:00:19  tapzones:epub-vertical:0:NONE                 1/1
+18:02:56  tapzones:epub-vertical:1:NONE                 1/1
+18:06:00  tapzones:epub-vertical:2:NONE                 1/1
+18:08:56  tapzones:epub-vertical:3:NONE                 1/1
+18:12:23  tapzones:epub-vertical:4:NONE                 1/1
+18:17:32  tapzones:epub-vertical:5:NONE                 1/1
+18:20:17  tapzones:epub-vertical:1:HORIZONTAL           1/1
+18:23:01  tapzones:epub-vertical:1:VERTICAL             1/1
+18:25:40  tapzones:epub-vertical:1:BOTH                 1/1
+18:28:58  tapzones:epub-horizontal:0:NONE               1/1
+18:30:24  volume:on=True:inverted=False                 1/1
+18:31:43  volume:on=True:inverted=True                  1/1
+18:33:35  volume:on=False:inverted=False                1/1
+18:35:37  switch:epub-with-pictures                     6/6
+18:39:58  switch:epub-without-pictures                  3/3
+18:44:29  switch_back:epub-one-picture                  2/2
+18:46:18  switch:comic                                  7/7
+18:50:06  classify                                      6/8
+    FAIL not classified yet: {"kind_auto": "TEXT", "kind_user": null, "file_size": 3556, "file_modified": 1794986588000, "char_counts": [914, 914]}
+    FAIL first open from the chapter list: image reader, then the text reader: {"resumed": "mResumedActivity: ActivityRecord{4c6a989 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t625}", "activity starts": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity"]}
+124/126 checks passed in 38 runs

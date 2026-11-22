@@ -1,0 +1,24 @@
+[drm-flagged-mobi] front: yokai.ebook.EbookReaderActivity 
+  539,  730  TextView         error_title            '此書受 DRM 保護' ''
+  540,  925  TextView         error_message          '保護方式：Mobipocket / Kindle\n\nBookmania 只能開啟' ''
+  crashes: 0
+[drm-adept-epub] front: yokai.ebook.EbookReaderActivity 
+  539,  730  TextView         error_title            '此書受 DRM 保護' ''
+  540,  925  TextView         error_message          '保護方式：Adobe ADEPT\n\nBookmania 只能開啟沒有 DRM 的' ''
+  crashes: 0
+[not-an-ebook] front: .NexusLauncherActivity 
+  crashes: 0
+[corrupt-truncated] front: .NexusLauncherActivity 
+  crashes: 0
+[comic-fixed-epub] front: eu.kanade.tachiyomi.ui.reader.ReaderActivity 
+  crashes: 0
+[comic-reflowable-epub] front: eu.kanade.tachiyomi.ui.reader.ReaderActivity 
+  crashes: 0
+[comic-cbz] front: eu.kanade.tachiyomi.ui.reader.ReaderActivity 
+  crashes: 0
+[epub2-ncx] front: yokai.ebook.EbookReaderActivity 
+  crashes: 0
+[text-with-images-mobi6] front: yokai.ebook.EbookReaderActivity 
+  crashes: 0
+[text-with-images-epub] front: yokai.ebook.EbookReaderActivity 
+  crashes: 0

@@ -1,0 +1,2 @@
+dismissed: mCurrentFocus=Window{769e5a4 u0 Application Not Responding: com.android.systemui}
+.. warm-up: mResumedActivity: ActivityRecord{8211257 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t526} {'ready': True, 'error': None, 'page': 3, 'pages': 8, 'cols': 1, 'mode': 'H', 'seq': 1, 'ms': 15226, 'rubyFix': False}

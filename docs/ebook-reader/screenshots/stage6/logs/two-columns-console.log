@@ -1,0 +1,27 @@
+11-22 22:12:20.290  7271  7271 D Yokai   : ebook console: Refused to load the stylesheet 'http://10.0.2.2:8765/import.css' because it violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'".
+11-22 22:12:20.291  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/image.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:20.292  7271  7271 D Yokai   : ebook console: Refused to load the font 'http://10.0.2.2:8765/font.ttf' because it violates the following Content Security Policy directive: "font-src 'self' data:".
+11-22 22:12:20.292  7271  7271 D Yokai   : ebook console: Refused to load the image 'android-webview-video-poster:default_video_poster/-216598423123212615' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:20.293  7271  7271 D Yokai   : ebook console: Refused to load the stylesheet 'http://10.0.2.2:8765/import2.css' because it violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'".
+11-22 22:12:20.293  7271  7271 D Yokai   : ebook console: Refused to load media from 'http://10.0.2.2:8765/video.mp4' because it violates the following Content Security Policy directive: "media-src 'self'".
+11-22 22:12:20.294  7271  7271 D Yokai   : ebook console: Refused to load media from 'http://10.0.2.2:8765/audio.mp3' because it violates the following Content Security Policy directive: "media-src 'self'".
+11-22 22:12:20.315  7271  7271 D Yokai   : ebook console: Refused to load the font 'http://10.0.2.2:8765/font.ttf' because it violates the following Content Security Policy directive: "font-src 'self' data:".
+11-22 22:12:20.315  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/inline-style.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:20.316  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/background.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:20.328  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/css-background.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.824  7271  7271 D Yokai   : ebook console: Refused to load the stylesheet 'http://10.0.2.2:8765/import.css' because it violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'".
+11-22 22:12:21.825  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/image.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.837  7271  7271 D Yokai   : ebook console: Refused to load the font 'http://10.0.2.2:8765/font.ttf' because it violates the following Content Security Policy directive: "font-src 'self' data:".
+11-22 22:12:21.841  7271  7271 D Yokai   : ebook console: Refused to load the image 'android-webview-video-poster:default_video_poster/-216598423123212615' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.841  7271  7271 D Yokai   : ebook console: Refused to load media from 'http://10.0.2.2:8765/video.mp4' because it violates the following Content Security Policy directive: "media-src 'self'".
+11-22 22:12:21.842  7271  7271 D Yokai   : ebook console: Refused to load media from 'http://10.0.2.2:8765/audio.mp3' because it violates the following Content Security Policy directive: "media-src 'self'".
+11-22 22:12:21.843  7271  7271 D Yokai   : ebook console: Refused to load the stylesheet 'http://10.0.2.2:8765/import2.css' because it violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'".
+11-22 22:12:21.843  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/inline-style.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.843  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/background.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.844  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/css-background.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.844  7271  7271 D Yokai   : ebook console: Refused to load the font 'http://10.0.2.2:8765/font.ttf' because it violates the following Content Security Policy directive: "font-src 'self' data:".
+11-22 22:12:21.845  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/inline-style.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.845  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/background.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+11-22 22:12:21.845  7271  7271 D Yokai   : ebook console: Refused to load the image 'http://10.0.2.2:8765/css-background.png' because it violates the following Content Security Policy directive: "img-src 'self' data:".
+--- blocked by the App:
+Blocked request: https://appassets.androidplatform.net

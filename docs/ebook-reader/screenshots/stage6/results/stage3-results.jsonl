@@ -1,0 +1,81 @@
+{"step": "reset", "check": "ebook prefs cleared", "ok": true, "detail": {}}
+{"step": "defaults", "check": "vertical book opens in V mode", "ok": true, "detail": {"ready": true, "error": null, "page": 0, "pages": 10, "cols": 1, "mode": "V", "seq": 1, "ms": 2791, "rubyFix": false}}
+{"step": "defaults", "check": "default font size 20px", "ok": true, "detail": "20px"}
+{"step": "defaults", "check": "default line height 1.8 (36px)", "ok": true, "detail": "36px"}
+{"step": "defaults", "check": "default margins 32/32/20/20", "ok": true, "detail": [12, 24, 388, 684]}
+{"step": "defaults", "check": "letter spacing not overridden at 0", "ok": true, "detail": "normal"}
+{"step": "defaults", "check": "book's own indent kept (1em = 20px)", "ok": true, "detail": "20px"}
+{"step": "global", "check": "panel starts on the global level", "ok": true, "detail": "全部書籍"}
+{"step": "global", "check": "font size 30px", "ok": true, "detail": "30px"}
+{"step": "global", "check": "stored as global pref_ebook_fontSize=30", "ok": true, "detail": {"pref_ebook_fontSize": "30"}}
+{"step": "global", "check": "same text position after relayout", "ok": true, "detail": {"before": {"node": 1, "offset": 0, "text": "第１章　測試章節"}, "after": {"node": 1, "offset": 0, "text": "第１章　測試章節"}}}
+{"step": "global", "check": "line height 2.4 (72px)", "ok": true, "detail": "72px"}
+{"step": "global", "check": "letter spacing 0.1em (3px)", "ok": true, "detail": "3px"}
+{"step": "global", "check": "indent: \"follow the book\" switch on by default", "ok": true, "detail": [890, 1510, 1027, 1636]}
+{"step": "global", "check": "indent switched to 2 characters (60px)", "ok": true, "detail": "60px"}
+{"step": "global", "check": "indent 3 characters (90px)", "ok": true, "detail": "90px"}
+{"step": "global", "check": "paragraph spacing: \"follow the book\" switch on by default", "ok": true, "detail": [890, 1647, 1027, 1773]}
+{"step": "global", "check": "paragraph spacing 0.5em (15px, left side in vertical text)", "ok": true, "detail": ["0px", "0px", "0px", "15px"]}
+{"step": "global", "check": "paragraph spacing 1em (30px)", "ok": true, "detail": ["0px", "0px", "0px", "30px"]}
+{"step": "global", "check": "writing mode forced horizontal", "ok": true, "detail": ["H", "horizontal-tb"]}
+{"step": "global", "check": "writing mode back to the book (vertical)", "ok": true, "detail": "V"}
+{"step": "global", "check": "top margin set near 60 and the page box follows it (top = margin - 8)", "ok": true, "detail": {"stored": 60, "frame": [12, 52, 388, 656]}}
+{"step": "global", "check": "left margin set near 40 and the page box follows it (x = margin - 8, width = W - left - 20 + 16)", "ok": true, "detail": {"stored": 38, "frame": [30, 52, 370, 656]}}
+{"step": "direction", "check": "auto, vertical: left tap = next page", "ok": true, "detail": [0, 1]}
+{"step": "direction", "check": "left-opening: right tap = next page", "ok": true, "detail": [1, 2]}
+{"step": "direction", "check": "left-opening: DPAD_RIGHT = next page", "ok": true, "detail": [2, 3]}
+{"step": "direction", "check": "direction stored as auto again", "ok": true, "detail": {"pref_ebook_paragraphSpacing": "1", "pref_ebook_fontSize": "30", "pref_ebook_marginTop": "60", "pref_ebook_letterSpacing": "0.1", "pref_ebook_indent": "3", "pref_ebook_lineHeight": "2.4", "pref_ebook_pageDirection": "auto", "pref_ebook_writingMode": "book", "pref_ebook_marginLeft": "38"}}
+{"step": "persist", "check": "after restart: font size 30", "ok": true, "detail": "30px"}
+{"step": "persist", "check": "after restart: line height 72px", "ok": true, "detail": "72px"}
+{"step": "persist", "check": "after restart: indent 90px", "ok": true, "detail": "90px"}
+{"step": "persist", "check": "after restart: paragraph spacing 30px", "ok": true, "detail": ["0px", "0px", "0px", "30px"]}
+{"step": "persist", "check": "after restart: letter spacing 3px", "ok": true, "detail": "3px"}
+{"step": "persist", "check": "after restart: page box from the stored margins", "ok": true, "detail": [[30, 52, 370, 656], "38", "60"]}
+{"step": "scopes", "check": "other book (another work) uses the global font size", "ok": true, "detail": ["30px", 30.0]}
+{"step": "scopes", "check": "work level selected", "ok": true, "detail": "這部作品"}
+{"step": "scopes", "check": "work level font size stored (near 24) and applied", "ok": true, "detail": {"stored": {"_source": "0", "_manga": "橫排測試書 EPUB", "fontSize": "24"}, "css": "24px"}}
+{"step": "scopes", "check": "global value unchanged", "ok": true, "detail": 30.0}
+{"step": "scopes", "check": "global view notes the work-level override", "ok": true, "detail": ["「這部作品」也有設定，這本書以那一層為準"]}
+{"step": "scopes", "check": "file level line height stored (near 1.5) and applied", "ok": true, "detail": {"stored": {"_source": "0", "_manga": "橫排測試書 EPUB", "_chapter": "橫排測試書 EPUB/zh-horizontal.epub", "lineHeight": "1.5"}, "css": "36px"}}
+{"step": "scopes", "check": "override entries carry the identity (_source, _manga; file also _chapter)", "ok": true, "detail": [{"_source": "0", "_manga": "橫排測試書 EPUB", "fontSize": "24"}, {"_source": "0", "_manga": "橫排測試書 EPUB", "_chapter": "橫排測試書 EPUB/zh-horizontal.epub", "lineHeight": "1.5"}]}
+{"step": "scopes", "check": "after restart: work font size", "ok": true, "detail": "24px"}
+{"step": "scopes", "check": "after restart: file line height", "ok": true, "detail": "36px"}
+{"step": "scopes", "check": "panel starts on the file level", "ok": true, "detail": "這個檔案"}
+{"step": "scopes", "check": "other work keeps the global values", "ok": true, "detail": ["30px", "72px"]}
+{"step": "vol2", "check": "same work, other file: work font size", "ok": true, "detail": ["24px", 24.0]}
+{"step": "vol2", "check": "same work, other file: global line height (not the other file's)", "ok": true, "detail": ["57.6px", 57.599999999999994]}
+{"step": "reset_levels", "check": "panel starts on the file level", "ok": true, "detail": "這個檔案"}
+{"step": "reset_levels", "check": "file level cleared: line height back to global", "ok": true, "detail": ["57.6px", 57.599999999999994]}
+{"step": "reset_levels", "check": "work level selected for clearing", "ok": true, "detail": "這部作品"}
+{"step": "reset_levels", "check": "work level cleared: font size back to global", "ok": true, "detail": ["30px", 30.0]}
+{"step": "reset_levels", "check": "no override entries left", "ok": true, "detail": ["pref_ebook_fontSize", "pref_ebook_indent", "pref_ebook_letterSpacing", "pref_ebook_lineHeight", "pref_ebook_marginLeft", "pref_ebook_marginTop", "pref_ebook_pageDirection", "pref_ebook_paragraphSpacing", "pref_ebook_writingMode"]}
+{"step": "fonts", "check": "warning for a font without vertical data", "ok": true, "detail": ["這個字型沒有直排資訊（vhea/vmtx, vert/vrt2），直書時標點與字距可能不正確。仍要匯入嗎？"]}
+{"step": "fonts", "check": "imported font listed with its note", "ok": true, "detail": ["這一層沒有設定的項目，沿用上一層。", "清除這一層的設定", "系統襯線", "DejaVu Sans", "沒有直排資訊", "匯入字型…", "字級", "30"]}
+{"step": "fonts", "check": "no warning for a font with vertical data", "ok": true, "detail": null}
+{"step": "fonts", "check": "two fonts in the app-state list", "ok": true, "detail": [{"id": "36dd2cf5274c4221b974b81289dfa86b", "name": "DejaVu Sans", "extension": "ttf", "vertical": false}, {"id": "3ee14f53a7974e4ab5d016ebdec618d4", "name": "Noto Serif CJK TC", "extension": "otf", "vertical": true}]}
+{"step": "fonts", "check": "font files stored in files/ebook-fonts", "ok": true, "detail": "total 25572\n-rw------- 1 u0_a79 u0_a79   759720 2026-11-22 20:48 36dd2cf5274c4221b974b81289dfa86b.ttf\n-rw------- 1 u0_a79 u0_a79 25420924 2026-11-22 20:48 3ee14f53a7974e4ab5d016ebdec618d4.otf\n"}
+{"step": "fonts", "check": "vertical flags from the font tables", "ok": true, "detail": [{"id": "36dd2cf5274c4221b974b81289dfa86b", "name": "DejaVu Sans", "extension": "ttf", "vertical": false}, {"id": "3ee14f53a7974e4ab5d016ebdec618d4", "name": "Noto Serif CJK TC", "extension": "otf", "vertical": true}]}
+{"step": "fonts", "check": "imported font applied (font-family and FontFace loaded)", "ok": true, "detail": ["BookmaniaUserFont, serif", ["BookmaniaUserFont:loaded"]]}
+{"step": "fonts", "check": "relayout with a 25 MB font finished", "ok": true, "detail": {"seconds_including_ui_wait": 21.4}}
+{"step": "fonts", "check": "font URLs other than a listed id are refused", "ok": true, "detail": {"/fonts/..%2F..%2Fshared_prefs%2Fio.github.n09527.bookmania.debug_preferences.xml": "error: NetworkError", "/fonts/0123456789abcdef0123456789abcdef": "error: NetworkError", "/fonts/ABCDEF0123456789ABCDEF0123456789": "error: NetworkError", "/fonts/3ee14f53a7974e4ab5d016ebdec618d4.ttf": "error: NetworkError", "https://example.com/font.ttf": "error: NetworkError", "/fonts/3ee14f53a7974e4ab5d016ebdec618d4": "loaded"}}
+{"step": "fonts", "check": "the listed id loads from the shell", "ok": true, "detail": {"/fonts/..%2F..%2Fshared_prefs%2Fio.github.n09527.bookmania.debug_preferences.xml": "error: NetworkError", "/fonts/0123456789abcdef0123456789abcdef": "error: NetworkError", "/fonts/ABCDEF0123456789ABCDEF0123456789": "error: NetworkError", "/fonts/3ee14f53a7974e4ab5d016ebdec618d4.ttf": "error: NetworkError", "https://example.com/font.ttf": "error: NetworkError", "/fonts/3ee14f53a7974e4ab5d016ebdec618d4": "loaded"}}
+{"step": "fonts", "check": "after restart: imported font used", "ok": true, "detail": ["BookmaniaUserFont:loaded"]}
+{"step": "fonts", "check": "deleted font falls back to the book font", "ok": true, "detail": "sans-serif"}
+{"step": "fonts", "check": "font files deleted", "ok": true, "detail": ""}
+{"step": "fonts", "check": "font list empty", "ok": true, "detail": "[]"}
+{"step": "toolbar", "check": "subtitle inside the toolbar", "ok": true, "detail": [[157, 73, 447, 151], [157, 151, 482, 208], [0, 0, 1080, 210]]}
+{"step": "toolbar", "check": "page number above the navigation bar (y < 1794)", "ok": false, "detail": null}
+{"step": "rotate", "check": "landscape: panel shown (close button found)", "ok": true, "detail": null}
+{"step": "rotate", "check": "landscape: page laid out again", "ok": true, "detail": {"ready": true, "error": null, "page": 0, "pages": 76, "cols": 2, "mode": "V", "seq": 2, "ms": 5532, "rubyFix": false}}
+{"step": "font_speed", "check": "first chapter file with the imported font", "ok": true, "detail": {"ms": 10752, "faces": ["BookmaniaUserFont:loaded"]}}
+{"step": "font_speed", "check": "next chapter file uses the shared font", "ok": true, "detail": {"src": "OEBPS/text/ch02.xhtml", "ms": 2129, "faces": ["BookmaniaUserFont:loaded"]}}
+{"step": "font_speed", "check": "third chapter file too", "ok": true, "detail": {"src": "OEBPS/text/ch03.xhtml", "ms": 1468}}
+{"step": "font_speed", "check": "timing without the imported font (comparison)", "ok": true, "detail": {"first": 2985, "second": 1460, "third": 1173}}
+{"step": "side_panel", "check": "landscape: side panel on the left", "ok": true, "detail": {"close": [802, 95, 865, 158], "tab": [156, 99, 229, 152]}}
+{"step": "side_panel", "check": "landscape (left): font changed from the side panel", "ok": true, "detail": "serif"}
+{"step": "side_panel", "check": "landscape (left): tap on the page closes the panel", "ok": true, "detail": null}
+{"step": "side_panel", "check": "landscape: side panel on the right", "ok": true, "detail": {"close": [1700, 95, 1763, 158], "tab": [1149, 99, 1222, 152]}}
+{"step": "side_panel", "check": "landscape (right): font changed from the side panel", "ok": true, "detail": "serif"}
+{"step": "side_panel", "check": "landscape (right): tap on the page closes the panel", "ok": true, "detail": null}
+{"step": "toolbar", "check": "subtitle inside the toolbar", "ok": true, "detail": [[157, 73, 447, 151], [157, 151, 482, 208], [0, 0, 1080, 210]]}
+{"step": "toolbar", "check": "page number above the navigation bar (y < 1794)", "ok": true, "detail": {"text": "1/3 · 1/10", "bounds": [42, 1610, 995, 1652]}}

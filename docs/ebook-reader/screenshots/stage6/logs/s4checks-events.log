@@ -1,0 +1,17 @@
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: FATAL EXCEPTION: LeakCanary-Heap-Dump
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: Process: io.github.n09527.bookmania.debug, PID: 12152
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: java.lang.SecurityException: Calling uid 10079 gave package com.android.chrome which is owned by uid 10044
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.os.Parcel.readException(Parcel.java:1943)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.os.Parcel.readException(Parcel.java:1889)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.app.INotificationManager$Stub$Proxy.getNotificationChannel(INotificationManager.java:1531)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.app.NotificationManager.getNotificationChannel(NotificationManager.java:461)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at leakcanary.internal.Notifications.buildNotification(Notifications.kt:122)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at leakcanary.internal.HeapDumpTrigger.showRetainedCountNotification(HeapDumpTrigger.kt:402)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at leakcanary.internal.HeapDumpTrigger.checkRetainedObjects(HeapDumpTrigger.kt:119)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at leakcanary.internal.HeapDumpTrigger.access$checkRetainedObjects(HeapDumpTrigger.kt:34)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at leakcanary.internal.HeapDumpTrigger$scheduleRetainedObjectCheck$1.run(HeapDumpTrigger.kt:357)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:789)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:98)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:164)
+11-22 19:23:26.396 12152 12175 E AndroidRuntime: 	at android.os.HandlerThread.run(HandlerThread.java:65)
+11-22 19:23:26.966  1674  1686 I am_crash: [12152,0,io.github.n09527.bookmania.debug,687390278,java.lang.SecurityException,Calling uid 10079 gave package com.android.chrome which is owned by uid 10044,Parcel.java,1943]

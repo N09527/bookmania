@@ -1,0 +1,32 @@
+11-22 19:39:20.810 14413 13944 F google-breakpad: Microdump skipped (uninteresting)
+11-22 19:39:20.842 13894 13944 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x58 in tid 13944 (RenderThread)
+11-22 19:39:21.031 14416 14416 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-22 19:39:21.031 14416 14416 F DEBUG   : Build fingerprint: 'Android/sdk_gphone_x86_64/generic_x86_64:8.0.0/OSR1.180418.026/6741039:userdebug/dev-keys'
+11-22 19:39:21.031 14416 14416 F DEBUG   : Revision: '0'
+11-22 19:39:21.031 14416 14416 F DEBUG   : ABI: 'x86_64'
+11-22 19:39:21.032 14416 14416 F DEBUG   : pid: 13894, tid: 13944, name: RenderThread  >>> io.github.n09527.bookmania.debug <<<
+11-22 19:39:21.032 14416 14416 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x58
+11-22 19:39:21.032 14416 14416 F DEBUG   : Cause: null pointer dereference
+11-22 19:39:21.033 14416 14416 F DEBUG   :     rax 0000000000000000  rbx 00007974a00ee240  rcx 0000000000000000  rdx 0000797498200000
+11-22 19:39:21.033 14416 14416 F DEBUG   :     rsi 00000000000017cd  rdi 00000000ffffffff
+11-22 19:39:21.033 14416 14416 F DEBUG   :     r8  ffffffffffffffe0  r9  00007974a0324188  r10 0000000000000000  r11 0000000000000246
+11-22 19:39:21.033 14416 14416 F DEBUG   :     r12 00007974b5ababc0  r13 0000000000000000  r14 00007974bf9c6900  r15 00007974a00ee288
+11-22 19:39:21.033 14416 14416 F DEBUG   :     cs  0000000000000033  ss  000000000000002b
+11-22 19:39:21.033 14416 14416 F DEBUG   :     rip 00007974b145c54f  rbp 000000000000005d  rsp 000079749ec62070  eflags 0000000000000286
+11-22 19:39:21.089 14416 14416 F DEBUG   : 
+11-22 19:39:21.089 14416 14416 F DEBUG   : backtrace:
+11-22 19:39:21.089 14416 14416 F DEBUG   :     #00 pc 000000000001154f  /vendor/lib64/egl/libEGL_emulation.so (_ZN20egl_window_surface_t11swapBuffersEv+591)
+11-22 19:39:21.089 14416 14416 F DEBUG   :     #01 pc 000000000001699b  /vendor/lib64/egl/libEGL_emulation.so (eglSwapBuffers+555)
+11-22 19:39:21.089 14416 14416 F DEBUG   :     #02 pc 0000000000013c28  /system/lib64/libEGL.so (eglSwapBuffersWithDamageKHR+536)
+11-22 19:39:21.089 14416 14416 F DEBUG   :     #03 pc 0000000000053862  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread10EglManager11swapBuffersERKNS1_5FrameERK6SkRect+114)
+11-22 19:39:21.089 14416 14416 F DEBUG   :     #04 pc 0000000000051631  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread14OpenGLPipeline11swapBuffersERKNS1_5FrameEbRK6SkRectPNS0_9FrameInfoEPb+97)
+11-22 19:39:21.090 14416 14416 F DEBUG   :     #05 pc 000000000004ef13  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13CanvasContext4drawEv+259)
+11-22 19:39:21.091 14416 14416 F DEBUG   :     #06 pc 00000000000527d8  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread13DrawFrameTask3runEv+200)
+11-22 19:39:21.091 14416 14416 F DEBUG   :     #07 pc 00000000000592d9  /system/lib64/libhwui.so (_ZN7android10uirenderer12renderthread12RenderThread10threadLoopEv+425)
+11-22 19:39:21.091 14416 14416 F DEBUG   :     #08 pc 0000000000011940  /system/lib64/libutils.so (_ZN7android6Thread11_threadLoopEPv+304)
+11-22 19:39:21.091 14416 14416 F DEBUG   :     #09 pc 00000000000c46d3  /system/lib64/libandroid_runtime.so (_ZN7android14AndroidRuntime15javaThreadShellEPv+131)
+11-22 19:39:21.091 14416 14416 F DEBUG   :     #10 pc 000000000007706b  /system/lib64/libc.so (_ZL15__pthread_startPv+27)
+11-22 19:39:21.094 14416 14416 F DEBUG   :     #11 pc 0000000000028aad  /system/lib64/libc.so (__start_thread+61)
+11-22 19:39:21.096 14416 14416 F DEBUG   :     #12 pc 0000000000027515  /system/lib64/libc.so (__bionic_clone+53)
+11-22 19:23:26.966  1674  1686 I am_crash: [12152,0,io.github.n09527.bookmania.debug,687390278,java.lang.SecurityException,Calling uid 10079 gave package com.android.chrome which is owned by uid 10044,Parcel.java,1943]
+11-22 19:39:24.078  1674 14421 I am_crash: [1674,0,io.github.n09527.bookmania.debug,687390278,Native crash,Segmentation fault,unknown,0]

@@ -1,0 +1,45 @@
+{"time": "22:27:27", "step": "release:install", "check": "the release APK installs", "ok": true, "detail": ["Success"]}
+{"time": "22:27:30", "step": "release:install", "check": "the installed App is the release build (not debuggable)", "ok": true, "detail": "versionCode=162 minSdk=26 targetSdk=36\n    versionName=1.10.3\n    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]\n    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]"}
+{"time": "22:27:43", "step": "release:data", "check": "the books and the library are in place for the release App", "ok": true, "detail": {"files in the debug folder": "25", "copied": "25", "uid": "10082"}}
+{"time": "22:28:30", "step": "release:vertical-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t718}"]}}
+{"time": "22:30:20", "step": "release:vertical-epub", "check": "a page key turns the page", "ok": false, "detail": {"error": "menu did not show"}}
+{"time": "22:30:21", "step": "release:vertical-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:31:11", "step": "release:horizontal-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t719}"]}}
+{"time": "22:33:02", "step": "release:horizontal-epub", "check": "a page key turns the page", "ok": false, "detail": {"error": "menu did not show"}}
+{"time": "22:33:02", "step": "release:horizontal-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:33:57", "step": "release:vertical-azw3", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t720}"]}}
+{"time": "22:35:51", "step": "release:vertical-azw3", "check": "a page key turns the page", "ok": false, "detail": {"error": "menu did not show"}}
+{"time": "22:35:51", "step": "release:vertical-azw3", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:36:44", "step": "release:horizontal-mobi6", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t721}"]}}
+{"time": "22:38:28", "step": "release:horizontal-mobi6", "check": "a page key turns the page", "ok": false, "detail": {"error": "menu did not show"}}
+{"time": "22:38:28", "step": "release:horizontal-mobi6", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:39:19", "step": "release:joint-mobi", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t722}"]}}
+{"time": "22:41:13", "step": "release:joint-mobi", "check": "a page key turns the page", "ok": false, "detail": {"error": "menu did not show"}}
+{"time": "22:41:13", "step": "release:joint-mobi", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:42:03", "step": "release:drm-adept-epub", "check": "the App shows a message in a reader screen", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t723}"], "screen": ["This book is protected by DRM", "Protection: Adobe ADEPT\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}}
+{"time": "22:42:03", "step": "release:drm-adept-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:42:54", "step": "release:drm-flagged-mobi", "check": "the App shows a message in a reader screen", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t724}"], "screen": ["This book is protected by DRM", "Protection: Mobipocket / Kindle\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}}
+{"time": "22:42:54", "step": "release:drm-flagged-mobi", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:45:59", "step": "release:corrupt-truncated", "check": "the App shows a message in a reader screen", "ok": false, "detail": {"front": ["com.google.android.apps.nexuslauncher/.NexusLauncherActivity", "t704}"], "screen": ["November 22", "SUNDAY, 2026", "Maps", "Search", "Apps list", "Phone", "Messages", "Gmail"]}}
+{"time": "22:45:59", "step": "release:corrupt-truncated", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:47:05", "step": "release:comic-cbz", "check": "the book opens in the image reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t726}"]}}
+{"time": "22:47:06", "step": "release:comic-cbz", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:48:17", "step": "release:comic-fixed-epub", "check": "the book opens in the image reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t727}"]}}
+{"time": "22:48:17", "step": "release:comic-fixed-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:49:48", "step": "release:vertical-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t728}"]}}
+{"time": "22:50:09", "step": "release:vertical-epub", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.088}}
+{"time": "22:50:09", "step": "release:vertical-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:50:59", "step": "release:horizontal-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t729}"]}}
+{"time": "22:51:23", "step": "release:horizontal-epub", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.287}}
+{"time": "22:51:23", "step": "release:horizontal-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:52:12", "step": "release:vertical-azw3", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t730}"]}}
+{"time": "22:52:35", "step": "release:vertical-azw3", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.087}}
+{"time": "22:52:35", "step": "release:vertical-azw3", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:53:27", "step": "release:horizontal-mobi6", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t731}"]}}
+{"time": "22:53:48", "step": "release:horizontal-mobi6", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.234}}
+{"time": "22:53:49", "step": "release:horizontal-mobi6", "check": "no crash while the book is open", "ok": false, "detail": {"crashes": ["11-22 22:52:45.586 12098 12099 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 12099 (Binder:12098_1)"]}}
+{"time": "22:54:40", "step": "release:joint-mobi", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t732}"]}}
+{"time": "22:55:01", "step": "release:joint-mobi", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.087}}
+{"time": "22:55:02", "step": "release:joint-mobi", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "22:58:09", "step": "release:corrupt-truncated", "check": "the reader closes again (no reader of the App in front)", "ok": true, "detail": {"front": ["com.google.android.apps.nexuslauncher/.NexusLauncherActivity", "t704}"]}}
+{"time": "22:58:09", "step": "release:corrupt-truncated", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}

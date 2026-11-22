@@ -1,0 +1,88 @@
+=== stage 5.5 items 27 35 (21:17:00)
+=== 27: settings_ui 8 10 (21:17:00)
+failed to clear the 'main' log
+PASS the text reader panel has 翻頁動畫 with 無／滑動／捲曲 ["捲曲", "滑動", "無", "翻頁動畫"]
+PASS 捲曲 is chosen by default {"無": false, "滑動": false, "捲曲": true}
+PASS choosing 滑動 stores pref_ebook_page_turn = slide null
+PASS Settings > Reader has 捲曲翻頁 right after 翻頁轉場動畫 {"捲曲翻頁": [42, 1193, 210, 1250], "翻頁轉場動畫": [42, 1052, 294, 1109]}
+PASS the switch stores pref_bookmania_pager_curl = true null
+--- exit 0 (21:21:37)
+=== 35: image 10 12 l2r i-swipe-off-drag --swipe --curl off (21:21:39)
+failed to clear the 'main' log
+.. i-swipe-off-drag: the screen was still after 6.2 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+.. i-swipe-off-drag: 35 frames, key sent 1795382560.5
+PASS the page turned {"last_page_read after the turn": 1, "started at": 0, "turned forward once first": false, "swipe": "input swipe 1004 960 75 960 4000"}
+PASS the page followed the finger (the pager's own drag) {"largest shift of the page frame (pixels of the recording, a quarter of the screen)": 11, "frames before the new page shows": 5}
+PASS no curl: the App did not play a page turn of its own (debug log) {"log": [], "frames during the turn": 5, "sheet": "shots/i-swipe-off-drag-frames.png"}
+--- exit 0 (21:24:11)
+RUN-ALL DONE 21:24:11
+=== stage 5.5 item 38 re-analysed from its recording (21:24:11)
+PASS the recording ends on the new page {"last": {"t": 30.424, "old": 0.0, "new": 0.68, "new_at": [0.479, 0.553], "old_at": null, "new_right_half": 0.492, "new_bottom_half": 0.597}, "most new": 0.68, "most old": 0.553}
+PASS the turn is animated (frames between the two pages) {"frames": 18, "frames during the turn": 2, "sheet": "shots/t-slide-ltr-varied-second-frames.png"}
+PASS the old page moves left and the new page comes in from the right {"frames": 18, "frames during the turn": 2, "sheet": "shots/t-slide-ltr-varied-second-frames.png", "shifts (text patches)": [{"t": 15.023, "old page shifted by": null, "patches": 17, "new page shifted by": 0, "patches new": 16}, {"t": 16.698, "old page shifted by": null, "patches": 14, "new page shifted by": 0, "patches new": 18}, {"t": 17.633, "old page shifted by": null, "patches": 9, "new page shifted by": 0, "patches new": 33}], "by patches": false, "whole-frame fits": [{"t": 15.023, "dx": -284, "fit the expected way": 5.95, "fit the other way": 19.0, "decides": "expected"}, {"t": 16.698, "dx": -296, "fit the expected way": 9.94, "fit the other way": 18.07, "decides": "expected"}, {"t": 17.633, "dx": -440, "fit the expected way": 4.31, "fit the other way": 8.33, "decides": "expected"}], "by fits": true}
+PASS the page that comes in is the new page, not a copy of the old one {"frames": [{"dx": -284, "strip": 284, "fit": 5.95, "error against the new page sliding in": 29.04, "error against the new page uncovered": 3.94, "error against a copy of the old page": 37.45, "t": 15.023, "shows": "the new page uncovered"}, {"dx": -296, "strip": 296, "fit": 9.94, "error against the new page sliding in": 29.28, "error against the new page uncovered": 3.86, "error against a copy of the old page": 37.64, "t": 16.698, "shows": "the new page uncovered"}, {"dx": -440, "strip": 440, "fit": 4.31, "error against the new page sliding in": 28.5, "error against the new page uncovered": 4.16, "error against a copy of the old page": 39.16, "t": 17.633, "shows": "the new page uncovered"}]}
+=== stage 5 item 36 (21:24:16)
+=== 36: classify 15 17 (21:24:16)
+.. classify: the book had been opened before ({'kind_auto': 'TEXT', 'kind_user': None, 'file_size': 3556, 'file_modified': 1794986588000, 'char_counts': [914, 914]}); its rows in ebook.db were removed
+PASS not classified yet null
+PASS first open from the chapter list: image reader, then the text reader {"resumed": "mResumedActivity: ActivityRecord{5096a0c u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t694}", "activity starts": ["io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity"]}
+PASS classification stored in ebook.db {"kind_auto": "TEXT", "kind_user": null, "file_size": 3556, "file_modified": 1794986588000, "char_counts": [914, 914]}
+PASS after an App restart: opened directly in the text reader {"resumed": "mResumedActivity: ActivityRecord{dfb674b u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t695}", "activity starts": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity"]}
+=== 36 done (21:27:34)
+=== stage 4 ruby h-epub columns off (21:27:34)
+PASS h-epub font size 16, columns off: no misplaced ruby {"rubyFix": false, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "H", "pages": 5, "lineHeight": "28.8px", "examples": []}
+PASS h-epub font size 20, columns off: no misplaced ruby {"rubyFix": false, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "H", "pages": 8, "lineHeight": "36px", "examples": []}
+PASS h-epub font size 24, columns off: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "H", "pages": 10, "lineHeight": "43.2px", "examples": []}
+PASS h-epub font size 26, columns off: no misplaced ruby {"rubyFix": false, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "H", "pages": 12, "lineHeight": "46.8px", "examples": []}
+PASS h-epub font size 30, columns off: no misplaced ruby {"rubyFix": false, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "H", "pages": 16, "lineHeight": "54px", "examples": []}
+=== stage 4 page-through v-azw3-2col-landscape (21:32:29)
+  ruby {"src": "text/part0001.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "text/part0002.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-azw3-2col-landscape: steps 29, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out6/runs/v-azw3-2col-landscape.jsonl
+  text/part0000.xhtml: cols 2, pages 18, spreads seen 9/9, chars 1840, visible==all: True
+  text/part0001.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1807, visible==all: True
+  text/part0002.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1832, visible==all: True
+v-azw3-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  text/part0000.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0001.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0002.xhtml: ruby fix False, annotations 16, misplaced 0
+v-azw3-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+=== stage 4 page-through h-mobi6-2col-landscape (21:37:00)
+  ruby {"src": "text/section0001.html", "rubyFix": false, "ruby": 0, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "text/section0002.html", "rubyFix": false, "ruby": 0, "misplaced": 0, "examples": [], "error": null}
+h-mobi6-2col-landscape: steps 32, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out6/runs/h-mobi6-2col-landscape.jsonl
+  text/section0000.html: cols 2, pages 20, spreads seen 10/10, chars 1880, visible==all: True
+  text/section0001.html: cols 2, pages 19, spreads seen 10/10, chars 1847, visible==all: True
+  text/section0002.html: cols 2, pages 19, spreads seen 10/10, chars 1872, visible==all: True
+h-mobi6-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  text/section0000.html: ruby fix False, annotations 0, misplaced 0
+  text/section0001.html: ruby fix False, annotations 0, misplaced 0
+  text/section0002.html: ruby fix False, annotations 0, misplaced 0
+h-mobi6-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+=== stage 4 page-through v-jointmobi-2col-landscape (21:41:54)
+  ruby {"src": "text/part0001.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "text/part0002.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-jointmobi-2col-landscape: steps 29, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out6/runs/v-jointmobi-2col-landscape.jsonl
+  text/part0000.xhtml: cols 2, pages 18, spreads seen 9/9, chars 1840, visible==all: True
+  text/part0001.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1807, visible==all: True
+  text/part0002.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1832, visible==all: True
+v-jointmobi-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  text/part0000.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0001.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0002.xhtml: ruby fix False, annotations 16, misplaced 0
+v-jointmobi-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+=== stage 3 toolbar (21:46:10)
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/check_settings.py", line 642, in <module>
+    fn()
+    ~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/check_settings.py", line 594, in step_toolbar
+    d.open_book(*VERT)
+    ~~~~~~~~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/drive.py", line 189, in open_book
+    raise RuntimeError('reader did not open: ' + resumed())
+RuntimeError: reader did not open: mResumedActivity: ActivityRecord{21c7854 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t704}
+=== stage 3 toolbar again (21:50:19)
+PASS subtitle inside the toolbar [[157, 73, 447, 151], [157, 151, 482, 208], [0, 0, 1080, 210]]
+PASS page number above the navigation bar (y < 1794) {"text": "1/3 · 1/10", "bounds": [42, 1610, 995, 1652]}
