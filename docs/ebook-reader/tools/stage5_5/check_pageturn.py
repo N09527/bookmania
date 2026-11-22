@@ -283,10 +283,12 @@ def slide_check(rows, frames, before, after, expect_old_sign, vertical=False):
         dx_old, n_old = patch_shift(img, before, vertical)
         dx_new, n_new = patch_shift(img, after, vertical)
         found.append({'t': r['t'], 'old page shifted by': dx_old, 'patches': n_old, 'new page shifted by': dx_new, 'patches new': n_new})
+    # judged on the first frame where each page is found moved: later frames show mostly the new page, and
+    # the test book repeats its sentences, so patches of the old page can also match the new page there
     moved_old = [f['old page shifted by'] for f in found if f['old page shifted by'] not in (None, 0)]
     moved_new = [f['new page shifted by'] for f in found if f['new page shifted by'] not in (None, 0)]
-    ok = bool(moved_old or moved_new) and all(dx * expect_old_sign > 0 for dx in moved_old) and \
-        all(dx * expect_old_sign < 0 for dx in moved_new)
+    ok = bool(moved_old or moved_new) and (not moved_old or moved_old[0] * expect_old_sign > 0) and \
+        (not moved_new or moved_new[0] * expect_old_sign < 0)
     return ok, found
 
 
