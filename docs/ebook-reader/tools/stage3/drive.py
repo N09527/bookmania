@@ -161,7 +161,14 @@ def dismiss_anr():
             if n['res'] == res:
                 tap(n['x'], n['y'], wait=2.0)
                 return focus
-    return focus + ' (no button found)'
+    # No button found (stage 6: a crash dialog stayed on the screen and took the keys of the next checks):
+    # the broadcast that closes system dialogs cancels it.
+    shell('am broadcast -a android.intent.action.CLOSE_SYSTEM_DIALOGS')
+    time.sleep(2)
+    still = shell('dumpsys window windows | grep mCurrentFocus').strip()
+    if 'Not Responding' in still or 'Application Error' in still:
+        return focus + ' (no button found; still shown after CLOSE_SYSTEM_DIALOGS)'
+    return focus + ' (no button found; closed with CLOSE_SYSTEM_DIALOGS)'
 
 
 def resumed():
