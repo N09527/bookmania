@@ -330,8 +330,35 @@ def incoming_fit(frame, before, after, sign, vertical=False):
     if best is None or best[1] < 0.1 * w:
         return None
     e_slide, e_uncovered, e_old = best[2]
-    return {'dx': best[1] * 2 * sign, 'strip': best[1] * 2, 'error against the new page sliding in': round(e_slide, 2),
+    return {'dx': best[1] * 2 * sign, 'strip': best[1] * 2, 'fit': round(float(best[0]), 2),
+            'error against the new page sliding in': round(e_slide, 2),
             'error against the new page uncovered': round(e_uncovered, 2), 'error against a copy of the old page': round(e_old, 2)}
+
+
+def direction_fit(rows, frames, before, after, expect_old_sign, vertical=False):
+    """The direction of a slide from whole frames: each frame of the turn is fitted with the old page moving
+    the expected way and the other way (incoming_fit). A frame decides when one way fits better by 20 %; at
+    least one frame must decide for the expected way and none for the other.
+    Works also when the new page is uncovered at its place (no copy of it), where the text patches of
+    slide_check find the new page unmoved and may not agree on the old page. Returns (ok, fits)."""
+    old_most = max(r['old'] for r in rows)
+    new_most = max(r['new'] for r in rows)
+    fits = []
+    for r, (t, img) in zip(rows, frames):
+        if r['old'] >= 0.95 * old_most or r['new'] >= 0.95 * new_most:
+            continue
+        expected = incoming_fit(img, before, after, expect_old_sign, vertical)
+        other = incoming_fit(img, before, after, -expect_old_sign, vertical)
+        if expected is None:
+            continue
+        fits.append({'t': r['t'], 'dx': expected['dx'], 'fit the expected way': expected['fit'],
+                     'fit the other way': other['fit'] if other else None})
+    # a frame decides when one way fits clearly better; near the start and the end of a slide both fit alike
+    for f in fits:
+        e, o = f['fit the expected way'], f['fit the other way']
+        f['decides'] = None if o is None else 'expected' if e < 0.8 * o else 'other' if o < 0.8 * e else None
+    ok = any(f['decides'] == 'expected' for f in fits) and not any(f['decides'] == 'other' for f in fits)
+    return ok, fits
 
 
 def incoming_check(rows, frames, before, after, expect_old_sign, vertical=False):
@@ -474,8 +501,10 @@ def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover, 
             return check('the new page slides in from the ' + ('right' if expect_right else 'left'),
                          side is not None and ((side > 0.5) if expect_right else (side < 0.5)), {**detail, 'first': first})
         ok, found = slide_check(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
+        ok_fit, fits = direction_fit(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
         check('the old page moves ' + ('left' if expect_right else 'right') + ' and the new page comes in from the '
-              + ('right' if expect_right else 'left'), ok, {**detail, 'shifts': found})
+              + ('right' if expect_right else 'left'), ok or ok_fit,
+              {**detail, 'shifts (text patches)': found, 'by patches': ok, 'whole-frame fits': fits, 'by fits': ok_fit})
         ok, fits = incoming_check(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
         return check('the page that comes in is the new page, not a copy of the old one', ok, {'frames': fits})
     # curl: the part of the page that has not turned yet is the copy of the page that was on the screen (a
