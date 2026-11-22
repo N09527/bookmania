@@ -8,7 +8,7 @@ import kotlin.math.abs
 
 /**
  * Swipes in the image reader's paged modes while the page curl is on (Bookmania; decided by the user, stage
- * 5.5 report 6.3): the pages do not follow the finger; when it is lifted, the page turns with the curl, as a
+ * 5.5 report 6.1): the pages do not follow the finger; when it is lifted, the page turns with the curl, as a
  * swipe does in the text reader. A swipe is a move along the pager (left / right, or up / down in the
  * vertical pager) longer than [MIN_DISTANCE_DP], or shorter but fast enough to be a fling.
  *

@@ -8,7 +8,7 @@ import eu.kanade.tachiyomi.core.preference.PreferenceStore
  */
 class PageTurnPreferences(private val store: PreferenceStore) {
 
-    /** The text reader: [NONE], [SLIDE] or [CURL], for all books; curl unless chosen otherwise (stage 5.5 report 6.3). */
+    /** The text reader: [NONE], [SLIDE] or [CURL], for all books; curl unless chosen otherwise (stage 5.5 report 6.1). */
     fun textReader() = store.getString(KEY_TEXT_READER, CURL)
 
     /**
