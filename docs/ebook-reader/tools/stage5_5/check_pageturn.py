@@ -12,6 +12,8 @@ Usage: python3 -I check_pageturn.py <step> [arguments]        (environment: ADB=
   rapid <manga> <chapter> <none|slide|curl> <label>   three keys in one command: each turn counts, nothing is left on top
   image <manga> <chapter> <l2r|r2l|vertical|webtoon> <label> [--curl on|off] [--double] [--back] [--swipe]
                                         --swipe: a quick swipe instead of a key
+  swipe_frames <label> <on|off> <horizontal|vertical>   whether the page followed the finger, for a saved
+                                        swipe recording (the check of image --swipe, added in stage 6)
   add_chapter <manga> <file on the device> <new file name>   copies a file into the work's folder and refreshes
                                         the work's chapter list (pull to refresh on its page)
   chapters <manga> <first chapter> <other text chapter> <image chapter, 0: the work's .cbz>
@@ -521,6 +523,48 @@ def scroll_shift(before, after):
     return shift, diffs[shift], diffs[0]
 
 
+def frame_shift(before, frames, rows, horizontal):
+    """How far the black frame of the comic test page moved (the largest shift, in pixels of the recording)
+    in the frames before the new page first shows, that is before the curl's first frame, or before the next
+    page comes in with a drag: a page that follows the finger moves, one that waits for the curl does not.
+    The frame's first and last dark pixel are found across the page at 30 % of its height (of its width in
+    the vertical pager). Returns (largest shift or None, frames measured)."""
+    def edges(img):
+        a = np.asarray(img.convert('L'), dtype=np.int16)
+        line = a[int(a.shape[0] * 0.3)] if horizontal else a[:, int(a.shape[1] * 0.3)]
+        dark = np.where(line < 60)[0]
+        return (int(dark[0]), int(dark[-1])) if len(dark) else None
+    ref = edges(before)
+    first_new = next((k for k, r in enumerate(rows) if r['new'] > 0.005), len(rows))
+    shifts = [max(abs(e[0] - ref[0]), abs(e[1] - ref[1])) for e in (edges(img) for _, img in frames[:first_new])
+              if ref and e]
+    return (max(shifts) if shifts else None), len(shifts)
+
+
+def follow_check(curl, before, frames, rows, horizontal):
+    """A swipe in the pager: with the curl on, the page stays where it is until the curl (the user's
+    decision, stage 5.5 report 6.1); with the curl off, the pager drags the page with the finger as before."""
+    shift, n = frame_shift(before, frames, rows, horizontal)
+    detail = {'largest shift of the page frame (pixels of the recording, a quarter of the screen)': shift,
+              'frames before the new page shows': n}
+    if curl == 'on':
+        check('the page did not follow the finger before the curl (its frame stayed in place)',
+              shift is not None and shift <= 3, detail)
+    else:
+        check("the page followed the finger (the pager's own drag)", shift is not None and shift >= 10, detail)
+
+
+def swipe_frames(label, curl, horizontal):
+    """follow_check again for a recording in out/rec/<label> (recordings made before the check existed)."""
+    folder = os.path.join(OUT, 'rec', label)
+    before = Image.open(os.path.join(folder, 'before.png')).convert('RGB')
+    with open(os.path.join(folder, 'analysis.json')) as f:
+        rows = json.load(f)
+    names = sorted(n for n in os.listdir(folder) if n.startswith('f0') and n.endswith('.png'))
+    frames = [(r['t'], fit(Image.open(os.path.join(folder, n)).convert('RGB'), before.size)) for r, n in zip(rows, names)]
+    follow_check(curl, before, frames, rows, horizontal)
+
+
 def image_step(manga, chapter, mode, label, curl='on', double=False, back=False, swipe=False):
     c.STEP[0] = f'image:{label}'
     c.set_prefs({
@@ -569,6 +613,8 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False,
         check('the page turned' + (' back to the first page' if back else ''), page == 0 if back else page >= 1,
               {'last_page_read after the turn': page, 'started at': 0, 'turned forward once first': back,
                'swipe': action})
+    if swipe and mode != 'webtoon':
+        follow_check(curl, before, frames, rows, horizontal=mode != 'vertical')
     if mode == 'webtoon' or curl == 'off':
         during = mid(rows)
         check('no curl: the App did not play a page turn of its own (debug log)', not logs,
@@ -833,6 +879,10 @@ def main():
             label, style = a.args[:2]
             c.STEP[0] = a.args[2] if len(a.args) > 2 else f'text:{label}'
             reanalyse(label, style, a.back, a.columns == 'on', a.direction == 'rtl', a.edge)
+        elif a.step == 'swipe_frames':
+            label, curl, direction = a.args
+            c.STEP[0] = f'image:{label}'
+            swipe_frames(label, curl, direction != 'vertical')
         elif a.step == 'rapid':
             m, ch, style, label = a.args
             rapid_step(int(m), int(ch), style, label)
