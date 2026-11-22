@@ -8,8 +8,8 @@ import eu.kanade.tachiyomi.core.preference.PreferenceStore
  */
 class PageTurnPreferences(private val store: PreferenceStore) {
 
-    /** The text reader: [NONE], [SLIDE] or [CURL], for all books. */
-    fun textReader() = store.getString(KEY_TEXT_READER, SLIDE)
+    /** The text reader: [NONE], [SLIDE] or [CURL], for all books; curl unless chosen otherwise (stage 5.5 report 6.3). */
+    fun textReader() = store.getString(KEY_TEXT_READER, CURL)
 
     /**
      * The image reader's paged modes: taps and keys turn the page with a curl (instead of the existing

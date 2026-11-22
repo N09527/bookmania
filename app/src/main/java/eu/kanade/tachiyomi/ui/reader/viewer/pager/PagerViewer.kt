@@ -114,6 +114,7 @@ abstract class PagerViewer(val activity: ReaderActivity) : BaseViewer {
         pager.id = R.id.reader_pager
         pager.adapter = adapter
         pager.addOnPageChangeListener(pagerListener)
+        pager.swipeTurn = pageCurl.swipeTurn { towardsEnd -> if (towardsEnd) moveRight() else moveLeft() } // Bookmania
         pager.tapListener = f@{ event ->
             val viewPosition = IntArray(2)
             pager.getLocationOnScreen(viewPosition)

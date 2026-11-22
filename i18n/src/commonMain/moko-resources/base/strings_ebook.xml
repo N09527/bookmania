@@ -73,5 +73,5 @@
     <string name="ebook_chapters">Chapters</string>
     <string name="ebook_chapters_current">Reading now</string>
     <string name="bookmania_page_curl">Page curl</string>
-    <string name="bookmania_page_curl_summary">In the paged modes, a tap or a key turns the page with a curl. Swiping still drags the page; long strip mode is unchanged.</string>
+    <string name="bookmania_page_curl_summary">In the paged modes, taps, keys and swipes turn the page with a curl (the page does not follow the finger). Long strip mode is unchanged.</string>
 </resources>

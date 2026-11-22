@@ -72,5 +72,5 @@
     <string name="ebook_chapters">章節</string>
     <string name="ebook_chapters_current">正在閱讀</string>
     <string name="bookmania_page_curl">捲曲翻頁</string>
-    <string name="bookmania_page_curl_summary">翻頁模式中，點擊或按鍵翻頁時以捲曲動畫翻頁。用手指滑動仍是拖動頁面；長條模式不變。</string>
+    <string name="bookmania_page_curl_summary">翻頁模式中，點擊、按鍵與手指滑動翻頁時，都以捲曲動畫翻頁（頁面不跟著手指移動）。長條模式不變。</string>
 </resources>

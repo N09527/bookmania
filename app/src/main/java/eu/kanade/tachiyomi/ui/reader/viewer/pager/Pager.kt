@@ -7,6 +7,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import androidx.viewpager.widget.DirectionalViewPager
 import eu.kanade.tachiyomi.ui.reader.viewer.GestureDetectorWithLongTap
+import yokai.pageturn.PagerSwipeTurn
 
 /**
  * Pager implementation that listens for tap and long tap and allows temporarily disabling touch
@@ -29,6 +30,9 @@ open class Pager(
     var longTapListener: ((MotionEvent) -> Boolean)? = null
 
     var isRestoring = false
+
+    /** Bookmania: swipes turn the page with the curl when it is on (yokai.pageturn). */
+    var swipeTurn: PagerSwipeTurn? = null
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         isRestoring = true
@@ -81,6 +85,7 @@ open class Pager(
      * views manipulate [requestDisallowInterceptTouchEvent].
      */
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
+        swipeTurn?.let { if (it.handles(ev)) return it.onInterceptTouchEvent(ev) }
         return try {
             super.onInterceptTouchEvent(ev)
         } catch (e: IllegalArgumentException) {
@@ -93,6 +98,7 @@ open class Pager(
      * [requestDisallowInterceptTouchEvent].
      */
     override fun onTouchEvent(ev: MotionEvent): Boolean {
+        swipeTurn?.let { if (it.handles(ev)) return it.onTouchEvent(ev) }
         return try {
             super.onTouchEvent(ev)
         } catch (e: IllegalArgumentException) {

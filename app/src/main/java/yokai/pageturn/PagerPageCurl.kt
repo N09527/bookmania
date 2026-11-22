@@ -65,6 +65,17 @@ class PagerPageCurl(private val viewer: PagerViewer) {
         return true
     }
 
+    /**
+     * Swipes with the curl on: the page turns with the curl when the finger is lifted ([PagerSwipeTurn]).
+     * Used while the curl would be used for a tap; otherwise the pager drags the pages as before.
+     */
+    fun swipeTurn(turn: (towardsEnd: Boolean) -> Unit) = PagerSwipeTurn(
+        view = viewer.pager,
+        horizontal = viewer !is VerticalPagerViewer,
+        active = { preferences.pagerCurl().get() && !viewer.activity.menuVisible && ValueAnimator.areAnimatorsEnabled() },
+        turn = turn,
+    )
+
     /** Ends a turn in progress at once; a page change it had not made yet is made now. */
     fun finishNow() {
         val item = pendingItem

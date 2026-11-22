@@ -66,4 +66,13 @@ run chapters 8 10 19 0
 run settings_ui 8 10
 run rapid 8 10 curl r-curl
 run rapid 8 10 slide r-slide
+# user's decisions of the stage 5.5 report 6.1 (stage 6): curl by default in the text reader; with the curl on,
+# a swipe in the image reader turns the page with the curl when the finger is lifted
+run text 8 10 default t-default
+run image 10 12 l2r i-swipe-l2r --swipe
+run image 10 12 l2r i-swipe-l2r-back --swipe --back
+run image 10 12 r2l i-swipe-r2l --swipe
+run image 10 12 vertical i-swipe-vertical --swipe
+run image 10 12 l2r i-swipe-off --swipe --curl off
+run image 10 12 webtoon i-swipe-webtoon --swipe
 echo "RUN-ALL DONE $(date +%H:%M:%S)"

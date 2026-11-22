@@ -6,11 +6,12 @@ and one taken after the turn: every cell of a grid is "old" (as before), "new" (
 flap, the shadow, a moving page). Where the new page shows up first tells the edge the page turns by.
 
 Usage: python3 -I check_pageturn.py <step> [arguments]        (environment: ADB=/path/to/adb)
-  text <manga> <chapter> <none|slide|curl> <label> [--columns on] [--back] [--landscape] [--direction rtl|ltr] [--warm]
+  text <manga> <chapter> <none|slide|curl|default> <label> [--columns on] [--back] [--landscape] [--direction rtl|ltr] [--warm]
                                         --warm: one animated turn first, the recorded turn is the second
                                         chapter 0: the work's chapter whose file name ends with --file
   rapid <manga> <chapter> <none|slide|curl> <label>   three keys in one command: each turn counts, nothing is left on top
-  image <manga> <chapter> <l2r|r2l|vertical|webtoon> <label> [--curl on|off] [--double] [--back]
+  image <manga> <chapter> <l2r|r2l|vertical|webtoon> <label> [--curl on|off] [--double] [--back] [--swipe]
+                                        --swipe: a quick swipe instead of a key
   add_chapter <manga> <file on the device> <new file name>   copies a file into the work's folder and refreshes
                                         the work's chapter list (pull to refresh on its page)
   chapters <manga> <first chapter> <other text chapter> <image chapter, 0: the work's .cbz>
@@ -82,7 +83,7 @@ def screen_size():
 SLOW = 40  # animator duration scale while recording: more frames of each turn on the slow emulator
 
 
-def record_turn(label, code, seconds=60, size=None):
+def record_turn(label, code, seconds=60, size=None, action=None):
     """Records the screen while key [code] turns the page, with animations [SLOW] times slower (the system
     setting "animator duration scale", which the App's animations follow). Sending a key with `input` takes
     seconds on this emulator, hence the long recording. Returns (before, after, frames, after_late)."""
@@ -102,7 +103,7 @@ def record_turn(label, code, seconds=60, size=None):
                             '--bit-rate', '8000000', '/sdcard/turn.mp4'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(2.5)  # screenrecord has started
     t_key = time.time()
-    d.shell(f'input keyevent {code}')
+    d.shell(action or f'input keyevent {code}')
     try:
         rec.wait(timeout=seconds + 60)
     except subprocess.TimeoutExpired:
@@ -326,7 +327,9 @@ def no_overlay_left(after, late):
 
 def text_step(manga, chapter, style, label, columns='off', back=False, landscape=False, direction=None, warm=False):
     c.STEP[0] = f'text:{label}'
-    values = {'pref_ebook_page_turn': style, 'pref_ebook_columns': columns}
+    # 'default': no choice stored, the text reader's default (curl since stage 6)
+    values = {'pref_ebook_page_turn': None if style == 'default' else style, 'pref_ebook_columns': columns}
+    style = 'curl' if style == 'default' else style
     if direction:
         values['pref_ebook_pageDirection'] = direction
     c.set_prefs(values, reset_typesetting=True)
@@ -481,7 +484,22 @@ def reanalyse(label, style, back=False, spread=False, rtl=False, edge=None):
 MODES = {'l2r': 1, 'r2l': 2, 'vertical': 3, 'webtoon': 4}
 
 
-def image_step(manga, chapter, mode, label, curl='on', double=False, back=False):
+def swipe_action(mode, back, size):
+    """A quick swipe that turns to the next page (or back): the finger moves left in left-to-right pagers,
+    right in right-to-left ones, up in the vertical pager."""
+    w, h = size
+    if mode == 'vertical':
+        y1, y2 = int(h * 0.75), int(h * 0.3)
+        if back:
+            y1, y2 = y2, y1
+        return f'input swipe {w // 2} {y1} {w // 2} {y2} 150'
+    x1, x2 = int(w * 0.8), int(w * 0.2)
+    if (mode == 'r2l') != back:
+        x1, x2 = x2, x1
+    return f'input swipe {x1} {h // 2} {x2} {h // 2} 150'
+
+
+def image_step(manga, chapter, mode, label, curl='on', double=False, back=False, swipe=False):
     c.STEP[0] = f'image:{label}'
     c.set_prefs({
         'pref_default_reading_mode_key': MODES[mode],
@@ -502,9 +520,10 @@ def image_step(manga, chapter, mode, label, curl='on', double=False, back=False)
         d.shell(f'input keyevent {KEY_PAGE_DOWN}')
         time.sleep(8)
     size = screen_size()
+    action = swipe_action(mode, back, size) if swipe else None
     check('the screen is in ' + ('landscape' if double else 'portrait'), (size[0] > size[1]) == double, {'screen': size})
     size = (size[0] // 4, size[1] // 4)  # comic pages are told apart by colour: a small, cheaper recording
-    before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size)
+    before, after, frames, late = record_turn(label, KEY_PAGE_UP if back else KEY_PAGE_DOWN, size=size, action=action)
     rows = analyse(before, after, frames)
     with open(os.path.join(OUT, 'rec', label, 'analysis.json'), 'w') as f:
         json.dump(rows, f, indent=1)
@@ -719,14 +738,14 @@ def settings_ui(manga, chapter):
                                      and m['b'][1] <= n['y'] <= m['b'][3] for m in ns)
 
     check('the text reader panel has 翻頁動畫 with 無／滑動／捲曲', len(labels) == 4, sorted(labels))
-    check('滑動 is chosen by default', chosen('滑動') and not chosen('無') and not chosen('捲曲'),
+    check('捲曲 is chosen by default', chosen('捲曲') and not chosen('無') and not chosen('滑動'),
           {label: chosen(label) for label in ('無', '滑動', '捲曲')})
-    if '捲曲' in labels:
-        d.tap(labels['捲曲']['x'], labels['捲曲']['y'], 3)
-    d.shot('s55-settings-text-panel-curl')
+    if '滑動' in labels:
+        d.tap(labels['滑動']['x'], labels['滑動']['y'], 3)
+    d.shot('s55-settings-text-panel-slide')
     c.stop_app()
     prefs = d.prefs()
-    check('choosing 捲曲 stores pref_ebook_page_turn = curl', 'name="pref_ebook_page_turn">curl<' in prefs, None)
+    check('choosing 滑動 stores pref_ebook_page_turn = slide', 'name="pref_ebook_page_turn">slide<' in prefs, None)
 
     # Settings > Reader: the new switch next to the existing transition switch
     d.shell(f'am start -n {d.PKG}/eu.kanade.tachiyomi.ui.main.MainActivity')
@@ -769,6 +788,7 @@ def main():
     p.add_argument('--edge')
     p.add_argument('--file', default='zh-varied.epub')
     p.add_argument('--warm', action='store_true')
+    p.add_argument('--swipe', action='store_true')
     a = p.parse_args()
     try:
         if a.step == 'text':
@@ -786,7 +806,7 @@ def main():
             rapid_step(int(m), int(ch), style, label)
         elif a.step == 'image':
             m, ch, mode, label = a.args
-            image_step(int(m), int(ch), mode, label, a.curl, a.double, a.back)
+            image_step(int(m), int(ch), mode, label, a.curl, a.double, a.back, a.swipe)
         elif a.step == 'add_chapter':
             m, source, name = a.args
             add_chapter(int(m), source, name)
