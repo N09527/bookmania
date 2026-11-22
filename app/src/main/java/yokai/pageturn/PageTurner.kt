@@ -89,7 +89,8 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         val width = page.width
         val height = page.height
         if (width <= 0 || height <= 0 || !page.isAttachedToWindow || !overlay.isAttachedToWindow) return false
-        val bitmap = bitmap(before, width, height)?.also { before = it } ?: return false
+        before = null
+        val bitmap = newBitmap(width, height)?.also { before = it } ?: return false
         val id = ++generation
         val start = SystemClock.uptimeMillis()
         var copiedAt = 0L
@@ -136,8 +137,9 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
             if (id != generation || current == null || current.isRecycled) return
             if (page.width != current.width || page.height != current.height) return // resized meanwhile
             val needsNext = turn.style == Style.SLIDE || (turn.spread && turn.forward)
+            after = null
             val next = if (needsNext) {
-                bitmap(after, current.width, current.height)?.also { after = it }?.takeIf { copy(it) }
+                newBitmap(current.width, current.height)?.also { after = it }?.takeIf { copy(it) }
             } else {
                 null
             }
@@ -210,12 +212,14 @@ class PageTurner(private val window: Window, private val page: View, parent: Vie
         }
     }
 
-    private fun bitmap(reuse: Bitmap?, width: Int, height: Int): Bitmap? {
-        if (reuse != null && !reuse.isRecycled && reuse.width == width && reuse.height == height) return reuse
-        if (reuse != null) {
-            renderer.forget()
-            reuse.recycle()
-        }
+    /**
+     * A new bitmap for each copy. Once a bitmap has been drawn, the GPU keeps its pixels, and PixelCopy
+     * writing into that bitmap again does not make it read them anew: a reused bitmap showed the page of the
+     * first turn in every later turn (found on the emulator, stage 5.5). The old copies are left to the
+     * garbage collector rather than recycled, as a frame being drawn may still use them.
+     */
+    private fun newBitmap(width: Int, height: Int): Bitmap? {
+        renderer.forget()
         return try {
             Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         } catch (e: OutOfMemoryError) {

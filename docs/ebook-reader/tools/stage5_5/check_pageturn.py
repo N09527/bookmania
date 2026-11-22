@@ -6,7 +6,8 @@ and one taken after the turn: every cell of a grid is "old" (as before), "new" (
 flap, the shadow, a moving page). Where the new page shows up first tells the edge the page turns by.
 
 Usage: python3 -I check_pageturn.py <step> [arguments]        (environment: ADB=/path/to/adb)
-  text <manga> <chapter> <none|slide|curl> <label> [--columns on] [--back] [--landscape] [--direction rtl|ltr]
+  text <manga> <chapter> <none|slide|curl> <label> [--columns on] [--back] [--landscape] [--direction rtl|ltr] [--warm]
+                                        --warm: one animated turn first, the recorded turn is the second
                                         chapter 0: the work's chapter whose file name ends with --file
   rapid <manga> <chapter> <none|slide|curl> <label>   three keys in one command: each turn counts, nothing is left on top
   image <manga> <chapter> <l2r|r2l|vertical|webtoon> <label> [--curl on|off] [--double] [--back]
@@ -321,7 +322,7 @@ def no_overlay_left(after, late):
 
 # region Text reader
 
-def text_step(manga, chapter, style, label, columns='off', back=False, landscape=False, direction=None):
+def text_step(manga, chapter, style, label, columns='off', back=False, landscape=False, direction=None, warm=False):
     c.STEP[0] = f'text:{label}'
     values = {'pref_ebook_page_turn': style, 'pref_ebook_columns': columns}
     if direction:
@@ -334,8 +335,12 @@ def text_step(manga, chapter, style, label, columns='off', back=False, landscape
     # a page in the middle of the document: the turn stays in it (a turn into the next document is played
     # only when that one is laid out quickly, which this emulator never does)
     start_page = 4 if back else 2
-    d.cdp(f'window.__reader.goPage({start_page})')
+    d.cdp(f'window.__reader.goPage({start_page - 1 if warm else start_page})')
     time.sleep(4)
+    if warm:
+        # one animated turn first: the recorded turn is the second one of this reading session
+        d.shell(f'input keyevent {KEY_PAGE_DOWN}')
+        time.sleep(15)
     st = d.status()
     if not st or st.get('pages', 0) < start_page + 2 * st.get('cols', 1):
         return check('the document has pages around page %d' % start_page, False, st)
@@ -395,7 +400,10 @@ def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover, 
         ok, found = slide_check(rows, *slide_frames, expect_old_sign=-1 if expect_right else 1)
         return check('the old page moves ' + ('left' if expect_right else 'right') + ' and the new page comes in from the '
                      + ('right' if expect_right else 'left'), ok, {**detail, 'shifts': found})
-    # curl
+    # curl: the part of the page that has not turned yet is the copy of the page that was on the screen (a
+    # copy of an earlier page would show here instead, see the stage 5.5 report)
+    check('during the curl, part of the page that was on the screen is still shown',
+          any(r['old'] >= 0.1 * old_most for r in during), {'old during the turn': [r['old'] for r in during]})
     if edge == 'BOTTOM':
         ok = first['new_bottom_half'] >= 0.8 if not back else first['new_bottom_half'] <= 0.2
         return check('vertical pager: the page curls from the bottom edge' + (' (back: comes down over the top edge)' if back else ''),
@@ -412,8 +420,11 @@ def verdicts(label, style, rows, back, spread, rtl, edge, sheet_path, leftover, 
     if not back and not spread:
         y = first['new_at'][1] if first['new_at'] else 0
         check('the curl starts at the bottom corner', y > 0.5, {'first': first})
-    if spread:
-        # at no time does the new page show on the other half as it lies at the end, until the very end
+    if spread and not back:
+        # going forward the turning page's back lands on the other half, so until late in the turn the new
+        # page does not show there as it lies at the end. (Going back, the previous spread lands in place on
+        # both halves: the other half is uncovered as the page lifts off it, and the turning half fills in
+        # from the centre line.)
         early = [r for r in during if r['new'] < 0.5]
         other_half = [r['new_right_half'] for r in early]
         ok = all((s >= 0.75) if lifted_on_right else (s <= 0.25) for s in other_half)
@@ -691,12 +702,25 @@ def settings_ui(manga, chapter):
         return check('the book opened', False, st)
     d.open_panel()
     d.tap_label('版面', wait=3, exact=True)
-    n = d.reveal('翻頁動畫')
+    ns = []
+    for _ in range(12):  # the row is at the end of the 版面 tab
+        ns = d.nodes()
+        if any(n['text'] == '捲曲' for n in ns) and any(n['text'] == '翻頁動畫' for n in ns):
+            break
+        d.scroll_panel(320)
     d.shot('s55-settings-text-panel')
-    check('the text reader panel has 翻頁動畫 (none / slide / curl), slide by default',
-          n is not None and all(d.find(x, exact=True) for x in ('無', '滑動', '捲曲')), None)
-    d.tap_revealed('捲曲')
-    time.sleep(2)
+    labels = {n['text']: n for n in ns if n['text'] in ('翻頁動畫', '無', '滑動', '捲曲')}
+
+    def chosen(label):
+        n = labels.get(label)
+        return n is not None and any((m['selected'] or m['checked']) and m['b'][0] <= n['x'] <= m['b'][2]
+                                     and m['b'][1] <= n['y'] <= m['b'][3] for m in ns)
+
+    check('the text reader panel has 翻頁動畫 with 無／滑動／捲曲', len(labels) == 4, sorted(labels))
+    check('滑動 is chosen by default', chosen('滑動') and not chosen('無') and not chosen('捲曲'),
+          {label: chosen(label) for label in ('無', '滑動', '捲曲')})
+    if '捲曲' in labels:
+        d.tap(labels['捲曲']['x'], labels['捲曲']['y'], 3)
     d.shot('s55-settings-text-panel-curl')
     c.stop_app()
     prefs = d.prefs()
@@ -710,10 +734,18 @@ def settings_ui(manga, chapter):
     c.clear_dialogs()
     for label in ('其他', '設定', '閱讀'):
         d.tap_label(label, wait=3, exact=True)
-    found = d.reveal('捲曲翻頁')
+    found = transitions = None
+    for _ in range(6):
+        ns = d.nodes()
+        found = next((n for n in ns if n['text'] == '捲曲翻頁'), None)
+        transitions = next((n for n in ns if n['text'] == '翻頁轉場動畫'), None)
+        if found:
+            break
+        d.swipe(540, 1500, 540, 900, ms=1200, wait=2)
     d.shot('s55-settings-reader')
-    check('Settings > Reader has 捲曲翻頁 after the transition switch', found is not None and d.find('翻頁轉場動畫', exact=True) is not None,
-          None)
+    check('Settings > Reader has 捲曲翻頁 right after 翻頁轉場動畫',
+          found is not None and transitions is not None and 0 < found['y'] - transitions['y'] < 300,
+          {'捲曲翻頁': found and found['b'], '翻頁轉場動畫': transitions and transitions['b']})
     if found:
         d.tap(found['x'], found['y'], 3)
     c.stop_app()
@@ -734,6 +766,7 @@ def main():
     p.add_argument('--double', action='store_true')
     p.add_argument('--edge')
     p.add_argument('--file', default='zh-varied.epub')
+    p.add_argument('--warm', action='store_true')
     a = p.parse_args()
     try:
         if a.step == 'text':
@@ -741,7 +774,7 @@ def main():
             ch = int(ch)
             if ch == 0:  # the work's chapter whose file is --file
                 ch = next(r[0] for r in chapter_rows(int(m)) if r[2].endswith(a.file))
-            text_step(int(m), ch, style, label, a.columns, a.back, a.landscape, a.direction)
+            text_step(int(m), ch, style, label, a.columns, a.back, a.landscape, a.direction, a.warm)
         elif a.step == 'reanalyse':
             label, style = a.args[:2]
             c.STEP[0] = a.args[2] if len(a.args) > 2 else f'text:{label}'

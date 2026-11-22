@@ -40,6 +40,9 @@ run text 8 10 none t-none
 run text 8 10 slide t-slide-ltr
 run text 8 10 curl t-curl-ltr
 run text 8 10 curl t-curl-ltr-back --back
+# the second animated turn of a reading session (each copy of the page must be the page on the screen)
+run text 8 10 curl t-curl-ltr-second --warm
+run text 8 10 slide t-slide-ltr-second --warm
 run text 14 16 slide t-slide-rtl
 run text 14 16 curl t-curl-rtl
 run text 14 16 curl t-curl-rtl-back --back
@@ -59,7 +62,7 @@ run image 10 12 l2r i-curl-l2r-double --double
 run image 10 12 webtoon i-webtoon
 run image 10 12 l2r i-off-l2r --curl off
 # chapter panel (work 8: two text EPUBs of the original set, the EPUB and the CBZ added above)
-run chapters 8 10 18 0
+run chapters 8 10 19 0
 run settings_ui 8 10
 run rapid 8 10 curl r-curl
 run rapid 8 10 slide r-slide
