@@ -43,11 +43,16 @@ def app_notifications():
 
 
 def open_library():
+    """The main screen opens on its last tab (it was 最新, Recents): the 書櫃 (library) tab is tapped."""
     d.shell(f'am start -n {PKG}/{MAIN}')
     time.sleep(8)
     c.wait_app_drawn()
     time.sleep(4)
     c.clear_dialogs()
+    n = d.find('書櫃', exact=True)
+    if n:
+        d.tap(n['x'], n['y'], 5)
+    c.check('the library tab is shown', d.find('書櫃', exact=True) is not None, None)
 
 
 def update_library(label):
