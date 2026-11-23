@@ -301,18 +301,18 @@ def expectations(target_mode):
 
 
 def tap_switch(label):
-    """The switch on the row of [label]; the row is brought well above the panel's lower edge first (right
-    after the panel opens, the switch of the last rows can be below what uiautomator reports)."""
-    sw = None
-    for _ in range(3):
-        d.reveal(label, max_bottom=1650)
-        sw = d.switch_for(label)
+    """Taps the switch on the row of [label]. The panel is scrolled forward step by step until the row and
+    its switch are above the panel's lower edge, then backward: the drive.reveal() helper took the book's
+    own text nodes (which do not move with the panel) for a panel that stopped scrolling (stage 6)."""
+    for i in range(14):
+        ns = d.nodes()
+        row = next((n for n in ns if n['text'] == label and n['b'][3] < 1700), None)
+        sw = d.switch_for(label, ns) if row else None
         if sw is not None:
-            break
-        d.scroll_panel(200)
-    if sw is None:
-        raise RuntimeError('no switch for ' + label)
-    d.tap(sw['x'], sw['y'], 3)
+            d.tap(sw['x'], sw['y'], 3)
+            return
+        d.scroll_panel(350 if i < 8 else -350)
+    raise RuntimeError('no switch for ' + label)
 
 
 def step_positions(which):
@@ -501,9 +501,15 @@ def open_new_work(title):
     for _ in range(8):
         n = d.find(title, exact=True)
         if n:
-            d.tap(n['x'], n['y'], 30)
-            capture('corrupt-0-work-page')
-            return True
+            for _ in range(3):  # a tap can be lost on this emulator: the work's page must show
+                d.tap(n['x'], n['y'], 10)
+                if d.find('開始閱讀', exact=True) or d.find('加入書櫃', exact=True) or d.find('在書櫃中', exact=True):
+                    time.sleep(25)  # the chapters are read from the folder
+                    capture('corrupt-0-work-page')
+                    return True
+                n = d.find(title, exact=True) or n
+            capture('corrupt-0-work-page-not-shown')
+            return False
         d.swipe(540, 1500, 540, 700, 800, 3)
     capture('corrupt-0-work-not-found')
     return False
