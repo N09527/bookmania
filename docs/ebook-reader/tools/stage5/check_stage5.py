@@ -1084,16 +1084,24 @@ def step_slider(manga, chapter, label, fraction):
     swipe_ms = 24000
     t = threading.Thread(target=lambda: d.shell(f'input swipe {x_from} {y} {x_to} {y} {swipe_ms}', timeout=swipe_ms / 1000 + 120))
     st0 = d.status()
+    t0 = time.time()
     t.start()
     time.sleep(swipe_ms / 1000 * 0.55)
+    t_dump = time.time()
     mid = d.nodes()
+    t_dumped = time.time()
     t.join()
+    t_swiped = time.time()
     d.shot(label + '-1-dragging')
     # The bar's texts are TextView nodes (the book's text in the WebView is in View nodes).
     bar_texts = [n['text'] for n in mid if n['text'] and n['y'] > 1500 and n['cls'].endswith('TextView')
                  and not re.fullmatch(r'\d+%', n['text'])]
+    # uiautomator dumps once the screen is idle, so the dump can come late; the times (seconds from the start of
+    # the swipe) tell whether it was taken while the finger was still down (stage 7).
     check('while dragging, the bar shows a table of contents title instead of the page', bar_texts and not any(PAGE_INFO.match(x) for x in bar_texts),
-          {'bar texts while dragging': bar_texts, 'page info before': page_info(ns)})
+          {'bar texts while dragging': bar_texts, 'page info before': page_info(ns),
+           'times (s)': {'swipe length': swipe_ms / 1000, 'dump asked': round(t_dump - t0, 1),
+                         'dump returned': round(t_dumped - t0, 1), 'swipe command returned': round(t_swiped - t0, 1)}})
     st = wait_change(st0, 120)
     time.sleep(4)
     after = d.nodes()
