@@ -1,0 +1,4 @@
+start at the beginning: saved positions removed 0, page in the chapter list 0
+PASS 長篇單檔百萬字, cold start 1 (first time ever): the first page is laid out {"seconds to the first page": 142.82, "seconds to the shell page": 61.12, "layout of the document (shell, ms)": 72812, "pages of the document": 2000, "App memory PSS (KB)": 159741, "front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t875}"], "App error shown": false, "screen": null, "raw": null}
+PASS 長篇單檔百萬字, cold start 2: the first page is laid out {"seconds to the first page": 138.44, "seconds to the shell page": 49.52, "layout of the document (shell, ms)": 84647, "pages of the document": 2000, "App memory PSS (KB)": 143834, "front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t876}"], "App error shown": false, "screen": null, "raw": null}
+.. 長篇單檔百萬字: open times [142.82, 138.44]
