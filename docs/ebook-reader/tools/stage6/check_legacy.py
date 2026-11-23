@@ -6,8 +6,8 @@ would be needed); they are left to a check on a phone.
   library    three works are added to the library from their pages (加入書櫃): the database marks them, the
              library tab lists them, one opens from there
   local      Local Source chapters in two more formats of the image reader, next to the .cbz and the comic EPUBs
-             of stage 2: a folder of images and a .zip. Both are listed as chapters, open in the image reader
-             and are paged to the end (the chapter is then marked read)
+             of stage 2: a folder of images and a .zip, in a work of their own opened from Browse. Both are
+             listed as chapters, open in the image reader and are paged to the end (then marked read)
   modes      the comic CBZ in each reading mode of the image reader (left to right, right to left, vertical,
              long strip, continuous vertical; the curl off): two page keys move the reading position and change
              the screen
@@ -15,7 +15,7 @@ would be needed); they are left to a check on a phone.
              without a crash (screenshots)
   backup     a backup made in the App holds the library; a work taken out of the library (in the database) is
              back in it after restoring that backup through the App's screens (../stage5/backup_ui.py)
-  cleanup    the chapters added by "local" are removed again
+  cleanup    the work folder added by "local" is removed again
 Usage: ADB=/path/to/adb python3 -I check_legacy.py <step> [...]
 Results: out/legacy/results.jsonl; screenshots: out/legacy/shots/.
 """
@@ -162,6 +162,32 @@ def step_library():
     c.stop_app(0)
 
 
+LOCAL_WORK = '圖片資料夾與壓縮檔'  # a work of its own: an existing work lists new files only after a pull to refresh
+
+
+def open_new_work(title):
+    """Browse > Local source > the work: a work opened for the first time lists its files as chapters. The
+    source's name is not translated. Returns True once the work's page shows."""
+    start_main()
+    if not tap_text('探索', wait=5):
+        return False
+    if not (tap_text('本機來源', tries=2, wait=10) or tap_text('Local source', wait=10)):
+        return False
+    for _ in range(8):
+        n = d.find(title, exact=True)
+        if n:
+            for _ in range(3):  # a tap can be lost on this emulator
+                d.tap(n['x'], n['y'], 10)
+                if d.find('開始閱讀', exact=True) or d.find('加入書櫃', exact=True) or d.find('在書櫃中', exact=True):
+                    time.sleep(25)  # the chapters are read from the folder
+                    capture('local-work-page')
+                    return True
+                n = d.find(title, exact=True) or n
+            return False
+        d.swipe(540, 1500, 540, 700, 800, 3)
+    return False
+
+
 def step_local():
     from PIL import Image, ImageDraw
     import zipfile
@@ -184,24 +210,25 @@ def step_local():
     with zipfile.ZipFile(os.path.join(folder, ADDED[1]), 'w') as z:
         for i, data in enumerate(pages):
             z.writestr(f'{i + 1:03d}.png', data)
-    d.shell(f"mkdir -p '{LOCAL}/{COMIC_FOLDER}/{ADDED[0]}'")
+    work = f'{LOCAL}/{LOCAL_WORK}'
+    d.shell(f"mkdir -p '{work}/{ADDED[0]}'")
     for i in range(len(pages)):
-        d.adb('push', os.path.join(folder, ADDED[0], f'{i + 1:03d}.png'), f'{LOCAL}/{COMIC_FOLDER}/{ADDED[0]}/{i + 1:03d}.png')
-    d.adb('push', os.path.join(folder, ADDED[1]), f'{LOCAL}/{COMIC_FOLDER}/{ADDED[1]}')
-    c.stop_app(0)
-    c.open_manga(COMIC_WORK)  # Local Source lists the new chapters
-    time.sleep(45)
-    capture('local-chapters')
+        d.adb('push', os.path.join(folder, ADDED[0], f'{i + 1:03d}.png'), f'{work}/{ADDED[0]}/{i + 1:03d}.png')
+    d.adb('push', os.path.join(folder, ADDED[1]), f'{work}/{ADDED[1]}')
+    opened = open_new_work(LOCAL_WORK)
     c.stop_app(3)
     con = c.pull_db('tachiyomi.db')
-    rows = con.execute('SELECT _id, url, name FROM chapters WHERE manga_id = ?', (COMIC_WORK,)).fetchall()
+    row = con.execute('SELECT _id FROM mangas WHERE title = ?', (LOCAL_WORK,)).fetchone()
+    manga = row[0] if row else None
+    rows = con.execute('SELECT _id, url, name FROM chapters WHERE manga_id = ?', (manga,)).fetchall() if manga else []
     con.close()
     ids = {name: cid for cid, url, _ in rows for name in ADDED if url.endswith(name)}
-    c.check('the image folder and the .zip are listed as chapters', len(ids) == 2, [(r[0], r[1], r[2]) for r in rows])
+    c.check('a folder of images and a .zip are listed as chapters (a new work opened from Browse)',
+            opened and len(ids) == 2, {'work': manga, 'chapters': [(r[0], r[1], r[2]) for r in rows]})
     c.set_prefs({'pref_default_reading_mode_key': 1, 'pref_bookmania_pager_curl': False})
     for name, cid in ids.items():
         set_progress(cid)
-        open_image_reader(COMIC_WORK, cid)
+        open_image_reader(manga, cid)
         a = capture(f'local-{cid}-page1')
         front = d.resumed()
         for _ in range(3):
@@ -214,6 +241,7 @@ def step_local():
         c.check(f'{name}: opens in the image reader and is paged to the end (marked read)',
                 'ui.reader.ReaderActivity' in front and row and (row['read'] == 1 or row['last_page_read'] == 2) and not crash_lines(),
                 {'front': front.split()[-2:], 'chapter': row, 'screen changed': changed(a, b), 'crashes': crash_lines()[:3]})
+    c.set_prefs({'pref_default_reading_mode_key': None, 'pref_bookmania_pager_curl': None})
 
 
 def step_modes():
@@ -252,29 +280,36 @@ def step_screens():
             c.check('Browse: Local Source lists the works of the test folder', src is not None and any('測試' in x for x in shown), shown[:20])
             d.shell('input keyevent 4')
             time.sleep(4)
+    tap_text('書櫃')  # the library's 其他 (toolbar) holds the download queue and the settings
     tap_text('其他')
+    menu = texts()
     q = tap_text('下載佇列')
     capture('screen-download-queue')
-    c.check('the download queue opens', q is not None, texts()[:10])
+    c.check('the download queue opens (from the library: 其他 > 下載佇列)', q is not None, {'menu': menu[:16], 'screen': texts()[:10]})
     d.shell('input keyevent 4')
     time.sleep(3)
+    tap_text('書櫃')
     tap_text('其他')
     tap_text('設定')
-    first = [x for x in texts()]
     capture('screen-settings')
-    names = [x for x in ('一般', '外觀', '書櫃', '閱讀', '下載', '探索', '歷程', 'Data and storage', '隱私', '進階', '關於') if x in first]
-    opened = {}
-    for name in names:
-        if not d.find(name, exact=True):
-            tap_text('設定')
-        n = tap_text(name, wait=5)
+    wanted = ('一般', '外觀', '書櫃', '閱讀', '下載', '探索', '歷程', 'Data and storage', '隱私', '進階', '關於')
+    opened, seen = {}, []
+    for rnd in range(2):  # the first screen, then the list scrolled to its end
+        if rnd:
+            d.swipe(540, 1500, 540, 500, 800, 3)
         shown = texts()
-        capture(f'screen-settings-{name.replace(" ", "-")}')
-        opened[name] = n is not None and len(shown) > 3
-        d.shell('input keyevent 4')
-        time.sleep(4)
-    c.check('every settings category on the first screen opens', bool(opened) and all(opened.values()),
-            {'categories': opened, 'first screen': first[:20]})
+        seen.append(shown[:20])
+        for name in [x for x in wanted if x in shown and x not in opened]:
+            n = tap_text(name, wait=5)
+            inside = texts()
+            capture(f'screen-settings-{name.replace(" ", "-")}')
+            opened[name] = n is not None and len(inside) > 3
+            d.shell('input keyevent 4')
+            time.sleep(4)
+            if rnd:
+                d.swipe(540, 1500, 540, 500, 800, 3)
+    c.check('every settings category opens', bool(opened) and all(opened.values()) and len(opened) >= 8,
+            {'categories': opened, 'not found': [x for x in wanted if x not in opened], 'lists seen': seen})
     c.check('no crash while opening the screens', not crash_lines(), crash_lines()[:3])
     c.stop_app(0)
 
@@ -316,16 +351,12 @@ def step_backup():
 
 
 def step_cleanup():
+    """Removes the work folder added by "local" (its rows stay in the library database, like any work whose
+    folder was deleted)."""
     c.STEP[0] = 'cleanup'
-    d.shell(f"rm -rf '{LOCAL}/{COMIC_FOLDER}/{ADDED[0]}' '{LOCAL}/{COMIC_FOLDER}/{ADDED[1]}'")
-    c.stop_app(0)
-    c.open_manga(COMIC_WORK)
-    time.sleep(45)
-    c.stop_app(3)
-    con = c.pull_db('tachiyomi.db')
-    left = con.execute('SELECT _id, url FROM chapters WHERE manga_id = ?', (COMIC_WORK,)).fetchall()
-    con.close()
-    c.check('the added chapters are gone', not any(u.endswith(ADDED[0]) or u.endswith(ADDED[1]) for _, u in left), left)
+    d.shell(f"rm -rf '{LOCAL}/{COMIC_FOLDER}/{ADDED[0]}' '{LOCAL}/{COMIC_FOLDER}/{ADDED[1]}' '{LOCAL}/{LOCAL_WORK}'")
+    left = d.shell(f"ls '{LOCAL}'")
+    c.check('the added work folder is gone', LOCAL_WORK not in left, left.split())
 
 
 def main():
