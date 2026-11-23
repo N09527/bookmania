@@ -301,17 +301,21 @@ def expectations(target_mode):
 
 
 def tap_switch(label):
-    """Taps the switch on the row of [label]. The panel is scrolled forward step by step until the row and
-    its switch are above the panel's lower edge, then backward: the drive.reveal() helper took the book's
-    own text nodes (which do not move with the panel) for a panel that stopped scrolling (stage 6)."""
-    for i in range(14):
+    """Taps the switch on the row of [label]. The panel is scrolled forward until the row shows, then nudged
+    until its switch is fully shown: the drive.reveal() helper took the book's own text nodes (which do not
+    move with the panel) for a panel that had stopped scrolling, and a long scroll could carry the row past
+    the panel's top (stage 6)."""
+    for i in range(16):
         ns = d.nodes()
-        row = next((n for n in ns if n['text'] == label and n['b'][3] < 1700), None)
+        row = next((n for n in ns if n['text'] == label and n['b'][1] > 1250), None)
         sw = d.switch_for(label, ns) if row else None
-        if sw is not None:
+        if sw is not None and sw['b'][3] - sw['b'][1] > 100:
             d.tap(sw['x'], sw['y'], 3)
             return
-        d.scroll_panel(350 if i < 8 else -350)
+        if row is not None:
+            d.scroll_panel(150 if row['y'] > 1500 else -150)
+        else:
+            d.scroll_panel(350 if i < 9 else -350)
     raise RuntimeError('no switch for ' + label)
 
 
