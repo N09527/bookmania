@@ -1,0 +1,51 @@
+=== 17:01:32 warmup
+dismissed: mCurrentFocus=Window{3c4edfc u0 Application Not Responding: com.android.systemui}
+.. warm-up: mResumedActivity: ActivityRecord{9a2f1ad u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t878} {'ready': True, 'error': None, 'page': 0, 'pages': 10, 'cols': 1, 'mode': 'V', 'seq': 1, 'ms': 5746, 'rubyFix': False, 'gutter': None, 'vw': 412}
+=== 17:03:19 stage7 checks
+.. chapter 16 is read; marking it unread in the chapter list
+.. swipe 1 on 直排測試書 at y=1092: snackbar 標示為未讀
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS bold on: stored for all books (pref_ebook_bold) {"pref_ebook_bold": "true"}
+PASS bold on: the body text is bold, it was not before {"before": [{"p": "400", "h": "700"}], "after": [{"p": "700", "h": "700"}]}
+PASS bold on: the reading position is the same character, on the screen {"page before → after": [3, 3], "pages": [10, 10], "position": [17, 0], "visible": [true]}
+PASS bold on: the page on the screen changed {"share of the page area": 0.108}
+PASS after a restart: still bold [{"p": "700", "h": "700"}]
+PASS after a restart: the same character, on the screen {"position": [17, 0], "visible": [true]}
+PASS bold off: the book's own weight again {"before": [{"p": "400", "h": "700"}], "now": [{"p": "400", "h": "700"}]}
+PASS bold off: the same character, on the screen {"position": [17, 0], "visible": [true]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS bold on: stored for all books (pref_ebook_bold) {"pref_ebook_bold": "true"}
+PASS bold on: the body text is bold, it was not before {"before": [{"p": "400", "h": "700"}], "after": [{"p": "700", "h": "700"}]}
+PASS bold on: the reading position is the same character, on the screen {"page before → after": [3, 3], "pages": [8, 8], "position": [43, 0], "visible": [true]}
+PASS bold on: the page on the screen changed {"share of the page area": 0.1115}
+PASS after a restart: still bold [{"p": "700", "h": "700"}]
+PASS after a restart: the same character, on the screen {"position": [43, 0], "visible": [true]}
+PASS bold off: the book's own weight again {"before": [{"p": "400", "h": "700"}], "now": [{"p": "400", "h": "700"}]}
+PASS bold off: the same character, on the screen {"position": [43, 0], "visible": [true]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS two columns: a shadow on the centre of the gap {"darkest column x": 539, "expected x": 540.0, "brightness at the darkest column": 176.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-01-horizontal-two-columns", "columns": 2, "WebView left / right": [0, 1080]}
+PASS two columns: the shadow is in the middle of the screen (same left and right margins) {"darkest column x": 539}
+PASS switched off: stored (pref_ebook_gutter_shadow) {"pref_ebook_gutter_shadow": "false"}
+PASS switched off: no shadow {"darkest column x": 400, "expected x": 540.0, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-02-off", "columns": 2, "WebView left / right": [0, 1080]}
+PASS switched off, after a restart: no shadow {"darkest column x": 400, "expected x": 540.0, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-03-off-reopened", "columns": 2, "WebView left / right": [0, 1080]}
+PASS switched on again: the shadow is back {"darkest column x": 539, "expected x": 540.0, "brightness at the darkest column": 176.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-04-on-again", "columns": 2, "WebView left / right": [0, 1080]}
+FAIL curl: frames taken while the turn played show the shadow on the centre line {"frames": 3, "frames between the two pages": 0, "darkest x / depth": []}
+PASS curl: after the turn the shadow is there {"darkest column x": 539, "expected x": 540.0, "brightness at the darkest column": 176.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-07-after-curl", "columns": 2, "WebView left / right": [0, 1080]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS left margin 60, right 20: the shadow follows the gap {"darkest column x": 592, "expected x": 592.4, "brightness at the darkest column": 175.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [216.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [217.0, 236.0, 249.0], "text-free gap": [533, 646], "gap centre": 589.5, "shot": "gutter-08-margins-60-20", "columns": 2, "WebView left / right": [0, 1080]}
+PASS left margin 60, right 20: the gap centre the shell reports is (width + 60 - 20) / 2 {"shell": 592.4271844660194, "formula": 592.4271844660194}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS one column: no shadow {"darkest column x": 400, "expected x": null, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [540, 540], "gap centre": 540.0, "shot": "gutter-09-one-column", "columns": 1, "WebView left / right": [0, 1080]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS two columns in landscape only, portrait: no shadow {"darkest column x": 400, "expected x": null, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [540, 540], "gap centre": 540.0, "shot": "gutter-10-landscape-setting-portrait", "columns": 1, "WebView left / right": [0, 1080]}
+FAIL landscape: two columns and the shadow on the gap {"darkest column x": 959, "expected x": 897.0, "brightness at the darkest column": 176.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [896, 1014], "gap centre": 955.0, "shot": "gutter-11-landscape", "columns": 2, "WebView left / right": [0, 1794]}
+PASS back to portrait: one column, no shadow {"darkest column x": 400, "expected x": null, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [540, 540], "gap centre": 540.0, "shot": "gutter-12-back-to-portrait", "columns": 1, "WebView left / right": [0, 1080]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS vertical book, two columns: a shadow on the centre of the gap {"darkest column x": 539, "expected x": 540.0, "brightness at the darkest column": 176.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [488, 635], "gap centre": 561.5, "shot": "gutter-13-vertical-two-columns", "columns": 2, "WebView left / right": [0, 1080]}
+PASS the test comic is listed as a chapter of a new work {"ids": [20, 32], "work page shown": true}
+.. pink/blue boundaries on the middle row: []
+FAIL double pages: the two pages are shown side by side {"shot": "comic-01-double-pages"}
+PASS Settings > 閱讀 has 中縫陰影 right after 捲曲翻頁, with its summary {"中縫陰影": [42, 1491, 210, 1548], "捲曲翻頁": [42, 1193, 210, 1250], "summary": "雙頁模式中，在兩頁相接處加上陰影，像實體書的中縫。"}
+PASS the switch (on by default) stores pref_bookmania_pager_gutter_shadow = false null
+.. typesetting and reader settings back to their defaults
+=== 17:42:20 chain done

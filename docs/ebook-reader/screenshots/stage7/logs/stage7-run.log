@@ -1,0 +1,57 @@
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS bold on: stored for all books (pref_ebook_bold) {"pref_ebook_bold": "true"}
+PASS bold on: the body text is bold, it was not before {"before": [{"p": "400", "h": "700"}], "after": [{"p": "700", "h": "700"}]}
+PASS bold on: the reading position is the same character, on the screen {"page before → after": [3, 3], "pages": [10, 10], "position": [17, 0], "visible": [true]}
+PASS bold on: the page on the screen changed {"share of the page area": 0.1077}
+PASS after a restart: still bold [{"p": "700", "h": "700"}]
+PASS after a restart: the same character, on the screen {"position": [17, 0], "visible": [true]}
+PASS bold off: the book's own weight again {"before": [{"p": "400", "h": "700"}], "now": [{"p": "400", "h": "700"}]}
+PASS bold off: the same character, on the screen {"position": [17, 0], "visible": [true]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS bold on: stored for all books (pref_ebook_bold) {"pref_ebook_bold": "true"}
+PASS bold on: the body text is bold, it was not before {"before": [{"p": "400", "h": "700"}], "after": [{"p": "700", "h": "700"}]}
+PASS bold on: the reading position is the same character, on the screen {"page before → after": [3, 3], "pages": [8, 8], "position": [43, 0], "visible": [true]}
+PASS bold on: the page on the screen changed {"share of the page area": 0.1105}
+PASS after a restart: still bold [{"p": "700", "h": "700"}]
+PASS after a restart: the same character, on the screen {"position": [43, 0], "visible": [true]}
+PASS bold off: the book's own weight again {"before": [{"p": "400", "h": "700"}], "now": [{"p": "400", "h": "700"}]}
+PASS bold off: the same character, on the screen {"position": [43, 0], "visible": [true]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS two columns: a shadow on the centre of the gap {"darkest column x": 540, "expected x": 540.8, "brightness at the darkest column": 179.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [221.0, 240.0, 254.0], "brightness 20 / 40 / 80 px right": [221.0, 240.0, 254.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-01-horizontal-two-columns", "columns": 2, "WebView left / right": [0, 1080]}
+PASS two columns: the shadow is in the middle of the screen (same left and right margins) {"darkest column x": 540}
+PASS switched off: stored (pref_ebook_gutter_shadow) {"pref_ebook_gutter_shadow": "false"}
+PASS switched off: no shadow {"darkest column x": 401, "expected x": 540.8, "brightness at the darkest column": 255.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [255.0, 255.0, 255.0], "brightness 20 / 40 / 80 px right": [255.0, 255.0, 255.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-02-off", "columns": 2, "WebView left / right": [0, 1080]}
+PASS switched off, after a restart: no shadow {"darkest column x": 401, "expected x": 540.8, "brightness at the darkest column": 255.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [255.0, 255.0, 255.0], "brightness 20 / 40 / 80 px right": [255.0, 255.0, 255.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-03-off-reopened", "columns": 2, "WebView left / right": [0, 1080]}
+PASS switched on again: the shadow is back {"darkest column x": 540, "expected x": 540.8, "brightness at the darkest column": 179.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [221.0, 240.0, 254.0], "brightness 20 / 40 / 80 px right": [221.0, 240.0, 254.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-04-on-again", "columns": 2, "WebView left / right": [0, 1080]}
+[image2 @ 0x555e2d91a7c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 3 >= 3
+[image2 @ 0x555e2d91a7c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 6 >= 6
+[image2 @ 0x555e2d91a7c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 7 >= 7
+PASS curl: in most recorded frames while the turn played (at least 60 %), the centre line is darker than 60 px to each side (the fold's own shading can come near the line) {"frames recorded": 13, "frames between the two pages": 4, "centre x": 540.75, "frames with the darker line": 4, "darker by (left, right)": [["0009.png", [70.0, 70.0]], ["0010.png", [63.0, 64.0]], ["0011.png", [77.0, 38.0]], ["0012.png", [68.0, 81.0]]]}
+PASS curl: after the turn the shadow is there {"darkest column x": 540, "expected x": 540.8, "brightness at the darkest column": 179.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [221.0, 240.0, 254.0], "brightness 20 / 40 / 80 px right": [221.0, 240.0, 254.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "gutter-07-after-curl", "columns": 2, "WebView left / right": [0, 1080]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS left margin 60, right 20: the shadow follows the gap {"darkest column x": 593, "expected x": 593.2, "brightness at the darkest column": 179.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [221.0, 240.0, 254.0], "brightness 20 / 40 / 80 px right": [221.0, 240.0, 254.0], "text-free gap": [533, 646], "gap centre": 589.5, "shot": "gutter-08-margins-60-20", "columns": 2, "WebView left / right": [0, 1080]}
+PASS left margin 60, right 20: the gap centre the shell reports is (width + 60 - 20) / 2 CSS px {"shell": 226, "formula": 226.0}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS one column: no shadow {"darkest column x": 400, "expected x": null, "brightness at the darkest column": 255.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [255.0, 255.0, 255.0], "brightness 20 / 40 / 80 px right": [255.0, 255.0, 255.0], "text-free gap": [540, 540], "gap centre": 540.0, "shot": "gutter-09-one-column", "columns": 1, "WebView left / right": [0, 1080]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS two columns in landscape only, portrait: no shadow {"darkest column x": 400, "expected x": null, "brightness at the darkest column": 255.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [255.0, 255.0, 255.0], "brightness 20 / 40 / 80 px right": [255.0, 255.0, 255.0], "text-free gap": [540, 540], "gap centre": 540.0, "shot": "gutter-10-landscape-setting-portrait", "columns": 1, "WebView left / right": [0, 1080]}
+PASS landscape: two columns and the shadow on the gap {"darkest column x": 960, "expected x": 960.8, "brightness at the darkest column": 179.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [221.0, 240.0, 254.0], "brightness 20 / 40 / 80 px right": [221.0, 240.0, 254.0], "text-free gap": [896, 1014], "gap centre": 955.0, "shot": "gutter-11-landscape", "columns": 2, "WebView left / right": [0, 1794]}
+PASS back to portrait: one column, no shadow {"darkest column x": 400, "expected x": null, "brightness at the darkest column": 255.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [255.0, 255.0, 255.0], "brightness 20 / 40 / 80 px right": [255.0, 255.0, 255.0], "text-free gap": [540, 540], "gap centre": 540.0, "shot": "gutter-12-back-to-portrait", "columns": 1, "WebView left / right": [0, 1080]}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS vertical book, two columns: a shadow on the centre of the gap {"darkest column x": 540, "expected x": 540.8, "brightness at the darkest column": 179.0, "page background": 255.0, "brightness 20 / 40 / 80 px left": [221.0, 240.0, 254.0], "brightness 20 / 40 / 80 px right": [221.0, 240.0, 254.0], "text-free gap": [488, 635], "gap centre": 561.5, "shot": "gutter-13-vertical-two-columns", "columns": 2, "WebView left / right": [0, 1080]}
+PASS the test comic is listed as a chapter of a new work {"ids": [20, 32], "work page shown": null}
+.. pink/blue boundaries on the middle row: [540]
+PASS double pages, fit screen: the shadow is on the seam, in the middle of the screen {"seam x": 540, "darkening left of the seam (ratio)": 0.714, "darkening right of the seam (ratio)": 0.724, "shot": "comic-01-double-pages", "image rows": [556, 1363]}
+PASS double pages: no shadow above or below the image {"largest difference above / below": [0.0, 0.0], "image rows": [556, 1363]}
+[image2 @ 0x55af243e5a80] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 1 >= 1
+[image2 @ 0x55af243e5a80] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 3 >= 3
+[image2 @ 0x55af243e5a80] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 4 >= 4
+[image2 @ 0x55af243e5a80] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 7 >= 7
+PASS curl: in most recorded frames while the turn played (at least 60 %) where both pages show, the shadow is where the pink and blue pages meet {"frames recorded": 13, "frames between the pages": 3, "frames with both pages": 1, "frames with the shadow": 1, "measurements": [["0008.png", 540, 0.718, 0.721]]}
+PASS the third page shown alone: no shadow in the middle {"green page shown": true, "largest difference": 0.0, "rows compared": 192}
+PASS original size: the seam is away from the middle of the screen and the shadow is on it {"seam x": 799, "darkening left of the seam (ratio)": 0.727, "darkening right of the seam (ratio)": 0.71, "shot": "comic-05-original-size"}
+PASS moved: the seam moved and the shadow went with it {"seam x": 510, "darkening left of the seam (ratio)": 0.722, "darkening right of the seam (ratio)": 0.715, "shot": "comic-06-moved", "seam before": 799}
+PASS setting off: no shadow on the seam {"seam x": 540, "darkening left of the seam (ratio)": 1.0, "darkening right of the seam (ratio)": 1.0, "shot": "comic-07-setting-off"}
+PASS Settings > 閱讀 has 中縫陰影 right after 捲曲翻頁, with its summary {"中縫陰影": [42, 1491, 210, 1548], "捲曲翻頁": [42, 1193, 210, 1250], "summary": "雙頁模式中，在兩頁相接處加上陰影，像實體書的中縫。"}
+PASS the switch (on by default) stores pref_bookmania_pager_gutter_shadow = false null
+.. typesetting and reader settings back to their defaults
