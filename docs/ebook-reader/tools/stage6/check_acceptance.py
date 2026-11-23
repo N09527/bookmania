@@ -370,6 +370,8 @@ def step_positions(which):
     for n, (label, value) in enumerate((('上', 60), ('下', 60), ('左', 40), ('右', 40))):
         d.set_slider(label, value / 120)
         after(8 + n, 'margins')
+    for _ in range(5):  # back to the top of the layout tab (writing mode, page direction, columns, margins)
+        d.scroll_panel(-500)
     d.tap_revealed('橫書' if target == 'H' else '直書')
     after(12, 'writing mode')
     d.tap_revealed('開啟')
