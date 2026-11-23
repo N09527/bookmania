@@ -31,16 +31,17 @@ KEY_PAGE_DOWN = 93
 IMAGE_CLASS = 'eu.kanade.tachiyomi.ui.reader.ReaderActivity'
 TEXT = f'{REL}/yokai.ebook.EbookReaderActivity'  # as dumpsys names it; the debug App's names start with
 IMAGE = f'{REL}/{IMAGE_CLASS}'                    # "io.github.n09527.bookmania.debug/", so they never match
-# (manga, chapter, label, expected: 'text' / 'image' reader, 'message' in a reader screen, or 'closes')
+# (manga, chapter, label, expected: 'text' / 'image' reader, or the text reader's 'drm' / 'damaged' explanation)
 BOOKS = [
     (14, 16, 'vertical-epub', 'text'),
     (8, 10, 'horizontal-epub', 'text'),
     (13, 15, 'vertical-azw3', 'text'),
     (9, 11, 'horizontal-mobi6', 'text'),
     (3, 1, 'joint-mobi', 'text'),
-    (1, 3, 'drm-adept-epub', 'message'),
-    (1, 2, 'drm-flagged-mobi', 'message'),
-    (6, 8, 'corrupt-truncated', 'closes'),  # handed to the image reader, which shows a toast and closes (stage 2 report)
+    (1, 3, 'drm-adept-epub', 'drm'),
+    (1, 2, 'drm-flagged-mobi', 'drm'),
+    (6, 8, 'corrupt-truncated', 'damaged'),  # since the stage 6 fix the text reader explains it (before: the image reader closed)
+    (6, 7, 'not-an-ebook', 'damaged'),
     (10, 12, 'comic-cbz', 'image'),
     (11, 13, 'comic-fixed-epub', 'image'),
 ]
@@ -133,12 +134,12 @@ def open_book(manga, chapter, label, kind):
     front = d.resumed()
     texts = screen_texts()
     d.shot(f'release-{label}-1')
-    want = {'text': TEXT, 'image': IMAGE, 'message': None, 'closes': None}[kind]
-    if kind == 'closes':
-        c.check('the reader closes again (no reader of the App in front)', TEXT not in front and IMAGE not in front,
-                {'front': front.split()[-2:] if front else None})
-    elif kind == 'message':
-        c.check('the App shows a message in a reader screen', (TEXT in front or IMAGE in front) and bool(texts),
+    want = {'text': TEXT, 'image': IMAGE}.get(kind)
+    if kind == 'drm':
+        c.check('the text reader explains the DRM', TEXT in front and '此書受 DRM 保護' in texts,
+                {'front': front.split()[-2:] if front else None, 'screen': texts[:8]})
+    elif kind == 'damaged':
+        c.check('the text reader explains that the file is damaged', TEXT in front and '無法開啟這本書' in texts,
                 {'front': front.split()[-2:] if front else None, 'screen': texts[:8]})
     else:
         c.check(f'the book opens in the {kind} reader', want in front, {'front': front.split()[-2:] if front else None})
