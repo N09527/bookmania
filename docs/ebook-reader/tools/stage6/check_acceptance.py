@@ -468,17 +468,47 @@ def crashes():
     return [ln for ln in log.splitlines() if 'FATAL EXCEPTION' in ln or 'Fatal signal' in ln]
 
 
-def start_reader(chapter):
+def start_reader(manga, chapter):
     d.shell(f'am force-stop {d.PKG}')
     d.shell('logcat -c; logcat -b crash -c')
     time.sleep(2)
-    d.shell(f'am start -n {d.PKG}/{c.IMAGE_READER} --el manga {DAMAGED} --el chapter {chapter}')
+    d.shell(f'am start -n {d.PKG}/{c.IMAGE_READER} --el manga {manga} --el chapter {chapter}')
+
+
+DAMAGED_WORK = '損毀檔 MOBI'  # a work folder of its own: an existing work only lists new files after a pull to
+                              # refresh, which `input swipe` did not trigger on this emulator
+
+
+def open_new_work(title):
+    """Browse > 本機來源 > the work: a work opened for the first time lists its files as chapters."""
+    c.stop_app(0)
+    d.shell(f'am start -n {d.PKG}/eu.kanade.tachiyomi.ui.main.MainActivity')
+    time.sleep(6)
+    c.wait_app_drawn()
+    time.sleep(4)
+    c.clear_dialogs()
+    for label, wait in (('探索', 5), ('本機來源', 10)):
+        n = d.find(label, exact=True)
+        if n is None:
+            return False
+        d.tap(n['x'], n['y'], wait)
+    for _ in range(8):
+        n = d.find(title, exact=True)
+        if n:
+            d.tap(n['x'], n['y'], 30)
+            capture('corrupt-0-work-page')
+            return True
+        d.swipe(540, 1500, 540, 700, 800, 3)
+    capture('corrupt-0-work-not-found')
+    return False
 
 
 def step_corrupt():
     c.STEP[0] = 'corrupt'
     c.rotate(False)
     made = {}
+    folder = f'{LOCAL}/{DAMAGED_WORK}'
+    d.shell(f"mkdir -p '{folder}'")
     for name, src, cut in (('corrupt-truncated.mobi', 'zh-horizontal-mobi6.mobi', 0.45),
                            ('corrupt-truncated.azw3', 'zh-horizontal.azw3', 0.45),
                            ('not-an-ebook.mobi', None, None)):
@@ -491,21 +521,22 @@ def step_corrupt():
         path = os.path.join(OUT, name)
         with open(path, 'wb') as f:
             f.write(data)
-        d.adb('push', path, f'{LOCAL}/損毀檔/{name}')
+        d.adb('push', path, f'{folder}/{name}')
         made[name] = len(data)
     c.note(f'damaged files: {made}')
-    c.stop_app(0)
-    c.open_manga(DAMAGED)  # the work's page: Local Source lists the new files as chapters
-    time.sleep(45)
+    opened = open_new_work(DAMAGED_WORK)
     c.stop_app(3)
     con = c.pull_db('tachiyomi.db')
-    ids = {url.split('/')[-1]: cid for cid, url in con.execute('SELECT _id, url FROM chapters WHERE manga_id = ?', (DAMAGED,))}
+    row = con.execute('SELECT _id FROM mangas WHERE title = ?', (DAMAGED_WORK,)).fetchone()
+    manga = row[0] if row else None
+    ids = {url.split('/')[-1]: cid for cid, url in con.execute('SELECT _id, url FROM chapters WHERE manga_id = ?', (manga,))} if manga else {}
     con.close()
-    c.check('the damaged files are listed as chapters', all(n in ids for n in made), ids)
+    c.check('Local Source lists the damaged files as chapters of a new work', opened and all(n in ids for n in made),
+            {'work': manga, 'chapters': ids})
     for name in made:
         if name not in ids:
             continue
-        start_reader(ids[name])
+        start_reader(manga, ids[name])
         t = time.time()
         while c.READER not in d.resumed() and time.time() - t < 150:
             time.sleep(3)
@@ -519,7 +550,7 @@ def step_corrupt():
     for chapter, name in ((7, 'not-an-ebook.epub'), (8, 'corrupt-truncated.epub')):
         events = subprocess.Popen([d.ADB, 'shell', 'uiautomator', 'events'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         time.sleep(3)
-        start_reader(chapter)
+        start_reader(DAMAGED, chapter)
         time.sleep(45)
         events.terminate()
         try:
