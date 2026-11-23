@@ -31,6 +31,8 @@ data class EbookSettings(
     val pageDirection: String = DIRECTION_AUTO,
     /** Two columns: [COLUMNS_OFF], [COLUMNS_ON] or [COLUMNS_LANDSCAPE] (only when the screen is wider than tall). */
     val columns: String = COLUMNS_LANDSCAPE,
+    /** Body text in bold (stage 7); false keeps the book's own weights. */
+    val bold: Boolean = false,
 ) {
     enum class Key(val id: String) {
         FONT("font"),
@@ -46,6 +48,7 @@ data class EbookSettings(
         WRITING_MODE("writingMode"),
         PAGE_DIRECTION("pageDirection"),
         COLUMNS("columns"),
+        BOLD("bold"),
         ;
 
         companion object {
@@ -74,6 +77,7 @@ data class EbookSettings(
         Key.WRITING_MODE.id to writingMode,
         Key.PAGE_DIRECTION.id to pageDirection,
         Key.COLUMNS.id to columns,
+        Key.BOLD.id to bold.toString(),
     )
 
     companion object {
@@ -132,6 +136,7 @@ data class EbookSettings(
                 pageDirection = str(Key.PAGE_DIRECTION)?.takeIf { it in setOf(DIRECTION_AUTO, DIRECTION_RTL, DIRECTION_LTR) }
                     ?: d.pageDirection,
                 columns = str(Key.COLUMNS)?.takeIf { it in setOf(COLUMNS_OFF, COLUMNS_ON, COLUMNS_LANDSCAPE) } ?: d.columns,
+                bold = str(Key.BOLD)?.toBooleanStrictOrNull() ?: d.bold,
             )
         }
 

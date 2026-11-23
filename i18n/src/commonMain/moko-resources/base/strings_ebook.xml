@@ -74,4 +74,9 @@
     <string name="ebook_chapters_current">Reading now</string>
     <string name="bookmania_page_curl">Page curl</string>
     <string name="bookmania_page_curl_summary">In the paged modes, taps, keys and swipes turn the page with a curl (the page does not follow the finger). Long strip mode is unchanged.</string>
+    <string name="ebook_bold">Bold text</string>
+    <string name="ebook_gutter_shadow">Gutter shadow</string>
+    <string name="ebook_gutter_shadow_hint">With two columns, a shadow between them like the fold of a printed book. For all books; not affected by the level chosen above.</string>
+    <string name="bookmania_gutter_shadow">Gutter shadow</string>
+    <string name="bookmania_gutter_shadow_summary">In double page mode, a shadow where the two pages meet, like the fold of a printed book.</string>
 </resources>

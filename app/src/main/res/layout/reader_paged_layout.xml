@@ -96,6 +96,15 @@
             android:text="@string/invert_double_pages"
             android:textColor="?attr/colorOnBackground" />
 
+        <!-- Bookmania: shadow in the fold of double pages (yokai.gutter) -->
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/gutter_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/bookmania_gutter_shadow"
+            android:textColor="?attr/colorOnBackground" />
+
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/crop_borders"
             android:layout_width="match_parent"

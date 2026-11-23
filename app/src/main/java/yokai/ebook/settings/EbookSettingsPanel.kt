@@ -78,6 +78,8 @@ data class EbookSettingsUiState(
     val fonts: List<ImportedFont>,
     /** The page turn animation ([PageTurnPreferences.textReader]): one setting for all books. */
     val pageTurn: String,
+    /** The fold's shadow with two columns ([yokai.gutter.GutterPreferences.textReader]): one setting for all books. */
+    val gutterShadow: Boolean,
 )
 
 /**
@@ -101,6 +103,7 @@ fun EbookSettingsPanel(
     onImportFont: () -> Unit,
     onDeleteFont: (ImportedFont) -> Unit,
     onPageTurn: (String) -> Unit,
+    onGutterShadow: (Boolean) -> Unit,
     onClose: () -> Unit,
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -177,6 +180,7 @@ fun EbookSettingsPanel(
                     if (tab == 0) {
                         FontSection(s.font, state.fonts, over[Key.FONT], onSet, onImportFont, onDeleteFont)
                         HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                        SwitchSetting(MR.strings.ebook_bold, s.bold, over[Key.BOLD]) { onSet(Key.BOLD, it.toString()) }
                         StepSlider(
                             MR.strings.ebook_font_size, s.fontSize.toFloat(),
                             Range.fontSize.first.toFloat()..Range.fontSize.last.toFloat(), 1f, over[Key.FONT_SIZE],
@@ -235,6 +239,11 @@ fun EbookSettingsPanel(
                             ),
                             selected = s.columns,
                             onSelect = { onSet(Key.COLUMNS, it) },
+                        )
+                        SwitchSetting(MR.strings.ebook_gutter_shadow, state.gutterShadow, null, onGutterShadow)
+                        Text(
+                            stringResource(MR.strings.ebook_gutter_shadow_hint),
+                            style = MaterialTheme.typography.bodySmall,
                         )
                         HorizontalDivider(Modifier.padding(vertical = 8.dp))
                         Label(MR.strings.ebook_margins, null)
@@ -299,6 +308,18 @@ private fun Label(text: StringResource, overridden: SettingsScope?) {
     Column(Modifier.padding(vertical = 4.dp)) {
         Text(stringResource(text), style = MaterialTheme.typography.titleSmall)
         OverriddenNote(overridden)
+    }
+}
+
+/** An on/off setting (the switch sits at the end of the row, after the label). */
+@Composable
+private fun SwitchSetting(label: StringResource, checked: Boolean, overridden: SettingsScope?, onChange: (Boolean) -> Unit) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(label), style = MaterialTheme.typography.titleSmall)
+            OverriddenNote(overridden)
+        }
+        Switch(checked = checked, onCheckedChange = onChange)
     }
 }
 

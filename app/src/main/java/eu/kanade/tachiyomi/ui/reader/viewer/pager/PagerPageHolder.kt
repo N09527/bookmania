@@ -52,6 +52,7 @@ import kotlinx.coroutines.withContext
 import okio.Buffer
 import okio.BufferedSource
 import uy.kohesive.injekt.injectLazy
+import yokai.gutter.PagerGutterShadow
 
 /**
  * View of the ViewPager that contains a page of a chapter.
@@ -116,6 +117,10 @@ class PagerPageHolder(
 
     private var scope = MainScope()
 
+    /** Bookmania (yokai.gutter): the image shown is two merged pages. */
+    @Volatile
+    private var twoPagesShown = false
+
     init {
         addView(progressIndicator)
         if (viewer.config.hingeGapSize > 0) {
@@ -138,6 +143,7 @@ class PagerPageHolder(
             }
         }
         onImageDecoded()
+        PagerGutterShadow.update(pageView, twoPagesShown) // Bookmania
     }
 
     override fun onNeedsLandscapeZoom() {
@@ -434,6 +440,7 @@ class PagerPageHolder(
      * Called when the page is ready.
      */
     private suspend fun setImage() {
+        twoPagesShown = false // Bookmania: set again below if two pages are merged
         progressIndicator.show()
         if (extraPage == null) {
             progressIndicator.completeAndFadeOut()
@@ -819,7 +826,7 @@ class PagerPageHolder(
                     progressIndicator.setProgress(it)
                 }
             }
-        }
+        }.also { twoPagesShown = true } // Bookmania
     }
 
     private fun setExtraPageBitmap(imageStream: InputStream, isLTR: Boolean): Bitmap? {

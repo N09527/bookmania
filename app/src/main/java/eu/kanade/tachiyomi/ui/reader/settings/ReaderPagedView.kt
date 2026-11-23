@@ -16,6 +16,7 @@ import eu.kanade.tachiyomi.widget.BaseReaderSettingsView
 import yokai.i18n.MR
 import yokai.util.lang.getString
 import yokai.pageturn.PageTurnPreferences
+import yokai.gutter.GutterPreferences
 
 class ReaderPagedView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
     BaseReaderSettingsView<ReaderPagedLayoutBinding>(context, attrs) {
@@ -50,6 +51,7 @@ class ReaderPagedView @JvmOverloads constructor(context: Context, attrs: Attribu
             }
 
             invertDoublePages.bindToPreference(preferences.invertDoublePages())
+            gutterShadow.bindToPreference(GutterPreferences(preferences.preferenceStore).pager()) // Bookmania
 
             pageLayout.title = pageLayout.title.toString().addBetaTag(context)
 
@@ -128,5 +130,6 @@ class ReaderPagedView @JvmOverloads constructor(context: Context, attrs: Attribu
             )
         }
         binding.invertDoublePages.isVisible = show && preferences.pageLayout().get() != PageLayout.SINGLE_PAGE.value
+        binding.gutterShadow.isVisible = binding.invertDoublePages.isVisible // Bookmania
     }
 }

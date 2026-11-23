@@ -140,6 +140,9 @@
       family = s.font.kind === 'sans' ? 'sans-serif' : 'serif';
     }
     if (family) css += 'html, body, body * { font-family: ' + family + ' !important; }\n';
+    // Bold (stage 7): every element, so a book that sets its paragraphs to normal weight is bold too. A font
+    // without a bold face is emboldened by the browser.
+    if (s.bold) css += 'body, body * { font-weight: bold !important; }\n';
     // 0 adds nothing, so the book's own letter spacing (e.g. spaced headings) is kept.
     if (typeof s.letterSpacing === 'number' && s.letterSpacing > 0) css += 'body, body * { letter-spacing: ' + s.letterSpacing + 'em !important; }\n';
     if (typeof s.indent === 'number') css += 'p { text-indent: ' + s.indent + 'em !important; }\n';
@@ -604,9 +607,12 @@
     return null;
   }
 
+  // gutter: with two columns, the centre of the gap between them (stage 7: the native layer draws the fold's
+  // shadow there); vw: the viewport width the layout used (window.innerWidth, a whole number). Both in CSS px.
   function status() {
+    var g = S.geo, two = !!g && S.cols === 2;
     return { ready: S.ready, error: S.error, page: S.page, pages: S.pages, cols: S.cols, mode: S.mode, seq: S.seq, ms: S.ms,
-      rubyFix: S.rubyFix };
+      rubyFix: S.rubyFix, gutter: two ? g.m.left + g.pageW + g.G / 2 : null, vw: g ? g.W : null };
   }
 
   var resizeTimer = null;

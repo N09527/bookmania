@@ -22,6 +22,7 @@ class EbookSettingsTest {
         assertEquals(EbookSettings.BOOK, d.writingMode)
         assertEquals(EbookSettings.DIRECTION_AUTO, d.pageDirection)
         assertEquals(EbookSettings.COLUMNS_LANDSCAPE, d.columns)
+        assertFalse(d.bold)
     }
 
     @Test
@@ -59,10 +60,19 @@ class EbookSettingsTest {
         val s = EbookSettings.parse(
             mapOf(
                 "font" to "../../etc/passwd", "fontSize" to "big", "lineHeight" to "NaN", "writingMode" to "diagonal",
-                "pageDirection" to "up", "indent" to "x", "columns" to "3",
+                "pageDirection" to "up", "indent" to "x", "columns" to "3", "bold" to "yes",
             ),
         )
         assertEquals(EbookSettings.DEFAULTS, s)
+    }
+
+    @Test
+    fun `bold is on or off, and the nearest level wins`() {
+        assertTrue(EbookSettings.parse(mapOf("bold" to "true")).bold)
+        assertFalse(EbookSettings.parse(mapOf("bold" to "false")).bold)
+        assertTrue(EbookSettings.resolve(mapOf("bold" to "true"), mapOf("fontSize" to "24")).bold) // inherited
+        assertFalse(EbookSettings.resolve(mapOf("bold" to "true"), mapOf(), mapOf("bold" to "false")).bold)
+        assertEquals("false", EbookSettings().toMap()["bold"])
     }
 
     @Test
@@ -84,9 +94,10 @@ class EbookSettingsTest {
     fun `map round trip`() {
         val s = EbookSettings(
             font = "serif", fontSize = 24, lineHeight = 2.2f, letterSpacing = 0.05f, indent = 2f, paragraphSpacing = 0.5f,
-            columns = EbookSettings.COLUMNS_ON,
+            columns = EbookSettings.COLUMNS_ON, bold = true,
         )
         assertEquals(s, EbookSettings.parse(s.toMap()))
+        assertEquals("true", s.toMap()["bold"])
         assertEquals("2.2", s.toMap()["lineHeight"])
         assertEquals("book", EbookSettings().toMap()["indent"])
     }

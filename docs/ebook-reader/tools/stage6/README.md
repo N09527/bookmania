@@ -40,6 +40,7 @@ ADB=/path/to/adb python3 -I measure_long.py setup          # 之後：open <標�
 ```bash
 ADB=/path/to/adb FONT_FILE=/path/to/NotoSerifCJKtc-Bold.otf ./run-regression.sh            # 全部
 ADB=/path/to/adb ./run-regression.sh s5 s4pages                                         # 只跑指定的部分
+RUN=out7 ADB=/path/to/adb FONT_FILE=/path/to/NotoSerifCJKtc-Bold.otf ./run-regression.sh  # 第 7 階段：各階段寫到 out7/，紀錄在 out/out7/
 ```
 
 `out/parts.log` 記錄每一部分的開始、結束時間與結束代碼；`out/<部分>-events.log` 是該部分期間系統紀錄中的當機與「沒有回應」事件。

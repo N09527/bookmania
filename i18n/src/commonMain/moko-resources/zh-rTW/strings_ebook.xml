@@ -73,4 +73,9 @@
     <string name="ebook_chapters_current">正在閱讀</string>
     <string name="bookmania_page_curl">捲曲翻頁</string>
     <string name="bookmania_page_curl_summary">翻頁模式中，點擊、按鍵與手指滑動翻頁時，都以捲曲動畫翻頁（頁面不跟著手指移動）。長條模式不變。</string>
+    <string name="ebook_bold">字體加粗</string>
+    <string name="ebook_gutter_shadow">中縫陰影</string>
+    <string name="ebook_gutter_shadow_hint">雙欄時在兩欄中間加上陰影，像實體書的中縫。所有書共用，不受上方選擇的範圍影響。</string>
+    <string name="bookmania_gutter_shadow">中縫陰影</string>
+    <string name="bookmania_gutter_shadow_summary">雙頁模式中，在兩頁相接處加上陰影，像實體書的中縫。</string>
 </resources>

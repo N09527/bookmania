@@ -114,6 +114,8 @@ import yokai.ebook.settings.EbookSettingsUiState
 import yokai.ebook.settings.FontStore
 import yokai.ebook.settings.ImportedFont
 import yokai.ebook.settings.SettingsScope
+import yokai.gutter.GutterPreferences
+import yokai.gutter.GutterShadowView
 import yokai.i18n.MR
 import yokai.pageturn.CurlEdge
 import yokai.pageturn.PageTurnPreferences
@@ -144,6 +146,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private val settingsStore by lazy { EbookSettingsStore(preferences.preferenceStore) }
     private val fontStore by lazy { FontStore(this, preferences.preferenceStore) }
     private val pageTurnPreferences by lazy { PageTurnPreferences(preferences.preferenceStore) }
+    private val gutterPreferences by lazy { GutterPreferences(preferences.preferenceStore) }
     /** Plays the page turn animation (see [turnPage]). */
     private var pageTurner: PageTurner? = null
     /** Page turns run one after another, so a quick second tap waits for the first instead of being lost. */
@@ -186,6 +189,9 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private var pages = 1
     /** Pages shown side by side (2 in two-column mode). */
     private var columns = 1
+    /** The fold's shadow over the page (stage 7), and where the shell puts the gap of two columns (CSS px). */
+    private var gutterView: GutterShadowView? = null
+    private var gutterCss: Double? = null
 
     private var busy = false
     private var waitJob: Job? = null
@@ -320,6 +326,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                                 onImportFont = ::importFont,
                                 onDeleteFont = ::confirmDeleteFont,
                                 onPageTurn = ::onPageTurnChanged,
+                                onGutterShadow = ::onGutterShadowChanged,
                                 onClose = { panel = null },
                             )
                         }
@@ -574,9 +581,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         // The shell lays the document out again by itself when the viewport changes (rotation, split
         // screen); page, page count and columns change with it, so read them again once it is done.
         wv.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
-            if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) refreshAfterResize()
+            if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
+                gutterView?.show(null) // until the new layout tells where the columns are
+                refreshAfterResize()
+            }
         }
         binding.webContainer.addView(wv)
+        // Above the page in the same container, so the page turn's copies of the page include the shadow.
+        gutterView = GutterShadowView(this).also { binding.webContainer.addView(it) }
         webView = wv
         busy = true
         binding.progress.isVisible = true
@@ -683,6 +695,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                         page = status.optInt("page")
                         pages = status.optInt("pages", 1)
                         columns = status.optInt("cols", 1)
+                        readGutter(status)
                         updatePageInfo()
                         if (pendingRelayout) {
                             endPendingTurn()
@@ -848,6 +861,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
                     page = status.optInt("page")
                     pages = status.optInt("pages", 1)
                     columns = status.optInt("cols", 1)
+                    readGutter(status)
                     updatePageInfo()
                     capturePosition()
                     return@launch
@@ -861,8 +875,30 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         page = status.optInt("page")
         pages = status.optInt("pages", 1)
         columns = status.optInt("cols", 1)
+        readGutter(status)
         updatePageInfo()
         capturePosition()
+    }
+
+    /** Where the shell puts the gap between two columns (none with one column), then shows the shadow there. */
+    private fun readGutter(status: JSONObject) {
+        gutterCss = if (status.isNull("gutter")) null else status.optDouble("gutter").takeIf { it.isFinite() }
+        showGutter()
+    }
+
+    /**
+     * The fold's shadow on the gap between the two columns, when there are two and the setting is on. A CSS px of
+     * the page is a dp (as for the hit test of links).
+     */
+    private fun showGutter() {
+        val view = gutterView ?: return
+        val center = gutterCss
+        val x = if (center != null && webView != null && gutterPreferences.textReader().get()) {
+            (center * resources.displayMetrics.density).toFloat()
+        } else {
+            null
+        }
+        view.show(x)
     }
 
     /** Reads the position shown now from the shell and saves it shortly after (see [scheduleSave]). */
@@ -1280,6 +1316,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             .put("rtl", rtl)
             .put("columns", s.columns)
             .put("font", font)
+            .put("bold", s.bold)
             .put("fontSize", s.fontSize)
             .put("lineHeight", cssNumber(s.lineHeight))
             .put("letterSpacing", cssNumber(s.letterSpacing))
@@ -1335,7 +1372,15 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             overridden = settingsStore.overriddenBelow(scope, key),
             fonts = fontStore.list(),
             pageTurn = pageTurnPreferences.textReader().get(),
+            gutterShadow = gutterPreferences.textReader().get(),
         )
+    }
+
+    /** The fold's shadow is one setting for all books, outside the three levels (stage 7). */
+    private fun onGutterShadowChanged(value: Boolean) {
+        gutterPreferences.textReader().set(value)
+        panel = panel?.copy(gutterShadow = value)
+        showGutter()
     }
 
     /** The page turn animation is one setting for all books, outside the three levels. */
