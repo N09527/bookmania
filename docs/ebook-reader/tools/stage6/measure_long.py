@@ -1,8 +1,8 @@
 """Stage 6, acceptance item 9 on the emulator (debug App, Android 8.0, no hardware acceleration): opening long
 books and turning their pages. The times describe this slow emulator only, not a phone.
 
-  setup               copies the books of make_long_books.py into Local Source work folders, opens those works'
-                      pages so the App lists the new files, writes out/long/ids.json
+  setup               copies the books of make_long_books.py into a new Local Source work folder (長篇測試書)
+                      and opens it from Browse so the App lists them, writes out/long/ids.json
   open <label> [runs] cold starts, the App stopped before each: the time from the start command to the first
                       page laid out (the shell's status "ready"), polled from this computer every 0.1 s over
                       one DevTools connection (open_poll.mjs); the shell's own layout time of that document; the
@@ -39,11 +39,14 @@ OUT = os.environ['OUT']
 BOOKS_DIR = os.path.join(HERE, 'out', 'long-books')
 LOCAL = f'/sdcard/Android/data/{d.PKG}/files/local'
 IDS = os.path.join(OUT, 'ids.json')
-BOOKS = {  # label: (file, Local Source work folder, manga id of that work)
-    'long-vertical': ('long-vertical.epub', '直排測試書 EPUB', 14),
-    'long-one': ('long-one-document.epub', '直排測試書 EPUB', 14),
-    'long-azw3': ('long-vertical.azw3', '直排測試書 AZW3', 13),
-    'long-horizontal': ('long-horizontal.epub', '橫排測試書 EPUB', 8),
+LONG_WORK = '長篇測試書'  # a work of its own: an existing work lists new files only after a pull to refresh,
+                          # which `input swipe` did not trigger on this emulator; a new work opened from Browse
+                          # lists its files
+BOOKS = {  # label: file in the work folder
+    'long-vertical': 'long-vertical.epub',
+    'long-one': 'long-one-document.epub',
+    'long-azw3': 'long-vertical.azw3',
+    'long-horizontal': 'long-horizontal.epub',
 }
 
 HOOK = r"""(function () {
@@ -115,24 +118,27 @@ def cold_open(manga, chapter, limit=300):
 
 
 def step_setup():
+    import check_legacy as lg  # open_new_work: Browse > Local source > the work
     c.STEP[0] = 'setup'
-    for label, (name, folder, manga) in BOOKS.items():
-        d.adb('push', os.path.join(BOOKS_DIR, name), f'{LOCAL}/{folder}/{name}', timeout=300)
-    for manga in sorted({b[2] for b in BOOKS.values()}):
-        c.stop_app(0)
-        c.open_manga(manga)  # Local Source lists the new files of the work's folder
-        time.sleep(45)
-        c.stop_app(3)
+    folder = f'{LOCAL}/{LONG_WORK}'
+    d.shell(f"mkdir -p '{folder}'")
+    for label, name in BOOKS.items():
+        d.adb('push', os.path.join(BOOKS_DIR, name), f'{folder}/{name}', timeout=300)
+    opened = lg.open_new_work(LONG_WORK)
+    c.stop_app(3)
     con = c.pull_db('tachiyomi.db')
+    row = con.execute('SELECT _id FROM mangas WHERE title = ?', (LONG_WORK,)).fetchone()
+    manga = row[0] if row else None
     found = {'short-vertical': [14, 16]}
-    for label, (name, folder, manga) in BOOKS.items():
-        row = con.execute('SELECT _id FROM chapters WHERE manga_id = ? AND url LIKE ?', (manga, '%' + name)).fetchone()
-        found[label] = [manga, row[0]] if row else None
+    for label, name in BOOKS.items():
+        r = con.execute('SELECT _id FROM chapters WHERE manga_id = ? AND url LIKE ?', (manga, '%' + name)).fetchone() if manga else None
+        found[label] = [manga, r[0]] if r else None
     con.close()
     with open(IDS, 'w', encoding='utf-8') as f:
         json.dump(found, f)
-    sizes = {label: os.path.getsize(os.path.join(BOOKS_DIR, b[0])) for label, b in BOOKS.items()}
-    c.check('the long books are listed as chapters', all(found.values()), {'ids': found, 'bytes': sizes})
+    sizes = {label: os.path.getsize(os.path.join(BOOKS_DIR, name)) for label, name in BOOKS.items()}
+    c.check('the long books are listed as chapters (a new work opened from Browse)', opened and all(found.values()),
+            {'ids': found, 'bytes': sizes})
 
 
 def step_open(label, runs=3):
@@ -253,19 +259,12 @@ def step_turns(label, n=6):
 
 
 def step_cleanup():
-    """Removes the long books from the work folders and lets the App drop them from the chapter lists."""
+    """Removes the long books' work folder (its rows stay in the library database, like any work whose folder
+    was deleted)."""
     c.STEP[0] = 'cleanup'
-    for label, (name, folder, manga) in BOOKS.items():
-        d.shell(f"rm -f '{LOCAL}/{folder}/{name}'")
-    for manga in sorted({b[2] for b in BOOKS.values()}):
-        c.stop_app(0)
-        c.open_manga(manga)
-        time.sleep(45)
-        c.stop_app(3)
-    con = c.pull_db('tachiyomi.db')
-    left = [r for r in con.execute("SELECT _id, url FROM chapters WHERE url LIKE '%long-%'")]
-    con.close()
-    c.check('the long books are gone from the chapter lists', not left, left)
+    d.shell(f"rm -rf '{LOCAL}/{LONG_WORK}'")
+    left = d.shell(f"ls '{LOCAL}'")
+    c.check('the long books\' folder is gone', LONG_WORK not in left, left.split())
 
 
 def main():
