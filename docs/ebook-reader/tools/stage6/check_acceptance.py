@@ -18,9 +18,9 @@ did not cover, on the emulator with the debug App (Android 8.0, WebView 69).
              (the writing mode goes to vertical).
   visible    item 4, for the two changes the open panel hid in the horizontal book (bottom margin, paragraph
              spacing at the page's lower edge): the page before the panel opened and after it closed again.
-  corrupt    item 3: damaged MOBI and AZW3 files (cut short, and a text file named .mobi) must show the
-             App's message in the text reader without a crash; the two damaged EPUBs of stage 2 go to the
-             image reader, whose message (a toast) is read from the accessibility events.
+  corrupt    item 3: damaged MOBI and AZW3 files (cut short, and a text file named .mobi), in a work of their
+             own opened from Browse, and the two damaged EPUBs of stage 2 must show the App's message in the
+             text reader without a crash.
   cleanup    imported fonts and typesetting settings removed, portrait.
 
 Usage: ADB=/path/to/adb python3 -I check_acceptance.py <step> [<argument>] [<step> ...]
@@ -31,8 +31,6 @@ middle of a document is quick on this slow emulator.
 import io
 import json
 import os
-import re
-import subprocess
 import sys
 import time
 
@@ -547,24 +545,20 @@ def step_corrupt():
         c.check(f'{name}: the text reader shows the App\'s message, no crash',
                 c.READER in d.resumed() and '無法開啟這本書' in texts and any('檔案已損毀' in x for x in texts) and not crashes(),
                 {'front': d.resumed().split()[-2:], 'screen': texts[:6], 'crashes': crashes()[:3]})
+    # The two damaged EPUBs of stage 2 (work 損毀檔): since the stage 6 fix the text reader explains them; before,
+    # the image reader closed without a message (cut short) or with its library's English error (not a ZIP).
     for chapter, name in ((7, 'not-an-ebook.epub'), (8, 'corrupt-truncated.epub')):
-        events = subprocess.Popen([d.ADB, 'shell', 'uiautomator', 'events'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        time.sleep(3)
         start_reader(DAMAGED, chapter)
-        time.sleep(45)
-        events.terminate()
-        try:
-            out = events.communicate(timeout=20)[0].decode('utf-8', 'replace')
-        except subprocess.TimeoutExpired:
-            events.kill()
-            out = events.communicate()[0].decode('utf-8', 'replace')
-        toasts = [m.group(1) for ln in out.splitlines() if 'TYPE_NOTIFICATION_STATE_CHANGED' in ln
-                  for m in [re.search(r'Text: \[(.*?)\];', ln)] if m]
-        front = d.resumed()
+        t = time.time()
+        while c.READER not in d.resumed() and time.time() - t < 150:
+            time.sleep(3)
+        time.sleep(12)
+        c.clear_dialogs()
+        texts = screen_texts()
         capture('corrupt-' + name.replace('.', '-'))
-        c.check(f'{name}: a message is shown (toast) and the reader closes, no crash',
-                bool(toasts) and c.READER not in front and c.IMAGE_READER not in front and not crashes(),
-                {'toasts': toasts, 'front': front.split()[-2:], 'crashes': crashes()[:3]})
+        c.check(f'{name}: the text reader shows the App\'s message, no crash',
+                c.READER in d.resumed() and '無法開啟這本書' in texts and any('檔案已損毀' in x for x in texts) and not crashes(),
+                {'front': d.resumed().split()[-2:], 'screen': texts[:6], 'crashes': crashes()[:3]})
     c.stop_app(0)
 
 # endregion
