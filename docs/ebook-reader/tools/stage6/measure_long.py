@@ -181,11 +181,14 @@ def step_open(label, runs=3):
         times.append(r.get('open_s'))
         d.shot(f'long-{label}-open-{i + 1}')
         st = r.get('status') or {}
+        screen = [n['text'] for n in d.nodes() if n['text'] and n['b'][0] < 1000][:6]  # the App's own error panel
+        app_error = any(x in ('無法開啟這本書', 'Cannot open this book') or 'Layout timed out' in x for x in screen)
         c.check(f'{label}, cold start {i + 1}{" (first time ever)" if i == 0 else ""}: the first page is laid out',
-                'open_s' in r and not st.get('error') and 'EbookReaderActivity' in ' '.join(r['front']),
+                'open_s' in r and not st.get('error') and not app_error and 'EbookReaderActivity' in ' '.join(r['front']),
                 {'seconds to the first page': r.get('open_s'), 'seconds to the shell page': r.get('shell_page_s'),
                  'layout of the document (shell, ms)': st.get('ms'), 'pages of the document': st.get('pages'),
-                 'App memory PSS (KB)': r.get('pss_kb'), 'front': r.get('front'), 'raw': r if 'open_s' not in r else None})
+                 'App memory PSS (KB)': r.get('pss_kb'), 'front': r.get('front'), 'App error shown': app_error,
+                 'screen': screen if app_error else None, 'raw': r if 'open_s' not in r else None})
         c.leave_reader()
         c.stop_app(3)
     c.note(f'{label}: open times {times}')
