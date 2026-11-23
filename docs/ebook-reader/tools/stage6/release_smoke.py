@@ -134,12 +134,12 @@ def open_book(manga, chapter, label, kind):
     front = d.resumed()
     texts = screen_texts()
     d.shot(f'release-{label}-1')
-    want = {'text': TEXT, 'image': IMAGE}.get(kind)
+    want = {'text': TEXT, 'image': IMAGE}.get(kind)  # the release App's screens were in English on this emulator (3.6)
     if kind == 'drm':
-        c.check('the text reader explains the DRM', TEXT in front and '此書受 DRM 保護' in texts,
+        c.check('the text reader explains the DRM', TEXT in front and any(x in texts for x in ('此書受 DRM 保護', 'This book is protected by DRM')),
                 {'front': front.split()[-2:] if front else None, 'screen': texts[:8]})
     elif kind == 'damaged':
-        c.check('the text reader explains that the file is damaged', TEXT in front and '無法開啟這本書' in texts,
+        c.check('the text reader explains that the file is damaged', TEXT in front and any(x in texts for x in ('無法開啟這本書', 'Cannot open this book')),
                 {'front': front.split()[-2:] if front else None, 'screen': texts[:8]})
     else:
         c.check(f'the book opens in the {kind} reader', want in front, {'front': front.split()[-2:] if front else None})
