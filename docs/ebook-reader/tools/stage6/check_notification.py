@@ -13,7 +13,8 @@ Two rounds, each from a stopped App:
 Each round: the App's process must be the same before and after the update, the crash buffer must stay
 empty, and the App's notification must show up in `dumpsys notification` during the update.
 
-Usage: ADB=/path/to/adb [PKG=io.github.n09527.bookmania(.debug)] python3 -I check_notification.py
+Usage: ADB=/path/to/adb [PKG=io.github.n09527.bookmania(.debug)] python3 -I check_notification.py [settings-browse]
+       settings-browse: only the App's own getNotificationChannel call in Settings > 探索 after a text book
 For the release App, PKG=io.github.n09527.bookmania (opening the book then needs no DevTools: the reader is
 waited for by its activity only). Results: out/notification/results.jsonl.
 """
@@ -69,13 +70,58 @@ def update_library(label):
     after = pid()
     crashes = [ln for ln in d.shell('logcat -d -b crash').splitlines() if 'FATAL' in ln or 'Fatal signal' in ln]
     d.shot(f'notification-{label}')
-    c.check('the App posted its notification', bool(seen), seen[:3])
+    own = [x for x in seen if 'LEAKCANARY' not in x]  # LeakCanary (debug only) posts under the App's package too
+    c.check("the App posted its own notification (not LeakCanary's)", bool(own), seen[:3])
     c.check('the App was not restarted or killed (same process)', before != '' and before == after,
             {'before': before, 'after': after})
     c.check('no crash in the crash buffer', not crashes, crashes[:5])
 
 
+def browse_settings_after_book():
+    """The App's own call of NotificationManager.getNotificationChannel (Notifications.isNotificationChannelEnabled)
+    that this emulator can reach: Settings > 探索 (SettingsBrowseController, API 26+), built in the same process
+    after a text book was open. A library update, the other caller, could not be started here: the pull to
+    refresh is not taken from `input swipe` on this emulator (stage 6)."""
+    c.STEP[0] = 'notification:settings-browse-after-a-text-book'
+    c.stop_app(0)
+    d.shell('logcat -b crash -c')
+    d.shell(f'am start -n {PKG}/{c.IMAGE_READER} --el manga 8 --el chapter 10')
+    t = time.time()
+    while TEXT not in d.resumed() and time.time() - t < 180:
+        time.sleep(3)
+    time.sleep(20)
+    c.check('the text book opened (the WebView is loaded in the App process)', TEXT in d.resumed(), d.resumed())
+    before = pid()
+    for _ in range(2):
+        if TEXT in d.resumed():
+            d.shell('input keyevent 4')
+            time.sleep(4)
+    d.shell(f'am start -n {PKG}/{MAIN}')
+    time.sleep(8)
+    c.wait_app_drawn()
+    time.sleep(4)
+    c.clear_dialogs()
+    path = []
+    for label in ('書櫃', '其他', '設定', '探索'):
+        n = d.find(label, exact=True)
+        if n:
+            d.tap(n['x'], n['y'], 5)
+        path.append((label, n is not None))
+    time.sleep(5)
+    shown = [x['text'] or x['desc'] for x in d.nodes() if x['text'] or x['desc']]
+    d.shot('notification-settings-browse')
+    after = pid()
+    crashes = [ln for ln in d.shell('logcat -d -b crash').splitlines() if 'FATAL' in ln or 'Fatal signal' in ln]
+    c.check('Settings > 探索 opened in the same process after the text book, no crash',
+            all(ok for _, ok in path) and before != '' and before == after and not crashes,
+            {'path': path, 'process before/after': [before, after], 'crashes': crashes[:5], 'screen': shown[:12]})
+    c.stop_app(0)
+
+
 def main():
+    if sys.argv[1:] == ['settings-browse']:
+        browse_settings_after_book()
+        return
     c.STEP[0] = 'notification:control'
     c.stop_app(0)
     open_library()
@@ -96,7 +142,6 @@ def main():
     open_library()
     update_library('after-a-text-book')
     c.stop_app(0)
-
 
 if __name__ == '__main__':
     main()
