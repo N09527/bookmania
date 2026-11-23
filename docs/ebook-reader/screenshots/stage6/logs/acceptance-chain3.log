@@ -1,0 +1,157 @@
+=== 09:30:14 long setup
+FAIL the long books are listed as chapters (a new work opened from Browse) {"ids": {"short-vertical": [14, 16], "long-vertical": null, "long-one": null, "long-azw3": null, "long-horizontal": null}, "bytes": {"long-vertical": 1024514, "long-one": 89374, "long-azw3": 1973770, "long-horizontal": 1024510}}
+=== 09:32:53 long open long-vertical
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 276, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 147, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long open long-horizontal
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 276, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 147, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long open long-azw3
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 276, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 147, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long open long-one
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 276, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 147, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long middle long-vertical
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 278, in main
+    step_middle(args[0])
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 172, in step_middle
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long middle long-horizontal
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 278, in main
+    step_middle(args[0])
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 172, in step_middle
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long middle long-azw3
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 278, in main
+    step_middle(args[0])
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 172, in step_middle
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long turns long-vertical
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 280, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 220, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long turns long-horizontal
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 280, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 220, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long turns long-azw3
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 280, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 220, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 long turns long-one
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 287, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 280, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 220, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:32:53 chain3 done

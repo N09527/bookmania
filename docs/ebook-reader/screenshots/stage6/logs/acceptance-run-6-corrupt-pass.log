@@ -1,0 +1,30 @@
+=== 08:01:09 corrupt
+.. damaged files: {'corrupt-truncated.mobi': 7730, 'corrupt-truncated.azw3': 9927, 'not-an-ebook.mobi': 8800}
+PASS Local Source lists the damaged files as chapters of a new work {"work": 16, "chapters": {"not-an-ebook.mobi": 22, "corrupt-truncated.mobi": 23, "corrupt-truncated.azw3": 24}}
+PASS corrupt-truncated.mobi: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t779}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+PASS corrupt-truncated.azw3: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t780}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+PASS not-an-ebook.mobi: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t781}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+PASS not-an-ebook.epub: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t782}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+PASS corrupt-truncated.epub: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t783}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+=== 08:08:14 end corrupt (exit 0)
+=== 08:08:14 visible
+start at the beginning: saved positions removed 1, page in the chapter list 0
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 604, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 598, in main
+    {'fonts': step_fonts, 'glyphs': step_glyphs, 'visible': step_visible, 'corrupt': step_corrupt,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     'cleanup': step_cleanup}[step]()
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 446, in step_visible
+    action()
+    ~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 437, in <lambda>
+    for slug, name, action in (('paragraph-spacing', 'paragraph spacing', lambda: tap_switch('段落間距')),
+                                                                                  ~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 315, in tap_switch
+    raise RuntimeError('no switch for ' + label)
+RuntimeError: no switch for 段落間距
+=== 08:12:47 end visible (exit 0)

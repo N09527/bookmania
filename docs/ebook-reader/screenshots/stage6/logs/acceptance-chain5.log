@@ -1,0 +1,85 @@
+=== 10:32:47 positions vertical (fixed App)
+start at the beginning: saved positions removed 1, page in the chapter list 0
+.. start: page 5/10, position {'chars': 1880, 'page': 4, 'pages': 10, 'cols': 1, 'location': [55, 0], 'text': '【第１３段】長一點的段落：閱讀程式需要依照使用者', 'before': 546}
+PASS font: the reading position is the same character, on the screen {"page before → after": [5, 5], "pages": 10, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "【第１３段】長一點的段落：閱讀程式需要依照使用者"}
+PASS font: the setting reached the book {"stored": "41b9e51345ff45c6a5e28383566d5c15", "font-family": "BookmaniaUserFont, serif"}
+PASS font: the page on the screen changed {"share of the page area": 0.1045}
+PASS font size: the reading position is the same character, on the screen {"page before → after": [5, 6], "pages": 17, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "要檢查。【第１２段】漢ㄏㄢ字ㄗ可以加上注音；日期"}
+PASS font size: the setting reached the book {"stored": "26", "css": "26px"}
+PASS font size: the page on the screen changed {"share of the page area": 0.1667}
+PASS line height: the reading position is the same character, on the screen {"page before → after": [6, 8], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "要檢查。【第１２段】漢ㄏㄢ字ㄗ可以加上注音；日期"}
+PASS line height: the setting reached the book {"stored": "2.2", "css": "57.2px", "expected px": 57.2}
+PASS line height: the page on the screen changed {"share of the page area": 0.1045}
+PASS letter spacing: the reading position is the same character, on the screen {"page before → after": [8, 8], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "折號——也要檢查。【第１２段】漢ㄏㄢˋ字ㄗˋ可以"}
+PASS letter spacing: the setting reached the book {"stored": "0.1", "css": "2.6px", "expected px": 2.6}
+PASS letter spacing: the page on the screen changed {"share of the page area": 0.0803}
+PASS first-line indent: the reading position is the same character, on the screen {"page before → after": [8, 8], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "折號——也要檢查。【第１２段】漢ㄏㄢˋ字ㄗˋ可以"}
+PASS first-line indent: the setting reached the book {"stored": "2", "css": "52px", "expected px": 52.0}
+PASS first-line indent: the page on the screen changed {"share of the page area": 0.0737}
+PASS paragraph spacing: the reading position is the same character, on the screen {"page before → after": [8, 8], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "折號——也要檢查。【第１２段】漢ㄏㄢˋ字ㄗˋ可以"}
+PASS paragraph spacing: the setting reached the book {"stored": "0.5", "css": "13px", "expected px": 13.0}
+PASS paragraph spacing: the page on the screen changed {"share of the page area": 0.0991}
+PASS margins: the reading position is the same character, on the screen {"page before → after": [8, 8], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "號……與破折號——也要檢查。【第１２段】漢ㄏㄢˋ"}
+PASS margins: the setting reached the book {"margins": {"Top": 60, "Bottom": 32, "Left": 20, "Right": 20}, "frames": [[12, 52, 400, 708]], "window": [412, 732]}
+PASS margins: the page on the screen changed {"share of the page area": 0.1007}
+PASS margins: the reading position is the same character, on the screen {"page before → after": [8, 8], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "號……與破折號——也要檢查。【第１２段】漢ㄏㄢˋ"}
+PASS margins: the setting reached the book {"margins": {"Top": 60, "Bottom": 60, "Left": 20, "Right": 20}, "frames": [[12, 52, 400, 680]], "window": [412, 732]}
+PASS margins: the page on the screen changed {"share of the page area": 0.0403}
+PASS margins: the reading position is the same character, on the screen {"page before → after": [8, 9], "pages": 26, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "【第１２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12"}
+PASS margins: the setting reached the book {"margins": {"Top": 60, "Bottom": 60, "Left": 38, "Right": 20}, "frames": [[30, 52, 400, 680]], "window": [412, 732]}
+PASS margins: the page on the screen changed {"share of the page area": 0.1092}
+PASS margins: the reading position is the same character, on the screen {"page before → after": [9, 9], "pages": 26, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "【第１２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12"}
+PASS margins: the setting reached the book {"margins": {"Top": 60, "Bottom": 60, "Left": 38, "Right": 38}, "frames": [[30, 52, 382, 680]], "window": [412, 732]}
+PASS margins: the page on the screen changed {"share of the page area": 0.1029}
+PASS writing mode: the reading position is the same character, on the screen {"page before → after": [9, 7], "pages": 22, "columns": 1, "visible in frame": [true], "position": [55, 0], "text": "【第１２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12"}
+PASS writing mode: the setting reached the book {"stored": "horizontal", "mode": "H", "css": "horizontal-tb"}
+PASS writing mode: the page on the screen changed {"share of the page area": 0.1082}
+PASS two columns: the reading position is the same character, on the screen {"page before → after": [7, 13], "pages": 42, "columns": 2, "visible in frame": [true, false], "position": [55, 0], "text": "【第１２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12"}
+PASS two columns: the setting reached the book {"stored": "on", "columns": 2}
+PASS two columns: the page on the screen changed {"share of the page area": 0.116}
+PASS panel closed: the character is on the screen [true, false]
+.. pages (1-based) after each change: [5, 5, 6, 8, 8, 8, 8, 8, 8, 9, 9, 7, 13]
+PASS after a restart: every setting is kept and applied {"font": [true, {"stored": "41b9e51345ff45c6a5e28383566d5c15", "font-family": "BookmaniaUserFont, serif"}], "font size": [true, {"stored": "26", "css": "26px"}], "line height": [true, {"stored": "2.2", "css": "57.2px", "expected px": 57.2}], "letter spacing": [true, {"stored": "0.1", "css": "2.6px", "expected px": 2.6}], "first-line indent": [true, {"stored": "2", "css": "52px", "expected px": 52.0}], "paragraph spacing": [true, {"stored": "0.5", "css": "13px", "expected px": 13.0}], "margins": [true, {"margins": {"Top": 60, "Bottom": 60, "Left": 38, "Right": 38}, "frames": [[30, 52, 194, 680], [218, 52, 382, 680]], "window": [412, 732]}], "writing mode": [true, {"stored": "horizontal", "mode": "H", "css": "horizontal-tb"}], "two columns": [true, {"stored": "on", "columns": 2}]}
+PASS after a restart: the reading position is the same character, on the screen {"position": [55, 0], "visible": [true, false], "page": 13, "pages": 42}
+PASS turned to landscape: the same character, on the screen {"page": 17, "pages": 52, "columns": 2, "visible": [true, false]}
+PASS turned to portrait: the same character, on the screen {"page": 13, "pages": 42, "columns": 2, "visible": [true, false]}
+=== 10:43:25 end positions vertical (0)
+=== 10:43:25 ruby v-epub columns off
+PASS v-epub font size 16, columns off: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "V", "pages": 8, "lineHeight": "28.8px", "examples": []}
+PASS v-epub font size 20, columns off: no misplaced ruby {"rubyFix": false, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "V", "pages": 10, "lineHeight": "36px", "examples": []}
+PASS v-epub font size 24, columns off: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "V", "pages": 14, "lineHeight": "43.2px", "examples": []}
+PASS v-epub font size 26, columns off: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "V", "pages": 17, "lineHeight": "46.8px", "examples": []}
+PASS v-epub font size 30, columns off: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 1, "mode": "V", "pages": 22, "lineHeight": "54px", "examples": []}
+=== 10:48:19 ruby v-epub columns on
+PASS v-epub font size 16, columns on: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 2, "mode": "V", "pages": 16, "lineHeight": "28.8px", "examples": []}
+PASS v-epub font size 20, columns on: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 2, "mode": "V", "pages": 23, "lineHeight": "36px", "examples": []}
+PASS v-epub font size 24, columns on: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 2, "mode": "V", "pages": 34, "lineHeight": "43.2px", "examples": []}
+PASS v-epub font size 26, columns on: no misplaced ruby {"rubyFix": true, "ruby": 16, "misplaced": 0, "cols": 2, "mode": "V", "pages": 43, "lineHeight": "46.8px", "examples": []}
+PASS v-epub font size 30, columns on: no misplaced ruby {"rubyFix": false, "ruby": 16, "misplaced": 0, "cols": 2, "mode": "V", "pages": 43, "lineHeight": "54px", "examples": []}
+=== 10:53:32 page-through v-epub-2col-portrait
+start at the beginning: saved positions removed 1, page in the chapter list 0
+v-epub-2col-portrait: cols 2, mode V, first frame on the right, tap x 129
+  ruby {"src": "OEBPS/text/ch01.xhtml", "rubyFix": true, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "OEBPS/text/ch02.xhtml", "rubyFix": true, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": true, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-epub-2col-portrait: steps 399, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-epub-2col-portrait.jsonl
+  OEBPS/text/ch01.xhtml: cols 2, pages 23, spreads seen 12/12, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 2, pages 21, spreads seen 11/11, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 2, pages 21, spreads seen 11/11, chars 1832, visible==all: True
+v-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  OEBPS/text/ch01.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix True, annotations 16, misplaced 0
+v-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+=== 11:12:38 page-through v-epub-1col-default
+start at the beginning: saved positions removed 1, page in the chapter list 0
+v-epub-1col-default: cols 1, mode V, first frame on the right, tap x 129
+  ruby {"src": "OEBPS/text/ch01.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "OEBPS/text/ch02.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-epub-1col-default: steps 30, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-epub-1col-default.jsonl
+  OEBPS/text/ch01.xhtml: cols 1, pages 10, spreads seen 10/10, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 1, pages 9, spreads seen 9/9, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 1, pages 9, spreads seen 9/9, chars 1832, visible==all: True
+v-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+=== 11:16:46 chain5 done

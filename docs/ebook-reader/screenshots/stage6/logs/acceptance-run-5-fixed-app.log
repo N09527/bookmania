@@ -1,0 +1,44 @@
+=== 07:35:43 corrupt
+.. damaged files: {'corrupt-truncated.mobi': 7730, 'corrupt-truncated.azw3': 9927, 'not-an-ebook.mobi': 8800}
+FAIL Local Source lists the damaged files as chapters of a new work {"work": 16, "chapters": {}}
+PASS not-an-ebook.epub: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t770}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+PASS corrupt-truncated.epub: the text reader shows the App's message, no crash {"front": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity", "t771}"], "screen": ["無法開啟這本書", "檔案已損毀，或不是有效的 EPUB、MOBI、AZW3 書籍。", "上一頁"], "crashes": []}
+=== 07:39:18 end corrupt (exit 0)
+=== 07:39:18 visible
+start at the beginning: saved positions removed 1, page in the chapter list 0
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 598, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 592, in main
+    {'fonts': step_fonts, 'glyphs': step_glyphs, 'visible': step_visible, 'corrupt': step_corrupt,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     'cleanup': step_cleanup}[step]()
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 446, in step_visible
+    action()
+    ~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 437, in <lambda>
+    for slug, name, action in (('paragraph-spacing', 'paragraph spacing', lambda: tap_switch('段落間距')),
+                                                                                  ~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 314, in tap_switch
+    raise RuntimeError('no switch for ' + label)
+RuntimeError: no switch for 段落間距
+=== 07:49:49 end visible (exit 0)
+=== 07:49:49 glyphs
+PASS an imported font is available (run "fonts" first) [{"id": "41b9e51345ff45c6a5e28383566d5c15", "name": "Noto Serif CJK TC", "extension": "otf", "vertical": true}]
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS zh page 1, book-font: vertical page shown {"font-family": "sans-serif", "text": "第１章測試章節【第１段】英文單字WebView與阿拉伯數字1混在其中；年份寫成二〇二六年；省略號……與破折號——也要檢查"}
+PASS zh page 2, book-font: vertical page shown {"font-family": "sans-serif", "text": ""}
+PASS zh page 3, book-font: vertical page shown {"font-family": "sans-serif", "text": "【第３段】長一點的段落：閱讀程式需要依照使用者的設定調整字級、行距、字距、首行縮排與段落間距，並且在直書與橫書之間切換，"}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS ja page 1, book-font: vertical page shown {"font-family": "sans-serif", "text": "第1章第１段落。漢字かんじにふりがなを付けます。数字の25は縦中横です。第２段落。短い段落です。第３段落。これは縦書きの"}
+PASS ja page 2, book-font: vertical page shown {"font-family": "sans-serif", "text": "第６段落。これは縦書きの試験用に書いた文章です。「かぎ括弧」や、読点、句点。を含みます。第７段落。漢字かんじにふりがなを"}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS zh page 1, imported-font: vertical page shown {"font-family": "BookmaniaUserFont, serif", "text": "第１章測試章節【第１段】英文單字WebView與阿拉伯數字1混在其中；年份寫成二〇二六年；省略號……與破折號——也要檢查"}
+PASS zh page 2, imported-font: vertical page shown {"font-family": "BookmaniaUserFont, serif", "text": ""}
+PASS zh page 3, imported-font: vertical page shown {"font-family": "BookmaniaUserFont, serif", "text": "【第３段】長一點的段落：閱讀程式需要依照使用者的設定調整字級、行距、字距、首行縮排與段落間距，並且在直書與橫書之間切換，"}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS ja page 1, imported-font: vertical page shown {"font-family": "BookmaniaUserFont, serif", "text": "第1章第１段落。漢字かんじにふりがなを付けます。数字の25は縦中横です。第２段落。短い段落です。第３段落。これは縦書きの"}
+PASS ja page 2, imported-font: vertical page shown {"font-family": "BookmaniaUserFont, serif", "text": "第６段落。これは縦書きの試験用に書いた文章です。「かぎ括弧」や、読点、句点。を含みます。第７段落。漢字かんじにふりがなを"}
+=== 07:55:28 end glyphs (exit 0)

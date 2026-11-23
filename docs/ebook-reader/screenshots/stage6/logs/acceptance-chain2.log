@@ -1,0 +1,191 @@
+=== 09:13:13 legacy local
+PASS a folder of images and a .zip are listed as chapters (a new work opened from Browse) {"work": 17, "chapters": [[25, "圖片資料夾與壓縮檔/第3話 壓縮檔.zip", "第3話 壓縮檔"], [26, "圖片資料夾與壓縮檔/第2話 圖片資料夾", "第2話 圖片資料夾"]]}
+PASS 第3話 壓縮檔.zip: opens in the image reader and is paged to the end (marked read) {"front": ["io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t816}"], "chapter": {"last_page_read": 2, "read": 1, "pages_left": 1}, "screen changed": 0.1068, "crashes": []}
+PASS 第2話 圖片資料夾: opens in the image reader and is paged to the end (marked read) {"front": ["io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t817}"], "chapter": {"last_page_read": 2, "read": 1, "pages_left": 1}, "screen changed": 0.9943, "crashes": []}
+=== 09:17:58 end legacy local (0)
+=== 09:17:59 legacy screens
+PASS tab 書櫃 opens ["標題", "4", "開始閱讀", "橫排測試書 EPUB", "Bookmania 測試", "1", "開始閱讀", "漫畫 CBZ", "1", "開始閱讀", "直排測試書 EPUB", "書櫃"]
+PASS tab 最新 opens ["繼續閱讀", "直排測試書", "直排測試書 EPUB", "閱讀 6 分鐘前\nPage 13 of 27", "重設章節閱讀記錄", "橫排測試書", "橫排測試書 EPUB", "閱讀 17 分鐘前\nPage 5 of 24", "重設章節閱讀記錄", "comic-pages", "漫畫 CBZ", "閱讀 33 分鐘前\nPage 2 of 3"]
+PASS tab 探索 opens ["最近使用", "Local source", "新上架", "釘選", "隱藏", "其他", "Local source", "新上架", "釘選", "隱藏", "拖曳控制條", "擴充套件"]
+PASS Browse: Local Source lists the works of the test folder ["DRM 測試", "EPUB2 NCX", "合併式 MOBI", "圖文 EPUB", "圖文 MOBI6", "圖片資料夾與壓縮檔", "損毀檔", "損毀檔 MOBI", "橫排測試書 AZW3", "熱門", "新上架", "篩選", "Local source", "示為", "本機來源入門指南", "Local source", "搜尋 Local source"]
+PASS tab 其他 opens ["最近使用", "Local source", "新上架", "釘選", "隱藏", "其他", "Local source", "新上架", "釘選", "隱藏", "拖曳控制條", "擴充套件"]
+FAIL the download queue opens (from the library: 其他 > 下載佇列) {"menu": ["橫排測試書 EPUB", "Bookmania 測試", "Local source", "在書櫃中", "關於此日漫", "沒有簡介", "開始閱讀", "共 5 章", "排序和篩選", "zh-horizontal-vol3-pictures", "17 小時前", "翻頁測試（不重複內容）", "17 小時前 • Page 3 of 45", "橫排測試書", "5 天前 • Page 5 of 24 • Bookmania 測試", "橫排測試書"], "screen": ["橫排測試書 EPUB", "Bookmania 測試", "Local source", "在書櫃中", "關於此日漫", "沒有簡介", "開始閱讀", "共 5 章", "排序和篩選", "zh-horizontal-vol3-pictures"]}
+PASS every settings category opens {"categories": {"一般": true, "外觀": true, "書櫃": true, "閱讀": true, "下載": true, "探索": true, "歷程": true, "Data and storage": true, "隱私": true, "進階": true, "關於": true}, "not found": [], "lists seen": [["一般", "外觀", "書櫃", "閱讀", "下載", "探索", "歷程", "Data and storage", "設定", "說明", "設定", "搜尋 設定"], ["一般", "外觀", "書櫃", "閱讀", "下載", "探索", "歷程", "Data and storage", "隱私", "進階", "關於", "設定", "說明", "搜尋 設定"]]}
+PASS no crash while opening the screens []
+=== 09:26:47 end legacy screens (0)
+=== 09:26:47 legacy cleanup
+PASS the added work folder is gone ["DRM", "測試", "EPUB2", "NCX", "合併式", "MOBI", "圖文", "EPUB", "圖文", "MOBI6", "損毀檔", "損毀檔", "MOBI", "橫排測試書", "AZW3", "橫排測試書", "EPUB", "橫排測試書", "MOBI6", "漫畫", "CBZ", "漫畫", "固定版面", "EPUB", "漫畫", "流動版面", "EPUB", "直排測試書", "AZW3", "直排測試書", "EPUB", "縦書き", "EPUB"]
+=== 09:26:49 end legacy cleanup (0)
+=== 09:26:49 notification settings-browse
+PASS the text book opened (the WebView is loaded in the App process) "mResumedActivity: ActivityRecord{e212980 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t819}"
+PASS Settings > 探索 opened in the same process after the text book, no crash {"path": [["書櫃", true], ["其他", true], ["設定", true], ["探索", true]], "process before/after": ["32218", "32218"], "crashes": [], "screen": ["隱藏已在書櫃的作品", "關閉", "擴充套件", "Extension ReposBETA", "自動檢查擴充套件更新", "開啟", "全域搜尋", "僅在固定的來源中搜索", "關閉", "遷移", "來源遷移", "匹配固定的來源"]}
+=== 09:29:08 end notification (0)
+=== 09:29:08 long setup
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 273, in main
+    step_setup()
+    ~~~~~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 121, in step_setup
+    import check_legacy as lg  # open_new_work: Browse > Local source > the work
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'check_legacy'
+=== 09:29:08 long open long-vertical
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 275, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 146, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long open long-horizontal
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 275, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 146, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long open long-azw3
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 275, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 146, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long open long-one
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 275, in main
+    step_open(args[0], int(args[1]) if len(args) > 1 else 3)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 146, in step_open
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long middle long-vertical
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 277, in main
+    step_middle(args[0])
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 171, in step_middle
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long middle long-horizontal
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 277, in main
+    step_middle(args[0])
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 171, in step_middle
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long middle long-azw3
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 277, in main
+    step_middle(args[0])
+    ~~~~~~~~~~~^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 171, in step_middle
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long turns long-vertical
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 279, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 219, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long turns long-horizontal
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 279, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 219, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long turns long-azw3
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 279, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 219, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long turns long-one
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 286, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 279, in main
+    step_turns(args[0], int(args[1]) if len(args) > 1 else 6)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 219, in step_turns
+    manga, chapter = book(label)
+                     ~~~~^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/measure_long.py", line 83, in book
+    return tuple(ids()[label])
+TypeError: 'NoneType' object is not iterable
+=== 09:29:08 long cleanup
+PASS the long books' folder is gone ["DRM", "測試", "EPUB2", "NCX", "合併式", "MOBI", "圖文", "EPUB", "圖文", "MOBI6", "損毀檔", "損毀檔", "MOBI", "橫排測試書", "AZW3", "橫排測試書", "EPUB", "橫排測試書", "MOBI6", "漫畫", "CBZ", "漫畫", "固定版面", "EPUB", "漫畫", "流動版面", "EPUB", "直排測試書", "AZW3", "直排測試書", "EPUB", "縦書き", "EPUB"]
+=== 09:29:11 chain2 done

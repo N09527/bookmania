@@ -1,0 +1,6 @@
+=== 08:25:27 visible
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS paragraph spacing: with the panel closed again, the page on the screen changed {"share of the screen": 0.2271, "page before → after": [5, 5], "stored": {"pref_ebook_paragraphSpacing": "0.5"}}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS bottom margin: with the panel closed again, the page on the screen changed {"share of the screen": 0.2348, "page before → after": [5, 5], "stored": {"pref_ebook_marginBottom": "60"}}
+=== 08:32:56 end visible (exit 0)

@@ -1,0 +1,23 @@
+=== 08:16:27 visible
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS paragraph spacing: with the panel closed again, the page on the screen changed {"share of the screen": 0.2271, "page before → after": [5, 5], "stored": {"pref_ebook_paragraphSpacing": "0.5"}}
+start at the beginning: saved positions removed 1, page in the chapter list 0
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 608, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 602, in main
+    {'fonts': step_fonts, 'glyphs': step_glyphs, 'visible': step_visible, 'corrupt': step_corrupt,
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     'cleanup': step_cleanup}[step]()
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 450, in step_visible
+    action()
+    ~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 439, in bottom_margin
+    d.set_slider('下', 60 / 120)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/../stage3/drive.py", line 329, in set_slider
+    raise RuntimeError(f'no slider under {label}')
+RuntimeError: no slider under 下
+=== 08:25:09 end visible (exit 0)

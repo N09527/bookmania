@@ -1,0 +1,31 @@
+=== 06:13:52 warmup
+dismissed: mCurrentFocus=Window{3cfd1ad u0 Application Not Responding: com.android.systemui}
+.. warm-up: mResumedActivity: ActivityRecord{b5ba7cd u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t735} {'ready': True, 'error': None, 'page': 0, 'pages': 10, 'cols': 1, 'mode': 'V', 'seq': 1, 'ms': 3150, 'rubyFix': False}
+=== 06:15:15 end warmup (exit 0)
+=== 06:15:15 fonts
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS vertical book before the import: the book's own font "sans-serif"
+start at the beginning: saved positions removed 1, page in the chapter list 0
+PASS horizontal book before the import: the book's own font "sans-serif"
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 484, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 479, in main
+    {'fonts': step_fonts, 'glyphs': step_glyphs, 'corrupt': step_corrupt, 'cleanup': step_cleanup}[step]()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage6/check_acceptance.py", line 148, in step_fonts
+    cs.pick_font_file(FONT_FILE)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage4/../stage3/check_settings.py", line 391, in pick_font_file
+    d.tap_label(file_name, exact=True, wait=8)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/../stage3/drive.py", line 79, in tap_label
+    raise RuntimeError(f'not found: {label}')
+RuntimeError: not found: NotoSerifCJKtc-Bold.otf
+=== 06:20:01 end fonts (exit 0)
+=== 06:20:01 glyphs
+FAIL an imported font is available (run "fonts" first) []
+=== 06:20:05 end glyphs (exit 0)
+=== 06:20:05 positions vertical
+.. chapter 16 is read; marking it unread in the chapter list
