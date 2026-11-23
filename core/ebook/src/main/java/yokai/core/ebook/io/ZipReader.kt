@@ -8,6 +8,7 @@ import java.nio.charset.Charset
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
 import yokai.core.ebook.CorruptBookException
+import yokai.core.ebook.UnreadableFileException
 
 /**
  * Minimal ZIP reader working on a [RandomAccessSource] (no temporary copies, works with any
@@ -49,7 +50,7 @@ class ZipReader(
         } catch (e: CorruptBookException) {
             throw e
         } catch (e: Exception) {
-            throw CorruptBookException("Cannot read the ZIP directory", e)
+            throw UnreadableFileException("Cannot read the ZIP directory", e)
         }
         lowerCaseIndex = entries.keys.associateBy { it.lowercase() }
     }
@@ -92,7 +93,7 @@ class ZipReader(
 
     private fun readCentralDirectory(): Map<String, Entry> {
         val size = source.size
-        if (size < 22) throw CorruptBookException("File too small to be a ZIP archive")
+        if (size < 22) throw UnreadableFileException("File too small to be a ZIP archive")
         val tailLen = minOf(size, 22L + 0xFFFF).toInt()
         val tailStart = size - tailLen
         val tail = source.read(tailStart, tailLen)
@@ -100,7 +101,7 @@ class ZipReader(
         for (i in tailLen - 22 downTo 0) {
             if (le32(tail, i) == EOCD_SIG) { eocd = i; break }
         }
-        if (eocd < 0) throw CorruptBookException("ZIP end-of-directory record not found (file truncated?)")
+        if (eocd < 0) throw UnreadableFileException("ZIP end-of-directory record not found (file truncated?)")
         var total = le16(tail, eocd + 10).toLong()
         var cdSize = le32(tail, eocd + 12)
         var cdOffset = le32(tail, eocd + 16)

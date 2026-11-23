@@ -7,7 +7,13 @@ open class BookException(message: String, cause: Throwable? = null) : Exception(
 class DrmProtectedException(val scheme: String) : BookException("The book is protected by DRM ($scheme)")
 
 /** The file is damaged or is not what its extension says. */
-class CorruptBookException(message: String, cause: Throwable? = null) : BookException(message, cause)
+open class CorruptBookException(message: String, cause: Throwable? = null) : BookException(message, cause)
+
+/**
+ * Not even the container can be read: the file is neither a ZIP (EPUB) nor a MOBI file, or it is a ZIP whose
+ * directory is missing because the file was cut short. Another reader cannot open such a file either.
+ */
+class UnreadableFileException(message: String, cause: Throwable? = null) : CorruptBookException(message, cause)
 
 /** A known format that this reader does not handle (for example KFX). */
 class UnsupportedBookException(message: String) : BookException(message)

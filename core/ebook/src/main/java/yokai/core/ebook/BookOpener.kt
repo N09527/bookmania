@@ -15,7 +15,7 @@ object BookOpener {
             FormatDetector.detect(source, extension)
         } catch (e: Throwable) {
             source.close()
-            throw CorruptBookException("Cannot read the file", e)
+            throw UnreadableFileException("Cannot read the file", e)
         }
         return when (format) {
             BookFormat.EPUB -> EpubParser.parse(source)
@@ -26,7 +26,7 @@ object BookOpener {
             }
             BookFormat.UNKNOWN -> {
                 source.close()
-                throw CorruptBookException("Unknown or damaged book file")
+                throw UnreadableFileException("Unknown or damaged book file")
             }
         }
     }

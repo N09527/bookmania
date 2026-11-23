@@ -21,6 +21,7 @@ import kotlin.math.min
 import yokai.core.ebook.ContentClassifier
 import yokai.core.ebook.ContentKind
 import yokai.core.ebook.DrmProtectedException
+import yokai.core.ebook.UnreadableFileException
 import yokai.ebook.data.EbookDatabase
 import yokai.ebook.data.EbookLocator
 import yokai.ebook.settings.BookKey
@@ -36,7 +37,8 @@ class TextBookException(message: String) : Exception(message)
  * - `.epub`: the user's choice for the file if there is one (design question 7: switchable, remembered per
  *   chapter), else the automatic classification ([ContentClassifier]); comic-like EPUBs keep using the
  *   existing manga reader exactly as before. Both are kept in ebook.db, so the classification runs
- *   once per file rather than at every app start.
+ *   once per file rather than at every app start. A file that cannot be read at all goes to the text
+ *   reader, which explains that it is damaged (stage 6, acceptance item 3).
  */
 object EbookRouter {
 
@@ -75,6 +77,13 @@ object EbookRouter {
         } catch (e: DrmProtectedException) {
             // The text reader explains DRM clearly; the image reader would show broken pages.
             ContentKind.TEXT
+        } catch (e: UnreadableFileException) {
+            // Not a ZIP, or one cut short: the image reader cannot open it either, and on the test emulator it
+            // closed without a word (stage 6). The text reader explains that the file is damaged. Not stored,
+            // so a replaced file is classified again.
+            Logger.w(e) { "EPUB file cannot be read, the text reader explains it" }
+            epubKinds[key] = ContentKind.TEXT
+            return true
         } catch (e: Throwable) {
             // Damaged or unusual files keep the existing behaviour of the image reader (not stored, so a
             // replaced file is classified again).

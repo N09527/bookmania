@@ -2,9 +2,13 @@ package yokai.core.ebook
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import java.io.ByteArrayOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import yokai.core.ebook.epub.EpubParser
+import yokai.core.ebook.io.ByteArraySource
 
 class EpubParserTest {
 
@@ -86,6 +90,26 @@ class EpubParserTest {
     fun `damaged files raise CorruptBookException`() {
         assertThrows<CorruptBookException> { open("corrupt-truncated.epub") }
         assertThrows<CorruptBookException> { open("not-an-ebook.epub") }
+    }
+
+    @Test
+    fun `files that cannot be read at all raise UnreadableFileException`() {
+        assertThrows<UnreadableFileException> { open("corrupt-truncated.epub") } // ZIP cut short
+        assertThrows<UnreadableFileException> { open("not-an-ebook.epub") } // not a ZIP
+        assertThrows<UnreadableFileException> { BookOpener.open(Fixtures.source("not-an-ebook.epub"), "epub") }
+    }
+
+    @Test
+    fun `a readable ZIP without a package document is damaged but not unreadable`() {
+        val bytes = ByteArrayOutputStream().also { out ->
+            ZipOutputStream(out).use { zip ->
+                zip.putNextEntry(ZipEntry("001.png"))
+                zip.write(ByteArray(64) { 1 })
+                zip.closeEntry()
+            }
+        }.toByteArray()
+        val e = assertThrows<CorruptBookException> { EpubParser.parse(ByteArraySource(bytes)) }
+        (e is UnreadableFileException) shouldBe false
     }
 
     @Test

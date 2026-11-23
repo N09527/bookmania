@@ -126,6 +126,11 @@
         (vertical ? 'max-width' : 'max-height') + ': ' + (vertical ? geo.pageW : geo.contentH) + 'px !important; ' +
         'object-fit: contain; box-sizing: border-box; break-inside: avoid; page-break-inside: avoid; }\n' +
       'html { color: ' + s.textColor + '; }\n';
+    // Ruby in vertical text: the default orientation (mixed) lays non-CJK characters sideways, the bopomofo
+    // tone marks too, so the 2nd and 4th tones look swapped (WebView 69 and Chromium 153, stage 6). Upright
+    // keeps them as written; kana and bopomofo letters are upright either way. Not !important: a more specific
+    // rule of the book for its ruby still applies.
+    if (vertical) css += 'rt { text-orientation: upright; -webkit-text-orientation: upright; }\n';
     // Font: the book's own (nothing to add), a generic family, or an imported font.
     var family = null;
     if (userFontUrl(s)) {
