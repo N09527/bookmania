@@ -16,6 +16,8 @@ did not cover, on the emulator with the debug App (Android 8.0, WebView 69).
              character is on the screen; then the screen is turned to landscape and back.
              `positions vertical` (the writing mode goes to horizontal) and `positions horizontal`
              (the writing mode goes to vertical).
+  visible    item 4, for the two changes the open panel hid in the horizontal book (bottom margin, paragraph
+             spacing at the page's lower edge): the page before the panel opened and after it closed again.
   corrupt    item 3: damaged MOBI and AZW3 files (cut short, and a text file named .mobi) must show the
              App's message in the text reader without a crash; the two damaged EPUBs of stage 2 go to the
              image reader, whose message (a toast) is read from the accessibility events.
@@ -416,6 +418,42 @@ def step_positions(which):
     c.stop_app()
     reset()
 
+def step_visible():
+    """Item 4, for two changes the "positions" step could not see: in the horizontal book the lower part of the
+    page is under the open panel, where the bottom margin and (on that page) the paragraph spacing act. The page
+    is compared before the panel opens and after it is closed again (the menu hidden both times)."""
+    c.STEP[0] = 'visible'
+    c.rotate(False)
+
+    def bottom_margin():
+        d.tap_label('版面', exact=True)
+        d.set_slider('下', 60 / 120)
+
+    for slug, name, action in (('paragraph-spacing', 'paragraph spacing', lambda: tap_switch('段落間距')),
+                               ('bottom-margin', 'bottom margin', bottom_margin)):
+        reset()
+        open_at_start(HORZ)
+        c.turn(4)
+        time.sleep(3)
+        before = capture(f'visible-{slug}-1-before')
+        st = d.status()
+        d.open_panel()
+        action()
+        st1 = c.wait_new_layout(st['seq'], 300)
+        time.sleep(3)
+        d.close_panel()
+        time.sleep(2)
+        c.hide_menu()
+        time.sleep(3)
+        after = capture(f'visible-{slug}-2-after')
+        changed = page_change(before, after, 0.0, 1.0)
+        c.check(f'{name}: with the panel closed again, the page on the screen changed', changed > 0.01,
+                {'share of the screen': changed, 'page before → after': [st['page'] + 1, st1 and st1['page'] + 1],
+                 'stored': {k: v for k, v in d.ebook_prefs().items() if k in ('pref_ebook_paragraphSpacing', 'pref_ebook_marginBottom')}})
+        c.leave_reader()
+        c.stop_app()
+    reset()
+
 # endregion
 
 # region item 3: damaged files
@@ -518,7 +556,8 @@ def main():
             step_positions(args[i])
             i += 1
         else:
-            {'fonts': step_fonts, 'glyphs': step_glyphs, 'corrupt': step_corrupt, 'cleanup': step_cleanup}[step]()
+            {'fonts': step_fonts, 'glyphs': step_glyphs, 'visible': step_visible, 'corrupt': step_corrupt,
+             'cleanup': step_cleanup}[step]()
         c.save_system_logs(c.STEP[0])
 
 
