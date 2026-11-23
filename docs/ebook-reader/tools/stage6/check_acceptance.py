@@ -319,6 +319,25 @@ def tap_switch(label):
     raise RuntimeError('no switch for ' + label)
 
 
+def set_slider_at(label, fraction):
+    """Like drive.set_slider, with the row found as in tap_switch: taps the slider under [label] at [fraction]
+    of its track once the slider is fully shown."""
+    for i in range(16):
+        ns = d.nodes()
+        lab = next((n for n in ns if n['text'] == label and n['b'][1] > 1250 and n['b'][0] < 1000), None)
+        sl = d.slider_after(label, ns) if lab else None
+        if sl is not None and sl['b'][3] < 1790 and sl['b'][3] - sl['b'][1] > 60:
+            x1, y1, x2, y2 = sl['b']
+            pad = 2 * 2.625
+            d.tap(x1 + pad + fraction * (x2 - x1 - 2 * pad), (y1 + y2) / 2, 3)
+            return
+        if lab is not None:
+            d.scroll_panel(150 if lab['y'] > 1450 else -150)
+        else:
+            d.scroll_panel(350 if i < 9 else -350)
+    raise RuntimeError('no slider under ' + label)
+
+
 def step_positions(which):
     c.STEP[0] = 'positions:' + which
     book = VERT if which == 'vertical' else HORZ
@@ -436,7 +455,7 @@ def step_visible():
 
     def bottom_margin():
         d.tap_label('版面', exact=True)
-        d.set_slider('下', 60 / 120)
+        set_slider_at('下', 60 / 120)
 
     for slug, name, action in (('paragraph-spacing', 'paragraph spacing', lambda: tap_switch('段落間距')),
                                ('bottom-margin', 'bottom margin', bottom_margin)):
