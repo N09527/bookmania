@@ -14,7 +14,7 @@ Each round: the App's process must be the same before and after the update, the 
 empty, and the App's notification must show up in `dumpsys notification` during the update.
 
 Usage: ADB=/path/to/adb [PKG=io.github.n09527.bookmania(.debug)] python3 -I check_notification.py [settings-browse]
-       settings-browse: only the App's own getNotificationChannel call in Settings > 探索 after a text book
+       settings-browse: Settings > 探索 after a text book (a smoke check; see the function's note)
 For the release App, PKG=io.github.n09527.bookmania (opening the book then needs no DevTools: the reader is
 waited for by its activity only). Results: out/notification/results.jsonl.
 """
@@ -78,10 +78,12 @@ def update_library(label):
 
 
 def browse_settings_after_book():
-    """The App's own call of NotificationManager.getNotificationChannel (Notifications.isNotificationChannelEnabled)
-    that this emulator can reach: Settings > 探索 (SettingsBrowseController, API 26+), built in the same process
-    after a text book was open. A library update, the other caller, could not be started here: the pull to
-    refresh is not taken from `input swipe` on this emulator (stage 6)."""
+    """Settings > 探索 opened in the same process after a text book was open. NOTE (stage 6): this does NOT reach
+    the App's own NotificationManager.getNotificationChannel call on this emulator. SettingsBrowseController
+    builds the switch that calls Notifications.isNotificationChannelEnabled only when
+    ExtensionManager.canAutoInstallUpdates() (Android 12+, or the Shizuku installer), and onActivityResumed
+    uses that switch only if it exists. The other caller, LibraryUpdateJob, calls it only after an update was
+    skipped or failed. Kept as a smoke check: the screen opens without a crash after the WebView was loaded."""
     c.STEP[0] = 'notification:settings-browse-after-a-text-book'
     c.stop_app(0)
     d.shell('logcat -b crash -c')
@@ -112,7 +114,7 @@ def browse_settings_after_book():
     d.shot('notification-settings-browse')
     after = pid()
     crashes = [ln for ln in d.shell('logcat -d -b crash').splitlines() if 'FATAL' in ln or 'Fatal signal' in ln]
-    c.check('Settings > 探索 opened in the same process after the text book, no crash',
+    c.check('Settings > 探索 opened in the same process after the text book, no crash (does not reach getNotificationChannel on Android 8)',
             all(ok for _, ok in path) and before != '' and before == after and not crashes,
             {'path': path, 'process before/after': [before, after], 'crashes': crashes[:5], 'screen': shown[:12]})
     c.stop_app(0)

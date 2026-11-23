@@ -118,6 +118,7 @@ def cold_open(manga, chapter, limit=300):
 
 
 def step_setup():
+    sys.path.insert(0, HERE)  # python3 -I does not put the script's folder on the path
     import check_legacy as lg  # open_new_work: Browse > Local source > the work
     c.STEP[0] = 'setup'
     folder = f'{LOCAL}/{LONG_WORK}'
