@@ -301,8 +301,15 @@ def expectations(target_mode):
 
 
 def tap_switch(label):
-    d.reveal(label)
-    sw = d.switch_for(label)
+    """The switch on the row of [label]; the row is brought well above the panel's lower edge first (right
+    after the panel opens, the switch of the last rows can be below what uiautomator reports)."""
+    sw = None
+    for _ in range(3):
+        d.reveal(label, max_bottom=1650)
+        sw = d.switch_for(label)
+        if sw is not None:
+            break
+        d.scroll_panel(200)
     if sw is None:
         raise RuntimeError('no switch for ' + label)
     d.tap(sw['x'], sw['y'], 3)
@@ -485,9 +492,10 @@ def open_new_work(title):
     c.wait_app_drawn()
     time.sleep(4)
     c.clear_dialogs()
-    for label, wait in (('探索', 5), ('本機來源', 10)):
-        n = d.find(label, exact=True)
+    for labels, wait in ((('探索',), 5), (('本機來源', 'Local source'), 10)):  # the source's name is not translated
+        n = next((m for m in (d.find(x, exact=True) for x in labels) if m), None)
         if n is None:
+            capture('corrupt-0-no-' + labels[0])
             return False
         d.tap(n['x'], n['y'], wait)
     for _ in range(8):

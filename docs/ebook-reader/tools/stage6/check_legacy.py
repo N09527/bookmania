@@ -246,7 +246,7 @@ def step_screens():
         capture(f'screen-tab-{tab}')
         c.check(f'tab {tab} opens', n is not None and d.find(tab, exact=True) is not None, texts()[:12])
         if tab == '探索':
-            src = tap_text('本機來源', wait=8)
+            src = tap_text('本機來源', tries=2, wait=8) or tap_text('Local source', wait=8)  # the name is not translated
             shown = texts()
             capture('screen-browse-local-source')
             c.check('Browse: Local Source lists the works of the test folder', src is not None and any('測試' in x for x in shown), shown[:20])
