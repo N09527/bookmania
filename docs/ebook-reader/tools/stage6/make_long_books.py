@@ -5,8 +5,9 @@ from a small hand-written list in a fixed pseudo-random order, so every run make
                           about 10,000 characters each, about 1,000,000 characters in all
   long-horizontal.epub    the same text, horizontal, left-to-right
   long-vertical.azw3      KF8 made from long-vertical.epub with Calibre's ebook-convert (a local tool only)
-  long-one-document.epub  vertical; the first 100,000 characters in a single document, like a book that was
+  long-one-document.epub  vertical; about 100,000 characters in a single document, like a book that was
                           converted without chapter breaks
+  long-one-document-1m.epub  the same with about 1,000,000 characters in the single document
 
 Usage: python3 -I make_long_books.py <output dir>
 Prints each file with its size and the number of characters.
@@ -70,11 +71,13 @@ def main():
                       uid=f'urn:uuid:bookmania-long-{"v" if vertical else "h"}', chapters=chs, vertical=vertical,
                       ppd='rtl' if vertical else 'ltr')
         made.append((path, total))
-    one, one_total = chapters(1, 100_000, seed=7)
-    path = os.path.join(OUT_DIR, 'long-one-document.epub')
-    mt.write_epub(path, title='長篇測試書（單一檔案）', lang='zh-Hant', uid='urn:uuid:bookmania-long-one',
-                  chapters=one, vertical=True, ppd='rtl')
-    made.append((path, one_total))
+    for name, size, seed, title, uid in (
+            ('long-one-document.epub', 100_000, 7, '長篇測試書（單一檔案）', 'urn:uuid:bookmania-long-one'),
+            ('long-one-document-1m.epub', 1_000_000, 11, '長篇測試書（單一檔案，百萬字）', 'urn:uuid:bookmania-long-one-1m')):
+        one, one_total = chapters(1, size, seed=seed)
+        path = os.path.join(OUT_DIR, name)
+        mt.write_epub(path, title=title, lang='zh-Hant', uid=uid, chapters=one, vertical=True, ppd='rtl')
+        made.append((path, one_total))
     conv = shutil.which('ebook-convert')
     if conv:
         dst = os.path.join(OUT_DIR, 'long-vertical.azw3')

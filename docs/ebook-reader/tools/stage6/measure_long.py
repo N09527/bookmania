@@ -9,6 +9,8 @@ books and turning their pages. The times describe this slow emulator only, not a
                       App's memory (PSS) afterwards. The first run is the first time the book is ever opened
                       (no saved position, no stored classification or character counts); the next runs open it
                       again at its saved position.
+  register <label> <file>   one more book (from out/long-books) in a new work folder named <label>, opened from
+                      Browse; then `open <label>` measures it
   middle <label>      the saved position moved to document 50 (the middle of a 100-document book), cold start
   turns <label> [n]   n page turns with the page turn animation "none", then n with the default curl, starting
                       two pages before the end of the first document so that one turn goes into the next
@@ -142,6 +144,28 @@ def step_setup():
             {'ids': found, 'bytes': sizes})
 
 
+def step_register(label, name):
+    """One more book in a work folder of its own (named after [label]), opened from Browse; adds it to ids.json."""
+    sys.path.insert(0, HERE)
+    import check_legacy as lg
+    c.STEP[0] = 'register:' + label
+    folder = f'{LOCAL}/{label}'
+    d.shell(f"mkdir -p '{folder}'")
+    d.adb('push', os.path.join(BOOKS_DIR, name), f'{folder}/{name}', timeout=300)
+    opened = lg.open_new_work(label)
+    c.stop_app(3)
+    con = c.pull_db('tachiyomi.db')
+    row = con.execute('SELECT _id FROM mangas WHERE title = ?', (label,)).fetchone()
+    manga = row[0] if row else None
+    r = con.execute('SELECT _id FROM chapters WHERE manga_id = ? AND url LIKE ?', (manga, '%' + name)).fetchone() if manga else None
+    con.close()
+    found = ids() if os.path.exists(IDS) else {}
+    found[label] = [manga, r[0]] if r else None
+    with open(IDS, 'w', encoding='utf-8') as f:
+        json.dump(found, f)
+    c.check(f'{name} is listed as a chapter of the new work {label}', opened and bool(r),
+            {'ids': found[label], 'bytes': os.path.getsize(os.path.join(BOOKS_DIR, name))})
+
 def step_open(label, runs=3):
     c.STEP[0] = 'open:' + label
     manga, chapter = book(label)
@@ -272,6 +296,8 @@ def main():
     step, args = sys.argv[1], sys.argv[2:]
     if step == 'setup':
         step_setup()
+    elif step == 'register':
+        step_register(args[0], args[1])
     elif step == 'open':
         step_open(args[0], int(args[1]) if len(args) > 1 else 3)
     elif step == 'middle':
