@@ -1,0 +1,8 @@
+{"time": "15:03:43", "step": "release:vertical-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1299}"]}}
+{"time": "15:03:53", "step": "release:vertical-epub", "check": "the first page is drawn before the key (two same screens with text)", "ok": true, "detail": {"seconds after the fixed wait": 8.6}}
+{"time": "15:04:15", "step": "release:vertical-epub", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.147}}
+{"time": "15:04:16", "step": "release:vertical-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "15:05:10", "step": "release:vertical-azw3", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1300}"]}}
+{"time": "15:05:21", "step": "release:vertical-azw3", "check": "the first page is drawn before the key (two same screens with text)", "ok": true, "detail": {"seconds after the fixed wait": 9.4}}
+{"time": "15:05:43", "step": "release:vertical-azw3", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.087}}
+{"time": "15:05:43", "step": "release:vertical-azw3", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}

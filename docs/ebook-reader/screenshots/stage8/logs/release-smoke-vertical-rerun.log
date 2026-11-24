@@ -1,0 +1,14 @@
+=== 15:02:44 reset the release App's typesetting keys
+prefs reset
+=== 15:02:46 vertical books
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1299}"]}
+PASS the first page is drawn before the key (two same screens with text) {"seconds after the fixed wait": 8.6}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.147}
+PASS no crash while the book is open {"crashes": []}
+.. vertical-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1300}"]}
+PASS the first page is drawn before the key (two same screens with text) {"seconds after the fixed wait": 9.4}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.087}
+PASS no crash while the book is open {"crashes": []}
+.. vertical-azw3: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+=== 15:05:44 done

@@ -1,0 +1,17 @@
+Stage 8 observation on the release App (universal release APK, emulator), 15:02-15:15.
+
+1) Release smoke test, first run (13:35-13:52): both vertical books ended on page 2, a picture page (FIG 1),
+   after the page key (screenshots release-vertical-epub-2 / release-vertical-azw3-2).
+2) The two vertical books again (15:02-15:05, release_smoke.py waits for the first page):
+   vertical EPUB opened on page 2 (the picture page) -> page key -> page 3 (text);
+   vertical AZW3 opened on page 1 (第１章) -> page key -> page 2 (the picture page).
+3) Saved positions in the release App's ebook.db afterwards (table position, column locator):
+   直排測試書 AZW3 15:04:37 {"spine":0,"href":"text/part0000.xhtml","pageProgression":0.1,"total":0.0335...,"chapterPage":1,...}
+     (no location and no text: the picture page has no text, so the page is saved as page / pages = 1 / 10)
+   直排測試書 EPUB 15:03:09 {"spine":0,"href":"OEBPS/text/ch01.xhtml","location":[17,0],"text":"【第３段】長一點的段落：閱讀程式需要依照使用者的",...,"chapterPage":2,...}
+4) Reopened as they were saved (reopen_azw3.py, a scratch script; the first page drawn after 8.3-9.0 s):
+   AZW3, twice: page 1 (第１章 測試章節) both times, not page 2 where it was left.
+   EPUB: page 3 (【第３段】...), where it was left.
+Restore code: reader.js start(): k = Math.floor(target.pageProgression * S.pages + 1e-6).
+Inference (not verified): if the page count when the book is opened is smaller than when it was saved (for example
+9 instead of 10 before the picture is loaded), floor() gives the page before.
