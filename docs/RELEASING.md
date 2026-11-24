@@ -1,6 +1,6 @@
 # 發布新版本
 
-Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布的是 **debug 版**（自用）。推送 `v1.2.3` 這類版本標籤後，GitHub Actions 的 [release 工作流程](../.github/workflows/release.yml) 會跑單元測試、建置 debug 版的五個 APK、檢查簽章，並發布它們與 SHA-256。不需要設定任何 secrets。
+Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布的是 **debug 版**（自用）。`main` 上 `app/build.gradle.kts` 的版本號改變並推送後，GitHub Actions 的 [release 工作流程](../.github/workflows/release.yml) 會自動跑單元測試、建置 debug 版的五個 APK、檢查簽章，然後建立版本標籤 `v1.2.3`，發布 APK 與 SHA-256。不需要設定任何 secrets，也不需要自己推送標籤。已經發布過的版本會跳過。
 
 ## debug 版是什麼
 
@@ -15,21 +15,16 @@ Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布的
 
 1. 修改 `app/build.gradle.kts`：
    - `_versionName` 改成新版本，例如 `"1.1.0"`。
-   - `versionCode` 加一以上，例如 `201`。**只能變大**，否則手機無法覆蓋安裝。
-2. 在 [CHANGELOG.md](../CHANGELOG.md) 新增這一版的段落，標題寫成 `## [1.1.0] - 日期`。發布的說明會取用這一段。
-3. 提交並推送到 `main`。
-4. 打上標籤並推送（標籤必須和 `_versionName` 相同，前面加 `v`）：
+   - `versionCode` 加一以上，例如 `201`。**只能變大**，否則手機無法覆蓋安裝；沒有比上一個發布的版本大時，工作流程會停止。
+2. 在 [CHANGELOG.md](../CHANGELOG.md) 新增這一版的段落，標題寫成 `## [1.1.0] - 日期`，並在檔尾加上 `[1.1.0]: https://github.com/N09527/bookmania/releases/tag/v1.1.0`。發布的說明會取用這一段。
+3. 提交並推送到 `main`。推送的變更包含 `app/build.gradle.kts` 時，工作流程會自動開始。
+4. 到存放庫的「Actions」看進度。完成後 Releases 會出現新版本，附上五個 APK 與 `SHA256SUMS.txt`。
 
-   ```bash
-   git tag v1.1.0
-   git push origin v1.1.0
-   ```
+也可以手動執行：「Actions」分頁 > 左側的「Release」>「Run workflow」，分支選 `main`。它會發布 `main` 目前的版本；這個版本已經發布過時，什麼都不做。適合用在第一次發布、或上一次執行失敗之後重試。
 
-5. 到存放庫的「Actions」看進度。完成後 Releases 會出現新版本，附上五個 APK 與 `SHA256SUMS.txt`。
+工作流程會先檢查：只在 `main` 上執行；這個版本還沒發布；同名的標籤如果已經存在，必須指向同一個提交；`versionCode` 比上一個發布的版本大；每個 APK 都用 `app/debug.keystore` 簽章。任何一項不符就停止，不會發布。
 
-工作流程會先檢查：標籤和 App 的版本號一致、每個 APK 都用 `app/debug.keystore` 簽章。任何一項不符就停止，不會發布。
-
-第一次使用前，請確認存放庫的「Settings > Actions > General」允許執行 Actions。
+第一次使用前，請確認「Settings > Actions > General」的「Actions permissions」允許執行 Actions；「Actions」分頁如果出現啟用工作流程的按鈕，請按下去。
 
 ## release 版（選用）
 

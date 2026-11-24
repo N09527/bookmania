@@ -1,24 +1,85 @@
-# Builds the debug APKs when a version tag (v1.2.3) is pushed and publishes them on GitHub Releases.
+# Publishes the debug APKs on GitHub Releases when the version in app/build.gradle.kts changes on main, or when the
+# workflow is run by hand (Actions > Release > Run workflow). The workflow creates the tag v<version> itself, so no tag
+# has to be pushed. A version that is already published is skipped.
 # The debug build is signed with the debug key kept in the repository (app/debug.keystore), so every published APK
 # updates the previous one in place; no secrets are needed. See docs/RELEASING.md.
 name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - app/build.gradle.kts
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release
   cancel-in-progress: false
 
 jobs:
+  check:
+    name: Check the version
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      publish: ${{ steps.version.outputs.publish }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0 # the earlier tags, to compare the version code
+
+      - name: Read the version and decide whether to publish
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Releases are made from main only (this run is on $GITHUB_REF)"
+            exit 1
+          fi
+          version=$(sed -n 's/^val _versionName = "\(.*\)"$/\1/p' app/build.gradle.kts)
+          code=$(sed -n 's/^ *versionCode = \([0-9]*\)$/\1/p' app/build.gradle.kts)
+          if [ -z "$version" ] || [ -z "$code" ]; then
+            echo "::error::_versionName or versionCode not found in app/build.gradle.kts"
+            exit 1
+          fi
+          tag="v$version"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "::notice::$tag is already published. To publish a new version, change _versionName and versionCode."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if git rev-parse -q --verify "refs/tags/$tag" > /dev/null \
+            && [ "$(git rev-parse "$tag^{commit}")" != "$GITHUB_SHA" ]; then
+            echo "::error::The tag $tag already exists on another commit. Change the version, or delete the tag."
+            exit 1
+          fi
+          # A phone only installs an update whose versionCode is larger than the installed one.
+          previous=$(git tag -l 'v*' --sort=-version:refname | awk -v t="$tag" '$0 != t && !found { print; found = 1 }')
+          if [ -n "$previous" ]; then
+            previous_code=$(git show "$previous:app/build.gradle.kts" | sed -n 's/^ *versionCode = \([0-9]*\)$/\1/p')
+            if [ -n "$previous_code" ] && [ "$code" -le "$previous_code" ]; then
+              echo "::error::versionCode $code is not larger than $previous_code of $previous"
+              exit 1
+            fi
+          fi
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+
   release:
     name: Build and publish
+    needs: check
+    if: needs.check.outputs.publish == 'true'
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ needs.check.outputs.tag }}
 
     steps:
       - name: Check out
@@ -36,15 +97,8 @@ jobs:
         uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6
 
       - name: Set up the Android SDK build tools
-        run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager "build-tools;35.0.0"
-
-      - name: Check that the tag matches the app's version
         run: |
-          version=$(sed -n 's/^val _versionName = "\(.*\)"$/\1/p' app/build.gradle.kts)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::The tag $GITHUB_REF_NAME does not match the version $version in app/build.gradle.kts"
-            exit 1
-          fi
+          "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" "build-tools;35.0.0"
 
       - name: Test and build the debug APKs
         run: |
@@ -55,7 +109,7 @@ jobs:
 
       - name: Check the signatures and collect the APKs
         run: |
-          apksigner="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/*/ | sort -V | tail -1)apksigner"
+          apksigner="$ANDROID_SDK_ROOT/build-tools/35.0.0/apksigner" # installed above
           # The certificate of the repository's debug key: every APK must carry it.
           expected=$(keytool -exportcert -keystore app/debug.keystore -storepass android -alias androiddebugkey \
             | sha256sum | cut -d' ' -f1)
@@ -68,27 +122,32 @@ jobs:
               echo "::error::$apk is not signed with app/debug.keystore ($actual)"
               exit 1
             fi
-            cp "$apk" "dist/bookmania-$GITHUB_REF_NAME-debug-$abi.apk"
+            cp "$apk" "dist/bookmania-$TAG-debug-$abi.apk"
           done
-          (cd dist && sha256sum *.apk > SHA256SUMS.txt)
+          (cd dist && sha256sum -- *.apk > SHA256SUMS.txt)
 
       - name: Write the release notes
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${TAG#v}"
           awk -v v="$version" '
             index($0, "## [" v "]") == 1 { found = 1; next }
             found && /^## \[/ { exit }
             found { print }
           ' CHANGELOG.md > notes.md
+          if ! grep -q '[^[:space:]]' notes.md; then
+            echo "::warning::CHANGELOG.md has no section for $version"
+          fi
+          # Relative links of the changelog (./docs/...) do not work on the release page: point them at this commit.
+          sed -i "s#](\./#](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/#g" notes.md
           {
             echo
             echo "### 下載 (Download)"
             echo
             echo "這是 debug 版：App 名稱「Bookmania Debug」，套件名稱 \`io.github.n09527.bookmania.debug\`。"
-            echo "一般手機請下載 \`bookmania-$GITHUB_REF_NAME-debug-arm64-v8a.apk\`；裝不了時改用 \`universal\`。需要 Android 8.0 以上。"
+            echo "一般手機請下載 \`bookmania-$TAG-debug-arm64-v8a.apk\`；裝不了時改用 \`universal\`。需要 Android 8.0 以上。"
             echo
             echo "This is the debug build (\"Bookmania Debug\", package \`io.github.n09527.bookmania.debug\`)."
-            echo "Most phones need \`bookmania-$GITHUB_REF_NAME-debug-arm64-v8a.apk\`; if it does not install, use \`universal\`. Requires Android 8.0+."
+            echo "Most phones need \`bookmania-$TAG-debug-arm64-v8a.apk\`; if it does not install, use \`universal\`. Requires Android 8.0+."
             echo
             echo "### SHA-256"
             echo
@@ -100,4 +159,6 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Bookmania $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+          GH_REPO: ${{ github.repository }}
+        # Creates the tag on this commit (or uses it if it is already there).
+        run: gh release create "$TAG" dist/* --title "Bookmania $TAG" --notes-file notes.md --target "$GITHUB_SHA"

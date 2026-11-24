@@ -1,6 +1,6 @@
 # 變更紀錄
 
-Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在分叉點的[變更紀錄](https://github.com/N09527/bookmania/blob/yokai-fork-point/CHANGELOG.md)。
+Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在分叉點（提交 `843a59b`）的[變更紀錄](https://github.com/N09527/bookmania/blob/843a59b20e4edd26c545dc48989a00162ac65937/CHANGELOG.md)。
 
 格式參考 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本號依 [語意化版本](https://semver.org/lang/zh-TW/)。
 
@@ -23,7 +23,7 @@ Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在�
 
 - 名稱改為 Bookmania，使用新的圖示與套件名稱 `io.github.n09527.bookmania`。
 - GitHub Releases 發布 debug 版（「Bookmania Debug」），以存放庫中固定的 debug 金鑰簽章，新版可以直接覆蓋安裝。
-- 版本號從 1.0.0 重新開始（內部編號 200）。先前提供的測試版顯示 1.10.3（內部編號 162），可以直接覆蓋安裝。
+- 版本號從 1.0.0 重新開始（內部編號 200）。release 版 1.0.0 可以直接覆蓋先前提供的測試版（顯示 1.10.3，內部編號 162）；Releases 上的 debug 版是另一個 App，不會覆蓋它。
 - 作品頁的「關於此…」改為「內容簡介」，「共 N 章」改為「共 N 冊」。
 - 「關於」頁的 GitHub 連結改為 Bookmania 的存放庫；「這一版的新功能」連到這份變更紀錄。
 - 追蹤服務連線時的 User-Agent 改為 Bookmania。
