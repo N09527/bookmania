@@ -78,4 +78,8 @@
     <string name="ebook_gutter_shadow_hint">雙欄時在兩欄中間加上陰影，像實體書的中縫。所有書共用，不受上方選擇的範圍影響。</string>
     <string name="bookmania_gutter_shadow">中縫陰影</string>
     <string name="bookmania_gutter_shadow_summary">雙頁模式中，在兩頁相接處加上陰影，像實體書的中縫。</string>
+    <string name="ebook_value_range">可輸入 %1$s～%2$s</string>
+    <string name="ebook_value_range_whole">可輸入 %1$s～%2$s 的整數</string>
+    <string name="ebook_margins_two_columns">雙欄時，左右邊距合計最多 %1$s dp（每欄至少 120 dp）。</string>
+    <string name="ebook_margins_two_columns_over">目前合計 %1$s dp，雙欄時會按比例縮小。</string>
 </resources>

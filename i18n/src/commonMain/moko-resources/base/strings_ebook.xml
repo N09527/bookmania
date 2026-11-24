@@ -79,4 +79,8 @@
     <string name="ebook_gutter_shadow_hint">With two columns, a shadow between them like the fold of a printed book. For all books; not affected by the level chosen above.</string>
     <string name="bookmania_gutter_shadow">Gutter shadow</string>
     <string name="bookmania_gutter_shadow_summary">In double page mode, a shadow where the two pages meet, like the fold of a printed book.</string>
+    <string name="ebook_value_range">Enter a number from %1$s to %2$s</string>
+    <string name="ebook_value_range_whole">Enter a whole number from %1$s to %2$s</string>
+    <string name="ebook_margins_two_columns">With two columns, the left and right margins add up to at most %1$s dp (each column at least 120 dp).</string>
+    <string name="ebook_margins_two_columns_over">They add up to %1$s dp now; with two columns they are narrowed in proportion.</string>
 </resources>

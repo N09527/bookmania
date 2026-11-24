@@ -1,7 +1,6 @@
 package yokai.ebook.settings
 
 import java.util.Locale
-import kotlin.math.roundToInt
 
 /**
  * Typesetting settings of the text reader (design section 5.6, agreed by the user).
@@ -96,7 +95,10 @@ data class EbookSettings(
 
         val DEFAULTS = EbookSettings()
 
-        /** Ranges and steps of the settings table (section 5.6). */
+        /**
+         * Ranges and steps of the settings table (section 5.6). The steps are the sliders'; a value typed in the
+         * panel can be finer (stage 8): lengths in em to 0.01, margins to 1 dp.
+         */
         object Range {
             val fontSize = 12..48
             val lineHeight = 1.0f..3.0f
@@ -124,10 +126,10 @@ data class EbookSettings(
             return EbookSettings(
                 font = str(Key.FONT)?.takeIf { it.isNotEmpty() && FONT_ID.matches(it) } ?: d.font,
                 fontSize = str(Key.FONT_SIZE)?.toIntOrNull()?.coerceIn(Range.fontSize) ?: d.fontSize,
-                lineHeight = stepped(str(Key.LINE_HEIGHT), Range.lineHeight, Range.LINE_HEIGHT_STEP) ?: d.lineHeight,
-                letterSpacing = stepped(str(Key.LETTER_SPACING), Range.letterSpacing, Range.LETTER_SPACING_STEP) ?: d.letterSpacing,
-                indent = optional(str(Key.INDENT), Range.indent, Range.INDENT_STEP, d.indent),
-                paragraphSpacing = optional(str(Key.PARAGRAPH_SPACING), Range.paragraphSpacing, Range.PARAGRAPH_SPACING_STEP, d.paragraphSpacing),
+                lineHeight = decimal(str(Key.LINE_HEIGHT), Range.lineHeight) ?: d.lineHeight,
+                letterSpacing = decimal(str(Key.LETTER_SPACING), Range.letterSpacing) ?: d.letterSpacing,
+                indent = optional(str(Key.INDENT), Range.indent, d.indent),
+                paragraphSpacing = optional(str(Key.PARAGRAPH_SPACING), Range.paragraphSpacing, d.paragraphSpacing),
                 marginTop = margin(str(Key.MARGIN_TOP)) ?: d.marginTop,
                 marginBottom = margin(str(Key.MARGIN_BOTTOM)) ?: d.marginBottom,
                 marginLeft = margin(str(Key.MARGIN_LEFT)) ?: d.marginLeft,
@@ -143,23 +145,20 @@ data class EbookSettings(
         /** Imported fonts are referenced by a 32-character hexadecimal id. */
         private val FONT_ID = Regex("""book|sans|serif|[0-9a-f]{32}""")
 
-        private fun stepped(text: String?, range: ClosedFloatingPointRange<Float>, step: Float): Float? {
+        /** A number within [range], to 0.01 (a typed value can be finer than the slider's step). */
+        private fun decimal(text: String?, range: ClosedFloatingPointRange<Float>): Float? {
             val v = text?.toFloatOrNull()?.takeIf { it.isFinite() } ?: return null
-            val snapped = (v.coerceIn(range.start, range.endInclusive) / step).roundToInt() * step
-            return (Math.round(snapped * 100f) / 100f).coerceIn(range.start, range.endInclusive)
+            return (Math.round(v.coerceIn(range.start, range.endInclusive) * 100f) / 100f).coerceIn(range.start, range.endInclusive)
         }
 
-        private fun optional(text: String?, range: ClosedFloatingPointRange<Float>, step: Float, default: Float?): Float? = when {
+        private fun optional(text: String?, range: ClosedFloatingPointRange<Float>, default: Float?): Float? = when {
             text == null -> default
             text == BOOK -> null
-            else -> stepped(text, range, step) ?: default
+            else -> decimal(text, range) ?: default
         }
 
-        private fun margin(text: String?): Int? {
-            val v = text?.toIntOrNull() ?: return null
-            val c = v.coerceIn(Range.margin)
-            return (c / Range.MARGIN_STEP) * Range.MARGIN_STEP
-        }
+        /** Whole dp within the range; before stage 8 the value was rounded down to an even number (the slider's step). */
+        private fun margin(text: String?): Int? = text?.toIntOrNull()?.coerceIn(Range.margin)
 
         fun format(value: Float): String = String.format(Locale.ROOT, "%.2f", value).trimEnd('0').trimEnd('.')
     }

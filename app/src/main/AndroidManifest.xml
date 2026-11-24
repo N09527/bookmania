@@ -198,9 +198,12 @@
             android:name=".ui.webview.WebViewActivity"
             android:configChanges="uiMode|orientation|screenSize"/>
         <!-- Bookmania text reader (yokai.ebook) -->
+        <!-- adjustResize: the typesetting panel's value fields (stage 8) get the keyboard's height as an inset and
+             move above it; with the default full screen the page itself is not resized. -->
         <activity
             android:name="yokai.ebook.EbookReaderActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
         <activity
             android:name=".ui.security.BiometricActivity" />

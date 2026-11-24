@@ -520,7 +520,8 @@
     <string name="category_is_empty">分類為空</string>
     <string name="fetched_">截取了 %1$s</string>
     <string name="grouped">已分組</string>
-    <string name="about_this_">關於此%1$s</string>
+    <!-- Bookmania (stage 8): the user's wording, the same for every series type -->
+    <string name="about_this_">內容簡介</string>
     <string name="reset_chapter_history">重設章節閱讀記錄</string>
     <string name="search_suggestions">搜尋建議</string>
     <string name="publishing_finished">出版完畢</string>

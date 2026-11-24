@@ -38,7 +38,7 @@ class EbookSettingsTest {
     }
 
     @Test
-    fun `values are clamped to the table and snapped to its steps`() {
+    fun `values are clamped to the table, to two decimals or whole dp`() {
         val s = EbookSettings.parse(
             mapOf(
                 "fontSize" to "99", "lineHeight" to "0.3", "letterSpacing" to "0.123", "indent" to "1.3",
@@ -47,12 +47,26 @@ class EbookSettingsTest {
         )
         assertEquals(48, s.fontSize)
         assertEquals(1.0f, s.lineHeight)
-        assertEquals(0.1f, s.letterSpacing)
-        assertEquals(1.5f, s.indent)
+        assertEquals(0.12f, s.letterSpacing)
+        assertEquals(1.3f, s.indent)
         assertEquals(3.0f, s.paragraphSpacing)
         assertEquals(0, s.marginTop)
-        assertEquals(36, s.marginLeft)
+        assertEquals(37, s.marginLeft) // an odd value typed in the panel is kept (stage 8)
         assertEquals(120, s.marginRight)
+    }
+
+    @Test
+    fun `typed values finer than the slider steps are kept`() {
+        val s = EbookSettings.parse(
+            mapOf("lineHeight" to "1.75", "letterSpacing" to "0.07", "indent" to "2.25", "paragraphSpacing" to "0.35", "marginLeft" to "25"),
+        )
+        assertEquals(1.75f, s.lineHeight)
+        assertEquals(0.07f, s.letterSpacing)
+        assertEquals(2.25f, s.indent)
+        assertEquals(0.35f, s.paragraphSpacing)
+        assertEquals(25, s.marginLeft)
+        assertEquals("1.75", s.toMap()["lineHeight"])
+        assertEquals("25", s.toMap()["marginLeft"])
     }
 
     @Test

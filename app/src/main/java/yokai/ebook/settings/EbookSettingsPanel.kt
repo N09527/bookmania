@@ -1,6 +1,8 @@
 package yokai.ebook.settings
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,6 +26,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -47,19 +53,36 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
+import kotlin.math.abs
 import kotlin.math.roundToInt
 import yokai.ebook.settings.EbookSettings.Companion.Range
 import yokai.ebook.settings.EbookSettings.Key
@@ -80,12 +103,18 @@ data class EbookSettingsUiState(
     val pageTurn: String,
     /** The fold's shadow with two columns ([yokai.gutter.GutterPreferences.textReader]): one setting for all books. */
     val gutterShadow: Boolean,
+    /**
+     * When the settings ask for two columns on this screen: the largest left + right margins that keep two columns
+     * of at least 120 dp (from the shell, stage 8). The left and right margin sliders and fields stop there.
+     */
+    val marginMost: Int? = null,
 )
 
 /**
  * Typesetting settings (design section 5.6), shown without covering the whole page, so every
  * change can be seen right away: at the bottom in portrait, as a full-height side panel in
- * landscape (decided by the user). Slider values are committed when the slider is released.
+ * landscape (decided by the user). Slider values are committed when the slider is released; each value can also
+ * be typed in the field next to its slider (stage 8), which moves the panel above the keyboard.
  *
  * Fills the screen but only the panel takes touches; the rest goes to the views below.
  *
@@ -127,7 +156,8 @@ fun EbookSettingsPanel(
         sidePanelOnLeft -> WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Vertical + WindowInsetsSides.Left)
         else -> WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Vertical + WindowInsetsSides.Right)
     }
-    Box(Modifier.fillMaxSize(), contentAlignment = alignment) {
+    // The keyboard of a value field pushes the panel up (portrait) or shortens it (landscape) instead of covering it.
+    Box(Modifier.fillMaxSize().imePadding(), contentAlignment = alignment) {
         Surface(
             modifier = if (landscape) Modifier.fillMaxHeight().width(sideWidth) else Modifier.fillMaxWidth(),
             shape = when {
@@ -138,7 +168,11 @@ fun EbookSettingsPanel(
             tonalElevation = 3.dp,
             shadowElevation = 8.dp,
         ) {
-            Column(Modifier.windowInsetsPadding(insets)) {
+            // A value field that is done gives the focus to the panel itself rather than clearing it: clearing it once
+            // left a link of the page's first frame focused, and the browser scrolled that frame to it (stage 8).
+            val park = remember { FocusRequester() }
+            CompositionLocalProvider(LocalFieldDone provides { park.requestFocus() }) {
+            Column(Modifier.windowInsetsPadding(insets).focusRequester(park).focusable()) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     TabRow(selectedTabIndex = tab, modifier = Modifier.weight(1f), divider = {}) {
                         Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(stringResource(MR.strings.ebook_settings_text)) })
@@ -183,24 +217,23 @@ fun EbookSettingsPanel(
                         SwitchSetting(MR.strings.ebook_bold, s.bold, over[Key.BOLD]) { onSet(Key.BOLD, it.toString()) }
                         StepSlider(
                             MR.strings.ebook_font_size, s.fontSize.toFloat(),
-                            Range.fontSize.first.toFloat()..Range.fontSize.last.toFloat(), 1f, over[Key.FONT_SIZE],
-                            { it.roundToInt().toString() },
+                            Range.fontSize.first.toFloat()..Range.fontSize.last.toFloat(), 1f, over[Key.FONT_SIZE], whole = true, unit = null,
                         ) { onSet(Key.FONT_SIZE, it.roundToInt().toString()) }
                         StepSlider(
                             MR.strings.ebook_line_height, s.lineHeight, Range.lineHeight, Range.LINE_HEIGHT_STEP, over[Key.LINE_HEIGHT],
-                            { EbookSettings.format(it) },
+                            whole = false, unit = null,
                         ) { onSet(Key.LINE_HEIGHT, EbookSettings.format(it)) }
                         StepSlider(
                             MR.strings.ebook_letter_spacing, s.letterSpacing, Range.letterSpacing, Range.LETTER_SPACING_STEP,
-                            over[Key.LETTER_SPACING], { "${EbookSettings.format(it)} em" },
+                            over[Key.LETTER_SPACING], whole = false, unit = "em",
                         ) { onSet(Key.LETTER_SPACING, EbookSettings.format(it)) }
                         OptionalSlider(
                             MR.strings.ebook_indent, s.indent, 2f, Range.indent, Range.INDENT_STEP, over[Key.INDENT],
-                            { stringResource(MR.strings.ebook_unit_characters, EbookSettings.format(it)) },
+                            unit = stringResource(MR.strings.ebook_unit_characters, "").trim(),
                         ) { onSet(Key.INDENT, it?.let(EbookSettings::format) ?: EbookSettings.BOOK) }
                         OptionalSlider(
                             MR.strings.ebook_paragraph_spacing, s.paragraphSpacing, 0.5f, Range.paragraphSpacing,
-                            Range.PARAGRAPH_SPACING_STEP, over[Key.PARAGRAPH_SPACING], { "${EbookSettings.format(it)} em" },
+                            Range.PARAGRAPH_SPACING_STEP, over[Key.PARAGRAPH_SPACING], unit = "em",
                         ) { onSet(Key.PARAGRAPH_SPACING, it?.let(EbookSettings::format) ?: EbookSettings.BOOK) }
                     } else {
                         Label(MR.strings.ebook_writing_mode, over[Key.WRITING_MODE])
@@ -249,17 +282,36 @@ fun EbookSettingsPanel(
                         Label(MR.strings.ebook_margins, null)
                         val margin = Range.margin.first.toFloat()..Range.margin.last.toFloat()
                         val step = Range.MARGIN_STEP.toFloat()
-                        val dp: @Composable (Float) -> String = { "${it.roundToInt()} dp" }
-                        StepSlider(MR.strings.ebook_margin_top, s.marginTop.toFloat(), margin, step, over[Key.MARGIN_TOP], dp) {
+                        // With two columns, each side margin stops where the two would leave less than 120 dp per
+                        // column (stage 8): the page no longer jumps to one column when a margin is moved too far.
+                        // Only when it limits the sides at all (a landscape screen leaves more than 120 + 120 dp).
+                        val most = state.marginMost?.takeIf { it < 2 * Range.margin.last }
+                        fun side(other: Int): ClosedFloatingPointRange<Float> =
+                            if (most == null) margin else 0f..(most - other).coerceIn(Range.MARGIN_STEP, Range.margin.last).toFloat()
+                        StepSlider(MR.strings.ebook_margin_top, s.marginTop.toFloat(), margin, step, over[Key.MARGIN_TOP], whole = true, unit = "dp") {
                             onSet(Key.MARGIN_TOP, it.roundToInt().toString())
                         }
-                        StepSlider(MR.strings.ebook_margin_bottom, s.marginBottom.toFloat(), margin, step, over[Key.MARGIN_BOTTOM], dp) {
+                        StepSlider(MR.strings.ebook_margin_bottom, s.marginBottom.toFloat(), margin, step, over[Key.MARGIN_BOTTOM], whole = true, unit = "dp") {
                             onSet(Key.MARGIN_BOTTOM, it.roundToInt().toString())
                         }
-                        StepSlider(MR.strings.ebook_margin_left, s.marginLeft.toFloat(), margin, step, over[Key.MARGIN_LEFT], dp) {
+                        if (most != null) {
+                            Text(
+                                stringResource(MR.strings.ebook_margins_two_columns, most),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(top = 8.dp),
+                            )
+                            if (s.marginLeft + s.marginRight > most) {
+                                Text(
+                                    stringResource(MR.strings.ebook_margins_two_columns_over, s.marginLeft + s.marginRight),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
+                        StepSlider(MR.strings.ebook_margin_left, s.marginLeft.toFloat(), side(s.marginRight), step, over[Key.MARGIN_LEFT], whole = true, unit = "dp") {
                             onSet(Key.MARGIN_LEFT, it.roundToInt().toString())
                         }
-                        StepSlider(MR.strings.ebook_margin_right, s.marginRight.toFloat(), margin, step, over[Key.MARGIN_RIGHT], dp) {
+                        StepSlider(MR.strings.ebook_margin_right, s.marginRight.toFloat(), side(s.marginLeft), step, over[Key.MARGIN_RIGHT], whole = true, unit = "dp") {
                             onSet(Key.MARGIN_RIGHT, it.roundToInt().toString())
                         }
                         HorizontalDivider(Modifier.padding(vertical = 8.dp))
@@ -281,9 +333,13 @@ fun EbookSettingsPanel(
                     }
                 }
             }
+            }
         }
     }
 }
+
+/** What a value field does when its value is done: give the focus to the panel (see [EbookSettingsPanel]). */
+private val LocalFieldDone = staticCompositionLocalOf<(() -> Unit)?> { null }
 
 private val SettingsScope.label: StringResource
     get() = when (this) {
@@ -394,17 +450,28 @@ private fun StepSlider(
     range: ClosedFloatingPointRange<Float>,
     step: Float,
     overridden: SettingsScope?,
-    format: @Composable (Float) -> String,
+    whole: Boolean,
+    unit: String?,
     onCommit: (Float) -> Unit,
 ) {
     var current by remember(value) { mutableFloatStateOf(value) }
+    var invalid by remember { mutableStateOf(false) }
+    val name = stringResource(label)
     Column(Modifier.padding(top = 4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(label), modifier = Modifier.weight(1f))
-            Text(format(current), style = MaterialTheme.typography.bodyMedium)
+            Text(name, modifier = Modifier.weight(1f))
+            NumberField(current, whole, range, name, { invalid = it }, onCommit)
+            UnitLabel(unit)
         }
+        if (invalid) RangeNote(range, whole)
         OverriddenNote(overridden)
-        StepTrackSlider(current, { current = snap(it, range, step) }, { if (current != value) onCommit(current) }, range, step)
+        StepTrackSlider(
+            current.coerceIn(range.start, range.endInclusive),
+            { current = snap(it, range, step); invalid = false },
+            { if (current != value) onCommit(current) },
+            range,
+            step,
+        )
     }
 }
 
@@ -417,31 +484,143 @@ private fun OptionalSlider(
     range: ClosedFloatingPointRange<Float>,
     step: Float,
     overridden: SettingsScope?,
-    format: @Composable (Float) -> String,
+    unit: String?,
     onCommit: (Float?) -> Unit,
 ) {
     val followBook = value == null
     var current by remember(value) { mutableFloatStateOf(value ?: initial) }
+    var invalid by remember { mutableStateOf(false) }
+    val name = stringResource(label)
     Column(Modifier.padding(top = 4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(label), modifier = Modifier.weight(1f))
+            Text(name, modifier = Modifier.weight(1f))
             if (!followBook) {
-                Text(format(current), style = MaterialTheme.typography.bodyMedium)
+                NumberField(current, false, range, name, { invalid = it }, onCommit)
+                UnitLabel(unit)
                 Spacer(Modifier.width(12.dp))
             }
             Text(stringResource(MR.strings.ebook_follow_book), style = MaterialTheme.typography.bodySmall)
             Switch(
                 checked = followBook,
-                onCheckedChange = { checked -> onCommit(if (checked) null else current) },
+                onCheckedChange = { checked -> invalid = false; onCommit(if (checked) null else current) },
                 modifier = Modifier.padding(start = 8.dp),
             )
         }
+        if (invalid && !followBook) RangeNote(range, false)
         OverriddenNote(overridden)
         if (!followBook) {
-            StepTrackSlider(current, { current = snap(it, range, step) }, { if (current != value) onCommit(current) }, range, step)
+            StepTrackSlider(
+                current.coerceIn(range.start, range.endInclusive),
+                { current = snap(it, range, step); invalid = false },
+                { if (current != value) onCommit(current) },
+                range,
+                step,
+            )
         }
     }
 }
+
+@Composable
+private fun UnitLabel(unit: String?) {
+    if (unit != null) Text(unit, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(start = 6.dp))
+}
+
+/** Under a value field: what can be typed, shown after a value outside it. */
+@Composable
+private fun RangeNote(range: ClosedFloatingPointRange<Float>, whole: Boolean) {
+    val lo = numberText(range.start, whole)
+    val hi = numberText(range.endInclusive, whole)
+    Text(
+        stringResource(if (whole) MR.strings.ebook_value_range_whole else MR.strings.ebook_value_range, lo, hi),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.error,
+    )
+}
+
+private fun numberText(v: Float, whole: Boolean) = if (whole) v.roundToInt().toString() else EbookSettings.format(v)
+
+/**
+ * The value of a slider, typed in (stage 8, asked by the user). Applied with the keyboard's Done key or when the
+ * field loses the focus. A number outside [range] (or not whole, for a [whole] value) is not applied: Done keeps
+ * the field open and [onInvalid] gets true, so the row shows what can be typed; leaving the field puts the value
+ * back. A typed value can be finer than the slider's step (to 0.01, margins to 1 dp). The value is selected when
+ * the field gets the focus, so typing replaces it.
+ */
+@Composable
+private fun NumberField(
+    value: Float,
+    whole: Boolean,
+    range: ClosedFloatingPointRange<Float>,
+    description: String,
+    onInvalid: (Boolean) -> Unit,
+    onCommit: (Float) -> Unit,
+) {
+    val shown = numberText(value, whole)
+    // A new value from outside (the slider, another level, a commit) replaces what the field shows.
+    var text by remember(shown) { mutableStateOf(TextFieldValue(shown)) }
+    var focused by remember { mutableStateOf(false) }
+    var selectAll by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+    val done = LocalFieldDone.current
+    // After the tap that focused the field has placed the cursor.
+    LaunchedEffect(selectAll) {
+        if (selectAll) {
+            text = text.copy(selection = TextRange(0, text.text.length))
+            selectAll = false
+        }
+    }
+
+    fun parsed(): Float? {
+        // Some keyboards type a decimal comma.
+        val v = text.text.trim().replace(',', '.').toFloatOrNull()?.takeIf { it.isFinite() } ?: return null
+        if (v < range.start - EPSILON || v > range.endInclusive + EPSILON) return null
+        if (whole && abs(v - v.roundToInt()) > EPSILON) return null
+        val r = if (whole) v.roundToInt().toFloat() else Math.round(v * 100f) / 100f
+        return r.coerceIn(range.start, range.endInclusive)
+    }
+
+    fun apply(): Boolean {
+        val v = parsed()
+        onInvalid(v == null)
+        if (v != null && abs(v - value) > EPSILON) onCommit(v)
+        return v != null
+    }
+
+    val colors = MaterialTheme.colorScheme
+    BasicTextField(
+        value = text,
+        onValueChange = { text = it },
+        modifier = Modifier
+            .width(64.dp)
+            .semantics { contentDescription = description }
+            .onFocusChanged { f ->
+                if (focused && !f.isFocused && !apply()) {
+                    onInvalid(false)
+                    text = TextFieldValue(shown)
+                }
+                if (!focused && f.isFocused) selectAll = true
+                focused = f.isFocused
+            },
+        singleLine = true,
+        textStyle = MaterialTheme.typography.bodyMedium.copy(color = colors.onSurface, textAlign = TextAlign.End),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = if (whole) KeyboardType.Number else KeyboardType.Decimal,
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(onDone = { if (apply()) done?.invoke() ?: focusManager.clearFocus() }),
+        cursorBrush = SolidColor(colors.primary),
+        decorationBox = { inner ->
+            Box(
+                Modifier
+                    .border(1.dp, if (focused) colors.primary else colors.outline, RoundedCornerShape(6.dp))
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                contentAlignment = Alignment.CenterEnd,
+            ) { inner() }
+        },
+    )
+}
+
+private const val EPSILON = 0.0001f
 
 /** A slider that snaps to [step] without drawing a dot for every stop (margins have 60). */
 @OptIn(ExperimentalMaterial3Api::class)

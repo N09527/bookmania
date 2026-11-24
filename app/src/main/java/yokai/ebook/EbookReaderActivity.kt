@@ -192,6 +192,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     /** The fold's shadow over the page (stage 7), and where the shell puts the gap of two columns (CSS px). */
     private var gutterView: GutterShadowView? = null
     private var gutterCss: Double? = null
+    /** The largest left + right margins that keep two columns, when the settings ask for two here (stage 8). */
+    private var marginMost: Int? = null
 
     private var busy = false
     private var waitJob: Job? = null
@@ -884,6 +886,13 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
     private fun readGutter(status: JSONObject) {
         gutterCss = if (status.isNull("gutter")) null else status.optDouble("gutter").takeIf { it.isFinite() }
         showGutter()
+        // The panel limits the side margins to what keeps two columns on this screen (stage 8).
+        marginMost = if (status.optBoolean("twoWanted") && !status.isNull("marginMost")) {
+            status.optInt("marginMost").takeIf { it >= 0 }
+        } else {
+            null
+        }
+        panel?.let { if (it.marginMost != marginMost) panel = it.copy(marginMost = marginMost) }
     }
 
     /**
@@ -1373,6 +1382,7 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             fonts = fontStore.list(),
             pageTurn = pageTurnPreferences.textReader().get(),
             gutterShadow = gutterPreferences.textReader().get(),
+            marginMost = marginMost,
         )
     }
 

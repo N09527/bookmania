@@ -18,7 +18,7 @@
   var P = 8;        // overflow allowance around the page box (ruby, glyph overhang)
   var GAP = 24;     // invisible gap between consecutive pages, must be > 2 * P
   var COL_GAP = 40; // gap between the two columns of a spread (fixed, decision 9 of the design)
-  var MIN_COL = 120; // narrower than this, two columns fall back to one
+  var MIN_COL = 120; // narrowest column of two; the screen must leave 2 * MIN_COL + COL_GAP between the side margins
   var POSITION_TEXT = 24; // characters of text saved with a reading position (to find it again)
   // anchor: first character of the page the reader navigated to. Relayouts (rotation, settings) keep
   // returning to it, so repeated relayouts do not drift; any navigation clears it.
@@ -93,14 +93,30 @@
     return 1;
   }
 
+  // The largest left + right margins that still leave two columns of MIN_COL (stage 8; negative: never two).
+  function twoColumnMargins(W) {
+    return W - 2 * MIN_COL - COL_GAP;
+  }
+
   // pageW: width of one page box (a column); G: gap between the two columns (rounding goes into it).
+  // With two columns, side margins too wide for two columns of MIN_COL are narrowed for the layout, in their
+  // proportion (the settings keep their values): before stage 8 the page fell back to one column, and a margin
+  // moved back and forth across that limit made the page jump between one and two columns. Only a screen
+  // narrower than 2 * MIN_COL + COL_GAP still gets one column.
   function geometry(s) {
     var W = window.innerWidth, H = window.innerHeight, m = s.margins;
+    var cols = wantedColumns(s);
+    var most = twoColumnMargins(W);
+    if (cols === 2 && most < 0) cols = 1;
+    if (cols === 2 && m.left + m.right > most) {
+      var left = Math.floor(m.left * most / (m.left + m.right));
+      m = { top: m.top, bottom: m.bottom, left: left, right: most - left };
+    }
     var w = Math.max(80, W - m.left - m.right), h = Math.max(80, H - m.top - m.bottom);
-    var cols = wantedColumns(s), pageW = w, G = 0;
+    var pageW = w, G = 0;
     if (cols === 2) {
       pageW = Math.floor((w - COL_GAP) / 2);
-      if (pageW < MIN_COL) { cols = 1; pageW = w; } else G = w - 2 * pageW;
+      G = w - 2 * pageW;
     }
     return { W: W, H: H, m: m, contentW: w, contentH: h, cols: cols, pageW: pageW, G: G,
       step: (S.mode === 'V' ? h : pageW) + GAP };
@@ -611,8 +627,12 @@
   // shadow there); vw: the viewport width the layout used (window.innerWidth, a whole number). Both in CSS px.
   function status() {
     var g = S.geo, two = !!g && S.cols === 2;
+    // twoWanted / marginMost: whether the settings ask for two columns on this screen, and the largest left +
+    // right margins that keep two columns (the panel limits its margin sliders to it, stage 8).
     return { ready: S.ready, error: S.error, page: S.page, pages: S.pages, cols: S.cols, mode: S.mode, seq: S.seq, ms: S.ms,
-      rubyFix: S.rubyFix, gutter: two ? g.m.left + g.pageW + g.G / 2 : null, vw: g ? g.W : null };
+      rubyFix: S.rubyFix, gutter: two ? g.m.left + g.pageW + g.G / 2 : null, vw: g ? g.W : null,
+      twoWanted: !!S.settings && wantedColumns(S.settings) === 2, marginMost: g ? twoColumnMargins(g.W) : null,
+      marginLeft: g ? g.m.left : null, marginRight: g ? g.m.right : null };
   }
 
   var resizeTimer = null;
