@@ -398,7 +398,7 @@ def device_time():
 
 def turn_logs(since):
     """The App's debug lines about page turns (PageTurner) written since [since] (device time, seconds)."""
-    out = d.adb('logcat', '-d', '-v', 'epoch', '-s', 'Yokai:D')
+    out = d.adb('logcat', '-d', '-v', 'epoch', '-s', 'Bookmania:D')  # the App's log tag (Yokai before the 1.0.0 rename)
     lines = []
     for ln in out.splitlines():
         parts = ln.split()

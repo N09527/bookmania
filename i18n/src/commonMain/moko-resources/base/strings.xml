@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Yōkai</string>
-    <string name="app_short_name" translatable="false">Yōkai</string>
-    <string name="app_normalized_name" translatable="false">Yokai</string>
+    <!-- Bookmania: the app's own name (it was forked from Yōkai) -->
+    <string name="app_name" translatable="false">Bookmania</string>
+    <string name="app_short_name" translatable="false">Bookmania</string>
+    <string name="app_normalized_name" translatable="false">Bookmania</string>
 
     <string name="action_menu_overflow_description">More options</string>
     <string name="action_bar_up_description">Navigate up</string>
@@ -212,7 +213,7 @@
     <string name="allow_notifications_recommended">Allowing notifications is recommended to keep your library and app up to date.</string>
     <string name="new_chapters_found">New chapters found</string>
     <string name="notification_size_warning">Large updates may lead to increased battery usage and sources becoming slower. Tap to learn more.</string>
-    <string name="download_queue_size_warning">Warning: large bulk downloads may lead to sources becoming slower and/or blocking Tachiyomi. Tap to learn more.</string>
+    <string name="download_queue_size_warning">Warning: large bulk downloads may lead to sources becoming slower and/or blocking Bookmania. Tap to learn more.</string>
     <string name="notification_update_error">%1$d update(s) failed</string>
     <string name="notification_update_skipped">%1$d update(s) skipped</string>
     <string name="skipped_reason_completed">Skipped because series is complete</string>
@@ -1050,7 +1051,7 @@
     <string name="please_update_webview">Please update the WebView app for better compatibility</string>
     <string name="information_webview_required">WebView is required for the app to function</string>
     <!-- Do not translate "WebView" -->
-    <string name="webview_is_required">WebView is required for Tachiyomi</string>
+    <string name="webview_is_required">WebView is required for Bookmania</string>
     <string name="action_webview_back">Back</string>
     <string name="action_webview_forward">Forward</string>
     <string name="action_webview_refresh">Refresh</string>

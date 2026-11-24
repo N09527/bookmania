@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -39,7 +37,7 @@ import eu.kanade.tachiyomi.data.preference.PreferencesHelper
 import eu.kanade.tachiyomi.data.updater.AppUpdateChecker
 import eu.kanade.tachiyomi.data.updater.AppUpdateNotifier
 import eu.kanade.tachiyomi.data.updater.AppUpdateResult
-import eu.kanade.tachiyomi.data.updater.RELEASE_URL
+import eu.kanade.tachiyomi.data.updater.GITHUB_REPO
 import eu.kanade.tachiyomi.util.CrashLogUtil
 import eu.kanade.tachiyomi.util.compose.LocalDialogHostState
 import eu.kanade.tachiyomi.util.compose.currentOrThrow
@@ -66,7 +64,6 @@ import yokai.presentation.component.preference.widget.TextPreferenceWidget
 import yokai.presentation.core.components.LinkIcon
 import yokai.presentation.core.enterAlwaysCollapsedAppBarScrollBehavior
 import yokai.presentation.core.icons.CustomIcons
-import yokai.presentation.core.icons.Discord
 import yokai.presentation.core.icons.GitHub
 import yokai.presentation.settings.SettingsScaffold
 import yokai.util.Screen
@@ -91,20 +88,23 @@ class AboutScreen : Screen() {
                 scope.launch { dialogHostState.awaitNotificationPermissionDeniedDialog() }
             }
         }
-        LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-            // FIXME: Move this to MainActivity once the app is fully migrated to Compose
-            scope.launchIO {
-                context.checkVersion(
-                    dialogState = dialogHostState,
-                    isUserPrompt = false,
-                    notificationPrompt = {
-                        context.showNotificationPermissionPrompt(
-                            requestNotificationPermission,
-                            false,
-                            preferences,
-                        )
-                    }
-                )
+        // Bookmania: only with the in-app updater (off), so opening About never asks GitHub for a release.
+        if (BuildConfig.INCLUDE_UPDATER) {
+            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                // FIXME: Move this to MainActivity once the app is fully migrated to Compose
+                scope.launchIO {
+                    context.checkVersion(
+                        dialogState = dialogHostState,
+                        isUserPrompt = false,
+                        notificationPrompt = {
+                            context.showNotificationPermissionPrompt(
+                                requestNotificationPermission,
+                                false,
+                                preferences,
+                            )
+                        }
+                    )
+                }
             }
         }
 
@@ -130,7 +130,7 @@ class AboutScreen : Screen() {
                         TextPreferenceWidget(
                             title = stringResource(MR.strings.whats_new_this_release),
                             onPreferenceClick = {
-                                context.openInBrowser(if (BuildConfig.DEBUG) SOURCE_URL else RELEASE_URL)
+                                context.openInBrowser(if (BuildConfig.DEBUG) SOURCE_URL else CHANGELOG_URL)
                             },
                         )
                     }
@@ -184,24 +184,10 @@ class AboutScreen : Screen() {
                             HorizontalDivider()
 
                             TextPreferenceWidget(
-                                title = stringResource(MR.strings.help_translate),
-                                onPreferenceClick = { context.openInBrowser("https://hosted.weblate.org/engage/yokai/") },
+                                title = stringResource(MR.strings.open_source_licenses),
+                                onPreferenceClick = { navigator.push(AboutLicenseScreen()) },
                             )
                         }
-                    }
-
-                    item {
-                        TextPreferenceWidget(
-                            title = stringResource(MR.strings.helpful_translation_links),
-                            onPreferenceClick = { context.openInBrowser("https://mihon.app/docs/contribute#helpful-links") },
-                        )
-                    }
-
-                    item {
-                        TextPreferenceWidget(
-                            title = stringResource(MR.strings.open_source_licenses),
-                            onPreferenceClick = { navigator.push(AboutLicenseScreen()) },
-                        )
                     }
 
                     item {
@@ -213,19 +199,9 @@ class AboutScreen : Screen() {
                             horizontalArrangement = Arrangement.Center,
                         ) {
                             LinkIcon(
-                                label = "Website",
-                                icon = Icons.Outlined.Public,
-                                url = "https://mihon.app",
-                            )
-                            LinkIcon(
-                                label = "Discord",
-                                icon = CustomIcons.Discord,
-                                url = "https://discord.gg/mihon",
-                            )
-                            LinkIcon(
                                 label = "GitHub",
                                 icon = CustomIcons.GitHub,
-                                url = "https://github.com/null2264/yokai",
+                                url = "https://github.com/$GITHUB_REPO",
                             )
                         }
                     }
@@ -297,4 +273,5 @@ fun getFormattedBuildTime(dateFormat: DateFormat): String {
     }
 }
 
-private const val SOURCE_URL = "https://github.com/null2264/yokai/commits/master"
+private const val SOURCE_URL = "https://github.com/$GITHUB_REPO/commits/main"
+private const val CHANGELOG_URL = "https://github.com/$GITHUB_REPO/blob/main/CHANGELOG.md"

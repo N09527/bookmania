@@ -464,7 +464,7 @@
     <string name="disabled">已停用</string>
     <string name="app_info">程式資訊</string>
     <string name="reading_mode">閱讀模式</string>
-    <string name="webview_is_required">WebView 為 Tachiyomi 的必要元件</string>
+    <string name="webview_is_required">WebView 為 Bookmania 的必要元件</string>
     <string name="create_new_category">建立新分類</string>
     <string name="log_in">登入</string>
     <string name="update_all">全部更新</string>
@@ -502,7 +502,7 @@
     <string name="extension_updates">擴充套件的更新內容</string>
     <string name="next">下一頁</string>
     <string name="every_3_days">每 3 日</string>
-    <string name="download_queue_size_warning">警告：大量批次下載可能壅塞來源並 (或) 使其封鎖 Tachiyomi。輕觸以瞭解詳情。</string>
+    <string name="download_queue_size_warning">警告：大量批次下載可能壅塞來源並 (或) 使其封鎖 Bookmania。輕觸以瞭解詳情。</string>
     <string name="confirm_category_deletion_message">這些項目將會被自動移到「預設分類」。</string>
     <string name="manage_category">管理分類</string>
     <string name="already_in_category">已存在於分類中的項目</string>
