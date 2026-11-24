@@ -261,8 +261,12 @@ def slider_after(label, ns=None):
 
 
 def _content_signature(ns):
-    inside = [n for n in ns if n['text'] and 1401 <= n['b'][1] < 1794]
-    return tuple((n['text'], n['b'][1]) for n in inside[:4])
+    """What the panel shows (texts and where they are), to tell whether a scroll moved it. The book's own text
+    nodes (class android.view.View, from the WebView under the panel) are left out: they do not move with the
+    panel. Before stage 7 the first four texts were taken, and with the horizontal book they were all the
+    book's, so the panel always looked still and the search turned back every two scrolls."""
+    inside = [n for n in ns if n['text'] and n['cls'] != 'android.view.View' and 1401 <= n['b'][1] < 1794]
+    return tuple((n['text'], n['b'][1]) for n in inside)
 
 
 def reveal_node(pred, tries=16):

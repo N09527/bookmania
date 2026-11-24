@@ -38,7 +38,6 @@ import os
 import re
 import sqlite3
 import sys
-import threading
 import time
 import xml.etree.ElementTree as ET
 
@@ -1068,6 +1067,36 @@ def step_toc(manga, chapter, label, entry):
     stop_app()
 
 
+# Raw touch events on the emulator's touch screen ("qwerty2": multi-touch protocol B, axes 0..32767 over the
+# 1080 x 1920 screen in portrait). A touch needs a pressure above 0: with a pressure axis, Android takes a contact
+# without pressure for hovering.
+TOUCH_DEV = '/dev/input/event1'
+
+
+def _ev(type_, code, value):
+    return f'sendevent {TOUCH_DEV} {type_} {code} {value}'
+
+
+def _touch_at(x, y):
+    return [_ev(3, 53, round(x * 32767 / 1080)), _ev(3, 54, round(y * 32767 / 1920)), _ev(0, 0, 0)]
+
+
+def touch_down(x, y):
+    return [_ev(3, 47, 0), _ev(3, 57, 7), _ev(3, 48, 5), _ev(3, 58, 512)] + _touch_at(x, y)
+
+
+def touch_moves(x1, x2, y, steps):
+    return [e for i in range(1, steps + 1) for e in _touch_at(x1 + (x2 - x1) * i / steps, y)]
+
+
+def touch_up():
+    return [_ev(3, 47, 0), _ev(3, 57, -1), _ev(0, 0, 0)]
+
+
+def touch(events):
+    d.shell('; '.join(events), timeout=180)
+
+
 def step_slider(manga, chapter, label, fraction):
     STEP[0] = 'slider:' + label
     set_prefs({}, reset_typesetting=True)
@@ -1078,30 +1107,27 @@ def step_slider(manga, chapter, label, fraction):
     if not check('slider shown with the menu', s is not None, page_info(ns)):
         return
     rtl = bool(d.cdp('window.__reader.status().mode') == 'V')
-    # Drag, holding the finger down: the label shows the table of contents entry under the thumb.
+    # Drag, holding the finger down: the label shows the table of contents entry under the thumb. The drag is made
+    # of raw touch events and the finger stays still for a moment part of the way (stage 7): uiautomator dumps the
+    # screen only once it is idle, and with `input swipe` (which moves the finger without a pause) the dump came
+    # after the finger was lifted. The screenshot is taken while the finger is down.
     x_from, x_to = slider_x(s, 0.1), slider_x(s, fraction)
+    x_mid = x_from + (x_to - x_from) * 0.55
     y = s['y']
-    swipe_ms = 24000
-    t = threading.Thread(target=lambda: d.shell(f'input swipe {x_from} {y} {x_to} {y} {swipe_ms}', timeout=swipe_ms / 1000 + 120))
     st0 = d.status()
-    t0 = time.time()
-    t.start()
-    time.sleep(swipe_ms / 1000 * 0.55)
+    touch(touch_down(x_from, y) + touch_moves(x_from, x_mid, y, 12))
+    time.sleep(2)
     t_dump = time.time()
     mid = d.nodes()
-    t_dumped = time.time()
-    t.join()
-    t_swiped = time.time()
+    dump_s = round(time.time() - t_dump, 1)
     d.shot(label + '-1-dragging')
+    touch(touch_moves(x_mid, x_to, y, 12) + touch_up())
     # The bar's texts are TextView nodes (the book's text in the WebView is in View nodes).
     bar_texts = [n['text'] for n in mid if n['text'] and n['y'] > 1500 and n['cls'].endswith('TextView')
                  and not re.fullmatch(r'\d+%', n['text'])]
-    # uiautomator dumps once the screen is idle, so the dump can come late; the times (seconds from the start of
-    # the swipe) tell whether it was taken while the finger was still down (stage 7).
     check('while dragging, the bar shows a table of contents title instead of the page', bar_texts and not any(PAGE_INFO.match(x) for x in bar_texts),
           {'bar texts while dragging': bar_texts, 'page info before': page_info(ns),
-           'times (s)': {'swipe length': swipe_ms / 1000, 'dump asked': round(t_dump - t0, 1),
-                         'dump returned': round(t_dumped - t0, 1), 'swipe command returned': round(t_swiped - t0, 1)}})
+           'finger held at (fraction of the track)': round(0.1 + (fraction - 0.1) * 0.55, 3), 'dump took (s)': dump_s})
     st = wait_change(st0, 120)
     time.sleep(4)
     after = d.nodes()
