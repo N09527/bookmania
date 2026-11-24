@@ -88,15 +88,22 @@ def type_value(label, text, expect_change=True):
     if f is None:
         return {'field': None}
     st0 = d.status()
+    t0 = time.time()
     d.tap(f['x'], f['y'], 3)
     up = keyboard_shown()
+    # The panel moves once the keyboard's height reaches it: on this emulator up to a few seconds after the
+    # keyboard is reported shown (seen 3 to 6 s), so the field's position is read until it changes.
     f2 = field(label)
+    while f2 is not None and f2['b'] == f['b'] and time.time() - t0 < 15:
+        time.sleep(1)
+        f2 = field(label)
+    moved_after = round(time.time() - t0, 1)
     st_up = d.status()
     d.shell(f'input text {text}')
     time.sleep(1.5)
     d.shell('input keyevent 66')
     st = wait_seq(st0['seq'], 45 if expect_change else 8)
-    return {'field': f['b'], 'keyboard shown': up, 'field with the keyboard': f2 and f2['b'],
+    return {'field': f['b'], 'keyboard shown': up, 'field with the keyboard': f2 and f2['b'], 'seconds until read': moved_after,
             'laid out again while the keyboard was up': st_up['seq'] != st0['seq'], 'seq': [st0['seq'], st['seq']], 'status': st}
 
 
@@ -328,7 +335,10 @@ def step_margins():
     seq = d.status()['seq']
     x1, y1, x2, y2 = sl['b']
     thumb = x1 + 5 + (20 / 72) * (x2 - x1 - 10)
-    d.swipe(int(thumb), int((y1 + y2) / 2), 1076, int((y1 + y2) / 2), 1500, 3)
+    y = (y1 + y2) / 2
+    # Raw touch events (as the stage 5 slider check): `input swipe` lifts the finger before the end of the drag
+    # when the App is busy (seen: 64 of 72), so the drag here ends exactly past the slider's end.
+    c.touch(c.touch_down(thumb, y) + c.touch_moves(thumb, 1076, y, 16) + c.touch_up())
     st = wait_seq(seq, 45)
     p = d.ebook_prefs()
     check('the right slider ends at the limit (132 - 60 = 72): still two columns',
