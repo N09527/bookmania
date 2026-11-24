@@ -167,11 +167,14 @@ def step_strings():
     c.clear_dialogs()
     for labels, wait in ((('探索', 'Browse'), 5), (('本機來源', 'Local source'), 10), (('橫排測試書 EPUB',), 30)):
         n = None
-        for _ in range(6):
-            n = next((m for m in (d.find(x, exact=True) for x in labels) if m), None)
+        for _ in range(10):  # the list of works is longer than a screen: scrolled until the work shows
+            n = next((m for m in (d.find(x, exact=True) for x in labels) if m and m['y'] < 1650), None)
             if n:
                 break
-            time.sleep(3)
+            if labels[0].startswith('橫排'):
+                d.swipe(540, 1500, 540, 800, 800, 3)
+            else:
+                time.sleep(3)
         if n is None:
             s7.shot('rel-strings-not-found')
             c.check(f'release, work page: {labels[0]} found', False, labels)

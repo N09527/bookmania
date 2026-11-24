@@ -119,10 +119,41 @@ def visible_texts():
 
 # region strings
 
+def open_work_page(title):
+    """Browse > Local source > [title], scrolling the list of works (it grew past one screen in stage 7)."""
+    c.stop_app(0)
+    d.shell(f'am start -n {d.PKG}/eu.kanade.tachiyomi.ui.main.MainActivity')
+    time.sleep(6)
+    c.wait_app_drawn()
+    time.sleep(4)
+    c.clear_dialogs()
+    for labels, wait in ((('探索', 'Browse'), 5), (('本機來源', 'Local source'), 10)):
+        n = next((m for m in (d.find(x, exact=True) for x in labels) if m), None)
+        if n is None:
+            s7.shot('strings-not-found-' + labels[0])
+            return False
+        d.tap(n['x'], n['y'], wait)
+    for _ in range(10):
+        n = d.find(title, exact=True)
+        if n is not None and n['y'] < 1650:
+            d.tap(n['x'], n['y'], 10)
+            for _ in range(12):
+                texts = [m['text'] for m in d.nodes() if m['text']]
+                if any(t in texts for t in ('開始閱讀', '繼續閱讀', '加入書櫃', '在書櫃中')) or any(t.startswith('繼續閱讀') for t in texts):
+                    time.sleep(20)  # the chapters are read from the folder
+                    return True
+                time.sleep(3)
+            s7.shot('strings-work-page-not-shown')
+            return False
+        d.swipe(540, 1500, 540, 800, 800, 3)
+    s7.shot('strings-work-not-in-list')
+    return False
+
+
 def step_strings():
     c.STEP[0] = 'strings'
     c.rotate(False)
-    opened = acc.open_new_work(WORK)
+    opened = open_work_page(WORK)
     check('the work page shows', opened)
     texts = []
     for _ in range(4):
@@ -148,9 +179,11 @@ def step_fields():
     c.rotate(False)
     c.open_book(*HORZ)
     d.open_panel()
+    reveal_row('字級')
     s7.shot('fields-01-text-tab')
     ns = d.nodes()
-    check('value fields on the rows (text tab)', any(n['cls'].endswith('EditText') for n in ns),
+    f = field('字級', ns)
+    check('a value field on the font size row, showing the value (20)', f is not None and f['text'] == '20',
           [(n['text'], n['b']) for n in ns if n['cls'].endswith('EditText')])
 
     # Font size: the keyboard pushes the panel up, the page is not laid out again until Done.
@@ -287,11 +320,15 @@ def step_margins():
           {k: st.get(k) for k in ('cols', 'marginLeft', 'marginRight', 'pages', 'seq')})
     s7.shot('margins-03-left-112')
 
-    # The slider stops at the limit: left back to 60, then the right slider's far end.
+    # The slider stops at the limit: left back to 60, then the right slider's thumb dragged past the end (a tap on
+    # the very edge of a slider does not register, on any slider: the drag is what a finger does).
     type_value('左', '60')
     reveal_row('右')
+    sl = d.reveal_slider('右')
     seq = d.status()['seq']
-    d.set_slider('右', 1.0)
+    x1, y1, x2, y2 = sl['b']
+    thumb = x1 + 5 + (20 / 72) * (x2 - x1 - 10)
+    d.swipe(int(thumb), int((y1 + y2) / 2), 1076, int((y1 + y2) / 2), 1500, 3)
     st = wait_seq(seq, 45)
     p = d.ebook_prefs()
     check('the right slider ends at the limit (132 - 60 = 72): still two columns',
