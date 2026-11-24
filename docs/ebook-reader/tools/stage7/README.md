@@ -27,9 +27,11 @@ ADB=/path/to/adb python3 -I check_stage7.py bold vertical bold horizontal gutter
 | `text` | 橫排 EPUB、直向、雙欄：陰影在間隙中央。預設邊距 20／20 時，間隙中央是螢幕中央：(412 + 20 − 20) ÷ 2 = 206 CSS px，乘以密度 2.625 = 540.75 px。關閉陰影的開關：沒有陰影。 |
 | `bold` | 單欄、同一頁：打開加粗後，頁面上深色像素的比例比關閉時多（至少 1.15 倍）。 |
 | `comic` | `check_stage7.py comic` 的測試漫畫（在複製過來的書櫃中），左至右、雙頁、符合螢幕：接縫上有陰影；關閉開關：沒有。 |
+| `strings` | 第 8 階段：release App 的作品頁（這部模擬器上是英文介面）：簡介標題是「About this book」，章數仍是「N chapters」。只在指定時執行。 |
 
 ```bash
 ADB=/path/to/adb python3 -I check_release_features.py            # text bold comic
+ADB=/path/to/adb python3 -I check_release_features.py strings    # 第 8 階段的英文字串
 ```
 
 結果在 `out/release-features/results.jsonl`，截圖在 `out/release-features/shots/`。

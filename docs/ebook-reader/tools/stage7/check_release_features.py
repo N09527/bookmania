@@ -9,12 +9,15 @@ check_stage7.py:
   - bold, one column: the same page with bold on has more ink than with bold off.
   - image reader, the test comic of check_stage7.py (in the copied library), left to right, double pages, fit
     screen: the shadow on the seam; with the switch off: none.
+  - strings (stage 8): the work page of the release App, whose screens are in English on this emulator: the
+    description header reads "About this book" (was "About this manga").
 The release App cannot be reached with run-as: its preferences and database are read and written as root.
 
 Usage: ADB=/path/to/adb python3 -I check_release_features.py
 Results: out/release-features/results.jsonl, screenshots in out/release-features/shots/.
 """
 import os
+import re
 import sqlite3
 import sys
 import time
@@ -153,9 +156,44 @@ def step_comic():
     set_prefs({k: None for k in COMIC_PREFS})
 
 
+def step_strings():
+    """Browse > Local source > the horizontal test book's work: the description header (stage 8)."""
+    c.STEP[0] = 'release-features:strings'
+    c.rotate(False)
+    d.shell(f'am force-stop {REL}')
+    time.sleep(2)
+    d.shell(f'am start -n {REL}/eu.kanade.tachiyomi.ui.main.MainActivity')
+    time.sleep(8)
+    c.clear_dialogs()
+    for labels, wait in ((('探索', 'Browse'), 5), (('本機來源', 'Local source'), 10), (('橫排測試書 EPUB',), 30)):
+        n = None
+        for _ in range(6):
+            n = next((m for m in (d.find(x, exact=True) for x in labels) if m), None)
+            if n:
+                break
+            time.sleep(3)
+        if n is None:
+            s7.shot('rel-strings-not-found')
+            c.check(f'release, work page: {labels[0]} found', False, labels)
+            return
+        d.tap(n['x'], n['y'], wait)
+    texts = []
+    for _ in range(4):
+        texts = [m['text'] for m in d.nodes() if m['text']]
+        if 'About this book' in texts:
+            break
+        d.swipe(540, 1500, 540, 900, 800, 3)
+    s7.shot('rel-07-work-page')
+    c.check('release, work page (English): the description header reads "About this book"', 'About this book' in texts,
+            [t for t in texts if t.startswith('About')])
+    c.check('release, work page (English): the chapter count is unchanged ("N chapters")',
+            any(re.fullmatch(r'\d+ chapters?', t) for t in texts), [t for t in texts if 'chapter' in t])
+    d.shell(f'am force-stop {REL}')
+
+
 def main():
-    steps = {'text': step_text, 'bold': step_bold, 'comic': step_comic}
-    for name in sys.argv[1:] or list(steps):
+    steps = {'text': step_text, 'bold': step_bold, 'comic': step_comic, 'strings': step_strings}
+    for name in sys.argv[1:] or ['text', 'bold', 'comic']:
         try:
             steps[name]()
         except Exception as e:  # noqa: BLE001  (record it and go on with the next step)
