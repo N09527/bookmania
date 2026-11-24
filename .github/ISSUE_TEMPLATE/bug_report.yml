@@ -1,0 +1,86 @@
+name: 🐞 回報問題 (Bug report)
+description: 回報 Bookmania 的錯誤或異常 / Report a problem in Bookmania
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        請不要上傳有版權的書；可以的話，用自己做的小檔案重現。受 DRM 保護的書不在支援範圍內。
+        Please do not upload copyrighted books. Books protected by DRM are not supported.
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 重現步驟 (Steps to reproduce)
+      placeholder: |
+        1. 打開某本 EPUB（直排）
+        2. 在排版面板把字級改成 24
+        3. 出現的問題
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 預期的結果 (Expected behavior)
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 實際的結果 (Actual behavior)
+      description: 可以附上截圖。 / Screenshots are welcome.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: format
+    attributes:
+      label: 書的格式 (Book format)
+      multiple: true
+      options:
+        - EPUB
+        - MOBI
+        - AZW3
+        - 漫畫／圖片 (Comic / images)
+        - 和書無關 (Not related to a book)
+
+  - type: textarea
+    id: crash-logs
+    attributes:
+      label: 當機紀錄 (Crash logs)
+      description: |
+        如果 App 當機，請到「設定 > 進階」按「傾印當機記錄」，把內容貼上或附加檔案。
+        If the App crashed, use Settings > Advanced > Dump crash logs and paste or attach the file.
+
+  - type: input
+    id: app-version
+    attributes:
+      label: Bookmania 版本 (Version)
+      description: 設定 > 關於 > 版本 / Settings > About > Version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: android-version
+    attributes:
+      label: Android 版本 (Android version)
+      placeholder: "Android 14"
+    validations:
+      required: true
+
+  - type: input
+    id: webview-version
+    attributes:
+      label: Android System WebView 版本 (WebView version)
+      description: 系統設定 > 應用程式 > Android System WebView / Settings > Apps > Android System WebView
+
+  - type: input
+    id: device
+    attributes:
+      label: 裝置 (Device)
+      placeholder: "Google Pixel 8"
+    validations:
+      required: true

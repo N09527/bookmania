@@ -1,0 +1,111 @@
+# Builds the signed release APKs when a version tag (v1.2.3) is pushed and publishes them on GitHub Releases.
+# Needs four repository secrets (see docs/RELEASING.md): BOOKMANIA_SIGNING_KEY (the keystore, base64),
+# BOOKMANIA_STORE_PASSWORD, BOOKMANIA_KEY_ALIAS and BOOKMANIA_KEY_PASSWORD.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0 # the build counts commits for the debug version name
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6
+
+      - name: Set up the Android SDK build tools
+        run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager "build-tools;35.0.0"
+
+      - name: Check that the tag matches the app's version
+        run: |
+          version=$(sed -n 's/^val _versionName = "\(.*\)"$/\1/p' app/build.gradle.kts)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::The tag $GITHUB_REF_NAME does not match the version $version in app/build.gradle.kts"
+            exit 1
+          fi
+
+      - name: Decode the signing key
+        env:
+          SIGNING_KEY: ${{ secrets.BOOKMANIA_SIGNING_KEY }}
+        run: |
+          if [ -z "$SIGNING_KEY" ]; then
+            echo "::error::The secret BOOKMANIA_SIGNING_KEY is not set (see docs/RELEASING.md)"
+            exit 1
+          fi
+          echo "$SIGNING_KEY" | base64 --decode > "$RUNNER_TEMP/bookmania-release.jks"
+
+      - name: Test and build the signed release
+        env:
+          ORG_GRADLE_PROJECT_bookmaniaStoreFile: ${{ runner.temp }}/bookmania-release.jks
+          ORG_GRADLE_PROJECT_bookmaniaStorePassword: ${{ secrets.BOOKMANIA_STORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_bookmaniaKeyAlias: ${{ secrets.BOOKMANIA_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_bookmaniaKeyPassword: ${{ secrets.BOOKMANIA_KEY_PASSWORD }}
+        run: |
+          mkdir -p ~/.gradle
+          cp .github/runner-files/ci-gradle.properties ~/.gradle/gradle.properties
+          ./gradlew :app:testBookmaniaDebugUnitTest :core:ebook:testDebugUnitTest :domain:testDebugUnitTest \
+            :app:assembleBookmaniaRelease
+
+      - name: Check the signatures and collect the APKs
+        run: |
+          apksigner="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/*/ | sort -V | tail -1)apksigner"
+          mkdir dist
+          for abi in arm64-v8a armeabi-v7a x86 x86_64 universal; do
+            apk="app/build/outputs/apk/bookmania/release/app-bookmania-$abi-release.apk"
+            "$apksigner" verify "$apk"
+            cp "$apk" "dist/bookmania-$GITHUB_REF_NAME-$abi.apk"
+          done
+          (cd dist && sha256sum *.apk > SHA256SUMS.txt)
+
+      - name: Write the release notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          {
+            echo
+            echo "### 下載 (Download)"
+            echo
+            echo "一般手機請下載 \`bookmania-$GITHUB_REF_NAME-arm64-v8a.apk\`；裝不了時改用 \`universal\`。需要 Android 8.0 以上。"
+            echo "Most phones need \`bookmania-$GITHUB_REF_NAME-arm64-v8a.apk\`; if it does not install, use \`universal\`. Requires Android 8.0+."
+            echo
+            echo "### SHA-256"
+            echo
+            echo '```'
+            cat dist/SHA256SUMS.txt
+            echo '```'
+          } >> notes.md
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" dist/* --title "Bookmania $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
+
+      - name: Remove the signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/bookmania-release.jks"

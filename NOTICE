@@ -1,0 +1,49 @@
+Bookmania
+Copyright 2026 N09527
+
+This product is a modified version of Yōkai (https://github.com/null2264/yokai),
+forked at Yōkai commit 843a59b20e4edd26c545dc48989a00162ac65937 (version 1.10.3).
+Yōkai is licensed under the Apache License, Version 2.0 (see LICENSE) and carries
+these copyright notices:
+
+  Copyright 2015 Javier Tomás
+  Copyright 2024 null2264
+
+Yōkai itself is derived from TachiyomiJ2K and Tachiyomi.
+
+Changes made in Bookmania
+-------------------------
+
+Bookmania changed Yōkai's files and added its own. The complete list of changes
+is in the git history of this repository; the files of Yōkai that were changed
+can be listed with:
+
+  git diff --name-status 843a59b -- . ':!docs'
+
+The main changes:
+
+  - A new reader for text ebooks (EPUB, MOBI, AZW3): the module core/ebook, the
+    package yokai.ebook in app/, and the reader in app/src/main/assets/ebook.
+    It typesets vertical and horizontal text, one or two columns, with
+    settings at three levels, imported fonts, and reading positions.
+  - Page turn animations (yokai.pageturn) and the fold's shadow between two
+    columns or two pages (yokai.gutter), for the text and the comic readers.
+  - Its own identity: the name Bookmania, the application id
+    io.github.n09527.bookmania, the icons, and version numbers from 1.0.0.
+  - Removed from Yōkai: Firebase crash reporting and analytics, Yōkai's build
+    flavors and release channels, and its self-update source.
+
+Third-party code included in source form
+----------------------------------------
+
+  - foliate-js (https://github.com/johnfactotum/foliate-js)
+    Copyright (c) 2022 John Factotum, MIT License.
+    Parts of mobi.js are ported to Kotlin in core/ebook (package
+    yokai.core.ebook.mobi). The license text is shown in the App under
+    Settings > About > Open source licenses.
+
+The other libraries the App uses are Gradle dependencies; they and their
+licenses are listed in the App under Settings > About > Open source licenses.
+
+Bookmania is not affiliated with Yōkai, Tachiyomi or Mihon. Their names are
+used only to describe the origin of this product.
