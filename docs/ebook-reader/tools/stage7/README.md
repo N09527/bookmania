@@ -17,3 +17,19 @@ ADB=/path/to/adb python3 -I check_stage7.py bold vertical bold horizontal gutter
 結果在 `out/results.jsonl`（每個檢查一行 JSON），截圖在 `out/shots/`。
 
 捲曲翻頁時的畫面：這部模擬器一次翻頁只畫 3～5 格，截圖（每張 3 秒以上）與一般速度的錄影都抓不到。所以和第 5.5 階段一樣，錄影期間把系統的「動畫時間比例」調成 40 倍（`animator_duration_scale`），用 `screenrecord` 錄下翻頁，再以 ffmpeg 拆成畫格；錄完恢復為 1。只檢查和翻頁前、翻頁後兩個畫面都不同的畫格（動畫進行中）。
+
+## release 版上的兩項功能
+
+`check_release_features.py`：在 `tools/stage6/release_smoke.py` 裝好 release App 並複製 debug App 的書櫃與書之後執行（adb 以 root 執行）。release App 不能用 WebView 的除錯介面，也不能 `run-as`，所以偏好設定與資料庫以 root 讀寫，量測都在截圖上做，方法與 `check_stage7.py` 相同。
+
+| 步驟 | 內容 |
+|---|---|
+| `text` | 橫排 EPUB、直向、雙欄：陰影在間隙中央。預設邊距 20／20 時，間隙中央是螢幕中央：(412 + 20 − 20) ÷ 2 = 206 CSS px，乘以密度 2.625 = 540.75 px。關閉陰影的開關：沒有陰影。 |
+| `bold` | 單欄、同一頁：打開加粗後，頁面上深色像素的比例比關閉時多（至少 1.15 倍）。 |
+| `comic` | `check_stage7.py comic` 的測試漫畫（在複製過來的書櫃中），左至右、雙頁、符合螢幕：接縫上有陰影；關閉開關：沒有。 |
+
+```bash
+ADB=/path/to/adb python3 -I check_release_features.py            # text bold comic
+```
+
+結果在 `out/release-features/results.jsonl`，截圖在 `out/release-features/shots/`。
