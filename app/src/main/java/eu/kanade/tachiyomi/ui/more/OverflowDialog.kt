@@ -133,6 +133,6 @@ class OverflowDialog(activity: MainActivity) : Dialog(activity, R.style.Overflow
     }
 
     private companion object {
-        private const val URL_HELP = "https://tachiyomi.org/docs/guides/troubleshooting/"
+        private const val URL_HELP = "https://github.com/N09527/bookmania#readme" // Bookmania's README (tachiyomi.org's guides are gone)
     }
 }
