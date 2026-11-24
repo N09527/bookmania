@@ -1,0 +1,4 @@
+{"book": "vertical-epub", "ready": true, "before": {"page": 2, "pages": 10, "seq": 1}, "after": {"page": 3, "pages": 10, "seq": 1}, "turned": true}
+{"book": "horizontal-epub", "ready": true, "before": {"page": 1, "pages": 8, "seq": 1}, "after": {"page": 2, "pages": 8, "seq": 1}, "turned": true}
+{"book": "vertical-azw3", "ready": true, "before": {"page": 0, "pages": 10, "seq": 1}, "after": {"page": 1, "pages": 10, "seq": 1}, "turned": true}
+{"book": "horizontal-mobi6", "ready": true, "before": {"page": 0, "pages": 9, "seq": 1}, "after": {"page": 1, "pages": 9, "seq": 1}, "turned": true}

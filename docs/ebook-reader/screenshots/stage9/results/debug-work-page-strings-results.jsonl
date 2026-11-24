@@ -1,0 +1,4 @@
+{"time": "16:58:44", "step": "strings", "check": "the work page shows", "ok": true, "detail": null}
+{"time": "16:58:52", "step": "strings", "check": "the description header reads 內容簡介", "ok": true, "detail": ["內容簡介", "沒有簡介"]}
+{"time": "16:58:52", "step": "strings", "check": "no header starts with 關於此", "ok": true, "detail": []}
+{"time": "16:58:52", "step": "strings", "check": "the chapter count reads 共 N 冊", "ok": true, "detail": "共 5 冊"}

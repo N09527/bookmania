@@ -1,0 +1,47 @@
+Stage 9: local simulation of .github/workflows/release.yml (console output, 2026-11-24).
+The run scripts of the steps were taken from the workflow file with PyYAML and run in a test clone of the
+repository; a fake `gh` stood in for GitHub ("release view <tag>" succeeds only for the tags in FAKE_RELEASED).
+Linting: actionlint 1.7.12 with shellcheck: no findings.
+
+== "Read the version and decide whether to publish" (job check), 7 cases, with both shells
+== shell: bash -e
+[1 new version, no tags] exit=0 outputs=tag=v1.0.0 publish=true  msg=
+[2 already published] exit=0 outputs=tag=v1.0.0 publish=false  msg=::notice::v1.0.0 is already published. To publish a new version, change _versionName and v
+[3 not main] exit=1 outputs= msg=::error::Releases are made from main only (this run is on refs/heads/x)
+[4 tag on another commit] exit=1 outputs=tag=v1.0.0  msg=::error::The tag v1.0.0 already exists on another commit. Change the version, or delete th
+[5 tag on this commit, only tag] exit=0 outputs=tag=v1.0.0 publish=true  msg=
+[6 code not larger] exit=1 outputs=tag=v1.1.0  msg=::error::versionCode 200 is not larger than 200 of v1.0.0
+[7 code larger] exit=0 outputs=tag=v1.1.0 publish=true  msg=
+== shell: bash --noprofile --norc -eo pipefail
+[1 new version, no tags] exit=0 outputs=tag=v1.0.0 publish=true  msg=
+[2 already published] exit=0 outputs=tag=v1.0.0 publish=false  msg=::notice::v1.0.0 is already published. To publish a new version, change _versionName and v
+[3 not main] exit=1 outputs= msg=::error::Releases are made from main only (this run is on refs/heads/x)
+[4 tag on another commit] exit=1 outputs=tag=v1.0.0  msg=::error::The tag v1.0.0 already exists on another commit. Change the version, or delete th
+[5 tag on this commit, only tag] exit=0 outputs=tag=v1.0.0 publish=true  msg=
+[6 code not larger] exit=1 outputs=tag=v1.1.0  msg=::error::versionCode 200 is not larger than 200 of v1.0.0
+[7 code larger] exit=0 outputs=tag=v1.1.0 publish=true  msg=
+(An earlier version of this step used grep in a pipe to find the previous tag; with -eo pipefail it would have
+failed case 1, as grep exits 1 when nothing passes. It was changed to awk before the runs above.)
+
+== "Check the signatures and collect the APKs" with the five local debug APKs (commit f7bd5bc), TAG=v1.0.0
+exit=0
+SHA256SUMS.txt
+bookmania-v1.0.0-debug-arm64-v8a.apk
+bookmania-v1.0.0-debug-armeabi-v7a.apk
+bookmania-v1.0.0-debug-universal.apk
+bookmania-v1.0.0-debug-x86.apk
+bookmania-v1.0.0-debug-x86_64.apk
+8b5188e05e069c6c621e7968cf31561e032afc0bfd1e7f2d316121dc317d12bf  bookmania-v1.0.0-debug-arm64-v8a.apk
+a5fb8140f8a3a02f646a865b1904eb16a4fb493ddbd8f2fb9c3f9ad87be8df66  bookmania-v1.0.0-debug-armeabi-v7a.apk
+5abd9f300ee2ef4976d690f9759988517d28da04654a8ea1454ebe69715d9a83  bookmania-v1.0.0-debug-universal.apk
+b60a53fd8a84078fb9517c1b44ea2f49f638cf9153fc0971c704efd1f19d83f2  bookmania-v1.0.0-debug-x86.apk
+d3ec995383beba79813a010c020777aeaec2bc0ba01f2e9a664b3284db6b7599  bookmania-v1.0.0-debug-x86_64.apk
+
+== "Write the release notes", TAG=v1.0.0
+exit=0; the 1.0.0 section of CHANGELOG.md, then the download text and the SHA-256 block (49 lines).
+The relative link became:
+[docs/ebook-reader](https://github.com/N09527/bookmania/blob/f7bd5bc0054f9a707b3cc7ee26e5dd0cca1fd2a5/docs/ebook-reader)
+(GITHUB_SHA was set to f7bd5bc for the test; on GitHub it is the commit of the run.)
+== same step with TAG=v9.9.9 (no section in the changelog)
+::warning::CHANGELOG.md has no section for 9.9.9
+exit=0

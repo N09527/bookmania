@@ -1,0 +1,8 @@
+{"check": "installed over the existing release App (update in place)", "ok": true, "detail": {"before": ["1.0.0", "200"], "after": ["1.0.0", "200"], "adb": "Performing Streamed Install\nSuccess"}}
+{"check": "the library is still there after the update", "ok": true, "detail": ["橫排測試書 EPUB", "Bookmania 測試", "直排測試書 EPUB"]}
+{"check": "the menu shows About with v1.0.0", "ok": true, "detail": "About\nv1.0.0"}
+{"check": "About shows \"Release 1.0.0\"", "ok": true, "detail": ["Release 1.0.0", "Release 1.0.0"]}
+{"check": "About has no translation links", "ok": true, "detail": []}
+{"check": "About links: GitHub only (no Website, no Discord)", "ok": true, "detail": ["GitHub", "GitHub"]}
+{"check": "no Firebase lines in the log since the update", "ok": false, "detail": ["11-24 16:23:21.351  3625  3625 W FirebaseApp: Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.", "11-24 16:23:21.351  3625  3625 I FirebaseInitProvider: FirebaseApp initialization unsuccessful"]}
+{"check": "no api.github.com in the log (no update check)", "ok": true, "detail": []}

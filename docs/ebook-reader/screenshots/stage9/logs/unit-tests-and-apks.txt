@@ -1,0 +1,32 @@
+Stage 9: unit tests and APK checks (2026-11-24, UTC).
+
+== Unit tests on commit a9cd0b2 (the emulator stopped)
+./gradlew --no-daemon :app:testBookmaniaDebugUnitTest :core:ebook:testDebugUnitTest :domain:testDebugUnitTest
+  BUILD SUCCESSFUL in 54s (167 actionable tasks: 17 executed, 150 up-to-date)
+  :app        73 tests, 0 failures, 0 errors, 0 skipped (results written 17:29:34)
+  :core:ebook and :domain were up-to-date (results of 15:43), so they were run again:
+./gradlew --no-daemon :core:ebook:testDebugUnitTest --rerun :domain:testDebugUnitTest --rerun
+  BUILD SUCCESSFUL in 18s (78 actionable tasks: 6 executed, 72 up-to-date)
+  :core:ebook 41 tests, 0 failures, 0 errors (results written 17:30:21)
+  :domain     34 tests, 0 failures, 0 errors (results written 17:30:23)
+
+== Release APK (built from 1004c14; the APK records "App version: 1.0.0 (bookmania, 1004c14, 200, 2026-11-24T16:15:09Z)")
+app-bookmania-arm64-v8a-release.apk  28,193,374 bytes  3fcfa69297127e5e349a1740bf2caff18eeb5ed64c50d460ee6d13f0193bd9be
+app-bookmania-universal-release.apk  67,830,626 bytes  7447b89aadfb3fa335e42dbc81c54dac9c5e70e236047269c78853e60a536a45
+aapt badging: package io.github.n09527.bookmania, versionCode 200, versionName 1.0.0, sdkVersion 26, label Bookmania
+Strings in the dex files of the universal APK: firebase (any case) 0, null2264/yokai 0, tachiyomi.org 0, discord.gg 0,
+N09527/bookmania 6. Files named firebase or google-services in the APK: 0.
+
+== Debug APK (built from f7bd5bc; the dex holds the string f7bd5bc)
+app-bookmania-arm64-v8a-debug.apk  55,513,601 bytes  8b5188e05e069c6c621e7968cf31561e032afc0bfd1e7f2d316121dc317d12bf
+aapt badging: package io.github.n09527.bookmania.debug, versionCode 200, versionName 1.0.0-d129, sdkVersion 26,
+label Bookmania Debug
+Strings in the dex files of the universal APK: firebase (any case) 5, null2264/yokai 0, tachiyomi.org 0,
+discord.gg 0, N09527/bookmania 14. Files named firebase or google-services in the APK: 0.
+The five firebase strings: "* should update to use Firebase Instance ID",
+Lcom/google/firebase/FirebaseApiNotAvailableException;, Lcom/google/firebase/FirebaseException;,
+Lcom/google/firebase/FirebaseExceptionMapper; and a long string that lists com.google.android.gms classes.
+The three classes are
+in com.google.android.gms:play-services-basement (17.0.0 and 18.5.0 in the Gradle cache), which comes with
+com.google.android.gms:play-services-gcm 17.0.0, a direct dependency already in Yōkai's
+gradle/libs.versions.toml at 843a59b. The runtime classpath of the debug build has no Firebase library.
