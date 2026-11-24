@@ -102,6 +102,16 @@ android {
         shaders = false
     }
 
+    // Debug signing with a key of Bookmania's own, kept in the repository (app/debug.keystore): every debug build,
+    // here, on GitHub Actions or on another computer, is signed alike, so the published debug APKs update each other
+    // in place. It is public, as debug keys are; the release key below is not.
+    signingConfigs.getByName("debug") {
+        storeFile = file("debug.keystore")
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+    }
+
     // Release signing. The keystore and its passwords never go into the repository: set
     // bookmaniaStoreFile, bookmaniaStorePassword, bookmaniaKeyAlias and bookmaniaKeyPassword in
     // ~/.gradle/gradle.properties (or as ORG_GRADLE_PROJECT_* environment variables, as the release workflow does).

@@ -44,6 +44,7 @@ Yōkai 原有的線上來源擴充與追蹤服務仍在 App 中，但 Bookmania 
 ## 下載
 
 - 到 [Releases](https://github.com/N09527/bookmania/releases) 下載 APK。一般手機選 `arm64-v8a`；如果裝不了，再選 `universal`。
+- Releases 上的是 debug 版（App 名稱「Bookmania Debug」），供自用；它和 release 版的差異見 [docs/RELEASING.md](./docs/RELEASING.md)。
 - 需要 Android 8.0 以上。
 - 每個版本都附上 APK 的 SHA-256，可以用來核對檔案。
 
@@ -55,7 +56,7 @@ Yōkai 原有的線上來源擴充與追蹤服務仍在 App 中，但 Bookmania 
 ./gradlew :app:assembleBookmaniaDebug
 ```
 
-APK 會出現在 `app/build/outputs/apk/bookmania/debug/`。簽章版 release 的建置與發布方式見 [docs/RELEASING.md](./docs/RELEASING.md)。
+APK 會出現在 `app/build/outputs/apk/bookmania/debug/`。debug 版用存放庫裡的 debug 金鑰 `app/debug.keystore` 簽章；發布方式與 release 版的建置見 [docs/RELEASING.md](./docs/RELEASING.md)。
 
 ## 由來
 

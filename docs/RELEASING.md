@@ -1,37 +1,22 @@
 # 發布新版本
 
-Bookmania 的 APK 用 GitHub Actions 的 [release 工作流程](../.github/workflows/release.yml) 自動建置與發布：推送 `v1.2.3` 這類版本標籤後，它會跑單元測試、用簽章金鑰建置 release APK，並發布到 [Releases](https://github.com/N09527/bookmania/releases)。
+Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布的是 **debug 版**（自用）。推送 `v1.2.3` 這類版本標籤後，GitHub Actions 的 [release 工作流程](../.github/workflows/release.yml) 會跑單元測試、建置 debug 版的五個 APK、檢查簽章，並發布它們與 SHA-256。不需要設定任何 secrets。
 
-## 第一次：設定簽章金鑰（只做一次）
+## debug 版是什麼
 
-**所有版本都必須用同一把金鑰簽章**，手機上的 App 才能直接覆蓋更新。金鑰遺失後，使用者必須先解除安裝（會清除 App 資料）才能裝新版本。請把金鑰檔與密碼另外備份，例如放在密碼管理器。
-
-金鑰不能放進存放庫，要設定成 GitHub 的 secrets：
-
-1. 準備金鑰檔 `bookmania-release.jks` 與 `SIGNING-INFO.txt`（裡面有密碼與別名）。
-2. 把金鑰檔轉成 base64 文字：
-   - macOS：`base64 -i bookmania-release.jks | pbcopy`（結果直接複製到剪貼簿）
-   - Linux：`base64 -w0 bookmania-release.jks`
-   - Windows（PowerShell）：`[Convert]::ToBase64String([IO.File]::ReadAllBytes("bookmania-release.jks")) | Set-Clipboard`
-3. 到存放庫的「Settings > Secrets and variables > Actions」，按「New repository secret」，新增這四個：
-
-   | 名稱 | 內容 |
-   |---|---|
-   | `BOOKMANIA_SIGNING_KEY` | 第 2 步的 base64 文字 |
-   | `BOOKMANIA_STORE_PASSWORD` | 金鑰庫密碼 |
-   | `BOOKMANIA_KEY_ALIAS` | 金鑰別名（`bookmania`） |
-   | `BOOKMANIA_KEY_PASSWORD` | 金鑰密碼 |
-
-4. 確認「Settings > Actions > General」允許執行 Actions。
-
-secrets 存進去之後就讀不出來，所以仍然需要自己保留一份金鑰。
+- App 名稱「Bookmania Debug」，套件名稱 `io.github.n09527.bookmania.debug`。和 release 版（`io.github.n09527.bookmania`）是不同的 App：可以同時安裝，資料不共用。
+- 沒有經過 R8 縮減，檔案較大、速度較慢。
+- 含開發用工具：網路檢查 Chucker 在 App 連網時會顯示通知；記憶體洩漏偵測 LeakCanary 發現洩漏時會傾印記憶體並顯示通知，傾印時 App 可能停頓幾秒。
+- 用存放庫裡的 debug 金鑰 `app/debug.keystore` 簽章（別名 `androiddebugkey`，密碼 `android`）。每次建置都用同一把，所以新版可以直接覆蓋安裝舊版，資料保留。
+- 這把金鑰是公開的：任何人都能用它簽出可以覆蓋你這個 debug 版的 APK。只從這個存放庫的 Releases 下載，就不會遇到這種情況。
+- **不要更換或刪除 `app/debug.keystore`**。換了之後，新版就無法覆蓋安裝舊版，必須先解除安裝（會清除 App 資料）。
 
 ## 每次發布
 
 1. 修改 `app/build.gradle.kts`：
    - `_versionName` 改成新版本，例如 `"1.1.0"`。
    - `versionCode` 加一以上，例如 `201`。**只能變大**，否則手機無法覆蓋安裝。
-2. 在 [CHANGELOG.md](../CHANGELOG.md) 新增這一版的段落，標題寫成 `## [1.1.0] - 日期`。release 的說明會取用這一段。
+2. 在 [CHANGELOG.md](../CHANGELOG.md) 新增這一版的段落，標題寫成 `## [1.1.0] - 日期`。發布的說明會取用這一段。
 3. 提交並推送到 `main`。
 4. 打上標籤並推送（標籤必須和 `_versionName` 相同，前面加 `v`）：
 
@@ -40,13 +25,15 @@ secrets 存進去之後就讀不出來，所以仍然需要自己保留一份金
    git push origin v1.1.0
    ```
 
-5. 到存放庫的「Actions」看工作流程的進度，完成後 Releases 會出現新版本，附上五個 APK 與 `SHA256SUMS.txt`。
+5. 到存放庫的「Actions」看進度。完成後 Releases 會出現新版本，附上五個 APK 與 `SHA256SUMS.txt`。
 
-工作流程會先檢查：標籤和 App 的版本號一致、`BOOKMANIA_SIGNING_KEY` 有設定、每個 APK 的簽章都通過。任何一項不符就停止，不會發布。
+工作流程會先檢查：標籤和 App 的版本號一致、每個 APK 都用 `app/debug.keystore` 簽章。任何一項不符就停止，不會發布。
 
-## 在自己的電腦上建置簽章版
+第一次使用前，請確認存放庫的「Settings > Actions > General」允許執行 Actions。
 
-在 `~/.gradle/gradle.properties` 加上（路徑與密碼換成你的）：
+## release 版（選用）
+
+release 版（經過 R8 縮減、沒有開發工具）用另一把私人的金鑰簽章，金鑰不在存放庫中。在自己的電腦上建置時，在 `~/.gradle/gradle.properties` 加上（路徑與密碼換成你的）：
 
 ```properties
 bookmaniaStoreFile=/path/to/bookmania-release.jks
@@ -55,10 +42,4 @@ bookmaniaKeyAlias=bookmania
 bookmaniaKeyPassword=金鑰密碼
 ```
 
-然後執行：
-
-```bash
-./gradlew :app:assembleBookmaniaRelease
-```
-
-APK 會出現在 `app/build/outputs/apk/bookmania/release/`。沒有設定這些屬性時，產生的是未簽章的 APK。
+然後執行 `./gradlew :app:assembleBookmaniaRelease`，APK 在 `app/build/outputs/apk/bookmania/release/`。沒有設定這些屬性時，產生的是未簽章的 APK。release 版的金鑰遺失後，同一個 release 版就無法再更新，請另外備份。

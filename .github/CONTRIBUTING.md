@@ -23,7 +23,7 @@
 ./gradlew :app:testBookmaniaDebugUnitTest :core:ebook:testDebugUnitTest :domain:testDebugUnitTest
 ```
 
-模擬器上的自動檢查腳本與說明在 `docs/ebook-reader/tools/`。
+debug 版用存放庫裡的 `app/debug.keystore` 簽章，請不要更換它（見 `docs/RELEASING.md`）。模擬器上的自動檢查腳本與說明在 `docs/ebook-reader/tools/`。
 
 ### 程式碼的位置
 

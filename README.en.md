@@ -44,6 +44,7 @@ Yōkai's online source extensions and trackers are still in the App, but Bookman
 ## Download
 
 - Get the APK from [Releases](https://github.com/N09527/bookmania/releases). Most phones need `arm64-v8a`; if that does not install, use `universal`.
+- Releases carry the debug build ("Bookmania Debug"), for personal use; how it differs from the release build is described in [docs/RELEASING.md](./docs/RELEASING.md) (Chinese).
 - Requires Android 8.0 or later.
 - Each release lists the SHA-256 of its APKs, so a download can be checked.
 
@@ -55,7 +56,7 @@ Needs JDK 21 and the Android SDK.
 ./gradlew :app:assembleBookmaniaDebug
 ```
 
-The APKs are written to `app/build/outputs/apk/bookmania/debug/`. Signed release builds and publishing are described in [docs/RELEASING.md](./docs/RELEASING.md) (Chinese).
+The APKs are written to `app/build/outputs/apk/bookmania/debug/`. Debug builds are signed with the debug key in the repository, `app/debug.keystore`; publishing and release builds are described in [docs/RELEASING.md](./docs/RELEASING.md) (Chinese).
 
 ## Origin
 

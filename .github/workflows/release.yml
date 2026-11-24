@@ -1,6 +1,6 @@
-# Builds the signed release APKs when a version tag (v1.2.3) is pushed and publishes them on GitHub Releases.
-# Needs four repository secrets (see docs/RELEASING.md): BOOKMANIA_SIGNING_KEY (the keystore, base64),
-# BOOKMANIA_STORE_PASSWORD, BOOKMANIA_KEY_ALIAS and BOOKMANIA_KEY_PASSWORD.
+# Builds the debug APKs when a version tag (v1.2.3) is pushed and publishes them on GitHub Releases.
+# The debug build is signed with the debug key kept in the repository (app/debug.keystore), so every published APK
+# updates the previous one in place; no secrets are needed. See docs/RELEASING.md.
 name: Release
 
 on:
@@ -24,7 +24,7 @@ jobs:
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          fetch-depth: 0 # the build counts commits for the debug version name
+          fetch-depth: 0 # the debug version name counts the commits
 
       - name: Set up JDK 21
         uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6
@@ -46,36 +46,29 @@ jobs:
             exit 1
           fi
 
-      - name: Decode the signing key
-        env:
-          SIGNING_KEY: ${{ secrets.BOOKMANIA_SIGNING_KEY }}
-        run: |
-          if [ -z "$SIGNING_KEY" ]; then
-            echo "::error::The secret BOOKMANIA_SIGNING_KEY is not set (see docs/RELEASING.md)"
-            exit 1
-          fi
-          echo "$SIGNING_KEY" | base64 --decode > "$RUNNER_TEMP/bookmania-release.jks"
-
-      - name: Test and build the signed release
-        env:
-          ORG_GRADLE_PROJECT_bookmaniaStoreFile: ${{ runner.temp }}/bookmania-release.jks
-          ORG_GRADLE_PROJECT_bookmaniaStorePassword: ${{ secrets.BOOKMANIA_STORE_PASSWORD }}
-          ORG_GRADLE_PROJECT_bookmaniaKeyAlias: ${{ secrets.BOOKMANIA_KEY_ALIAS }}
-          ORG_GRADLE_PROJECT_bookmaniaKeyPassword: ${{ secrets.BOOKMANIA_KEY_PASSWORD }}
+      - name: Test and build the debug APKs
         run: |
           mkdir -p ~/.gradle
           cp .github/runner-files/ci-gradle.properties ~/.gradle/gradle.properties
           ./gradlew :app:testBookmaniaDebugUnitTest :core:ebook:testDebugUnitTest :domain:testDebugUnitTest \
-            :app:assembleBookmaniaRelease
+            :app:assembleBookmaniaDebug
 
       - name: Check the signatures and collect the APKs
         run: |
           apksigner="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/*/ | sort -V | tail -1)apksigner"
+          # The certificate of the repository's debug key: every APK must carry it.
+          expected=$(keytool -exportcert -keystore app/debug.keystore -storepass android -alias androiddebugkey \
+            | sha256sum | cut -d' ' -f1)
           mkdir dist
           for abi in arm64-v8a armeabi-v7a x86 x86_64 universal; do
-            apk="app/build/outputs/apk/bookmania/release/app-bookmania-$abi-release.apk"
+            apk="app/build/outputs/apk/bookmania/debug/app-bookmania-$abi-debug.apk"
             "$apksigner" verify "$apk"
-            cp "$apk" "dist/bookmania-$GITHUB_REF_NAME-$abi.apk"
+            actual=$("$apksigner" verify --print-certs "$apk" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')
+            if [ "$actual" != "$expected" ]; then
+              echo "::error::$apk is not signed with app/debug.keystore ($actual)"
+              exit 1
+            fi
+            cp "$apk" "dist/bookmania-$GITHUB_REF_NAME-debug-$abi.apk"
           done
           (cd dist && sha256sum *.apk > SHA256SUMS.txt)
 
@@ -91,8 +84,11 @@ jobs:
             echo
             echo "### 下載 (Download)"
             echo
-            echo "一般手機請下載 \`bookmania-$GITHUB_REF_NAME-arm64-v8a.apk\`；裝不了時改用 \`universal\`。需要 Android 8.0 以上。"
-            echo "Most phones need \`bookmania-$GITHUB_REF_NAME-arm64-v8a.apk\`; if it does not install, use \`universal\`. Requires Android 8.0+."
+            echo "這是 debug 版：App 名稱「Bookmania Debug」，套件名稱 \`io.github.n09527.bookmania.debug\`。"
+            echo "一般手機請下載 \`bookmania-$GITHUB_REF_NAME-debug-arm64-v8a.apk\`；裝不了時改用 \`universal\`。需要 Android 8.0 以上。"
+            echo
+            echo "This is the debug build (\"Bookmania Debug\", package \`io.github.n09527.bookmania.debug\`)."
+            echo "Most phones need \`bookmania-$GITHUB_REF_NAME-debug-arm64-v8a.apk\`; if it does not install, use \`universal\`. Requires Android 8.0+."
             echo
             echo "### SHA-256"
             echo
@@ -105,7 +101,3 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release create "$GITHUB_REF_NAME" dist/* --title "Bookmania $GITHUB_REF_NAME" --notes-file notes.md --verify-tag
-
-      - name: Remove the signing key
-        if: always()
-        run: rm -f "$RUNNER_TEMP/bookmania-release.jks"
