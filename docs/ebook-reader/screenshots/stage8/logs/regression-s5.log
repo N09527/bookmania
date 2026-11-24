@@ -1,0 +1,64 @@
+=== 7: restore 14 16 epub-vertical-2col-landscape --columns landscape --landscape --pages 6 (09:42:52)
+.. chapter 16 is read; marking it unread in the chapter list
+.. swipe 1 on 直排測試書 at y=1073: snackbar None
+.. chapter 16 is still read; swiping again
+.. swipe 2 on 直排測試書 at y=1073: snackbar None
+.. chapter 16 is still read; swiping again
+.. swipe 3 on 直排測試書 at y=1073: snackbar None
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1693, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1631, in main
+    run_step(a, x)
+    ~~~~~~~~^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1645, in run_step
+    step_restore(int(x[0]), int(x[1]), x[2], a.pages, a.columns, a.landscape)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 681, in step_restore
+    before = ensure_unread(manga, chapter)
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 644, in ensure_unread
+    raise RuntimeError(f'chapter {chapter} is still read')
+RuntimeError: chapter 16 is still read
+=== 7 done (09:48:52)
+=== 8: restore 8 10 epub-horizontal-2col --columns on --pages 6 (09:48:52)
+.. chapter 10 is read; marking it unread in the chapter list
+.. swipe 1 on 橫排測試書 at y=1414: snackbar 標示為未讀
+.. start: 1/3 · 1–2/15
+.. shown: OEBPS/text/ch01.xhtml page 12/15 cols 2 {'chars': 1880, 'page': 12, 'pages': 15, 'cols': 2, 'location': [134, 0], 'text': '【第３５段】這是一段用來測試的文字，包含「引號」', 'before': 1552}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{a9fda53 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t1148}"
+PASS saved position = position shown at exit {"saved": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [134, 0], "text": "【第３５段】這是一段用來測試的文字，包含「引號」", "progression": 0.825531914893617, "total": 0.2771923557778175, "chapterPage": 12, "updatedAt": 1795513905076}, "shown": {"chars": 1880, "page": 12, "pages": 15, "cols": 2, "location": [134, 0], "text": "【第３５段】這是一段用來測試的文字，包含「引號」", "before": 1552}, "doc": "OEBPS/text/ch01.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [12, 33], "expected": [12, 33], "page": 12, "pages": 15, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 13 of 45"}
+PASS history: reading time added at exit {"before": 33227991, "after": 33330770, "added ms": 102779, "reader open ms (upper bound)": 145952}
+PASS history: last read is the exit time {"last_read": 1795513915072, "exit": 1795513974466}
+PASS reopened at the same page and character {"doc": ["OEBPS/text/ch01.xhtml", "OEBPS/text/ch01.xhtml"], "page": [12, 12], "location": [[134, 0], [134, 0]], "visible": [true, false]}
+=== 8 done (09:54:23)
+=== 9: rotate 14 16 epub-vertical --pages 5 (09:54:23)
+.. chapter 16 is read; marking it unread in the chapter list
+.. swipe 1 on 直排測試書 at y=1092: snackbar 標示為未讀
+.. start: 1/3 · 1/10
+PASS rotated to landscape: the first character stays the reading position and is on screen {"before": {"chars": 1880, "page": 5, "pages": 10, "cols": 1, "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "before": 776}, "after": {"chars": 1880, "page": 8, "pages": 18, "cols": 2, "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "before": 776}, "status": {"ready": true, "error": null, "page": 8, "pages": 18, "cols": 2, "mode": "V", "seq": 2, "ms": 3762, "rubyFix": false, "gutter": 366, "vw": 732, "twoWanted": true, "marginMost": 452, "marginLeft": 20, "marginRight": 20}, "visible": [true, false]}
+PASS landscape exit: saved position is the same character {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.4127659574468085, "total": 0.13859617788890874, "chapterPage": 8, "updatedAt": 1795514242269}
+PASS reopened in landscape: the character is on screen [true, false]
+PASS rotated back to portrait: the character is on screen [true]
+PASS reopened in portrait: same page as before the rotations {"page before": 5, "page now": 5, "location": [74, 0], "visible": [true]}
+=== 9 done (10:01:22)
+=== 10: settings 8 10 epub-horizontal --pages 5 (10:01:22)
+.. start: 1/3 · 1/8
+PASS font size 30: the reading position stays the same character, on screen {"before": {"chars": 1880, "page": 5, "pages": 8, "cols": 1, "location": [115, 0], "text": "【第３０段】這是一段用來測試的文字，包含「引號」", "before": 1322}, "after": {"chars": 1880, "page": 10, "pages": 16, "cols": 1, "location": [115, 0], "text": "【第３０段】這是一段用來測試的文字，包含「引號」", "before": 1322}, "status": {"ready": true, "error": null, "page": 10, "pages": 16, "cols": 1, "mode": "H", "seq": 2, "ms": 973, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}, "visible": [true]}
+PASS saved after the change: same character {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [115, 0], "text": "【第３０段】這是一段用來測試的文字，包含「引號」", "progression": 0.7031914893617022, "total": 0.23611359171280585, "chapterPage": 10, "updatedAt": 1795514710411}
+PASS reopened with font size 30: the character is on screen [true]
+=== 10 done (10:08:06)
+=== 18: slider 14 16 epub-vertical 0.25 (10:08:06)
+PASS slider shown with the menu "1/3 · 6/10"
+PASS while dragging, the bar shows a table of contents title instead of the page {"bar texts while dragging": ["第3章"], "page info before": "1/3 · 6/10", "finger held at (fraction of the track)": 0.182, "dump took (s)": 5.2}
+.. page_span: the page shown again is not the same: {'chars': 1872, 'page': 2, 'pages': 9, 'cols': 1, 'location': [39, 0], 'text': '【第９０段】這是一段用來測試的文字，包含「引號」', 'before': 413}
+PASS released at 0.25 of the track (right to left): the page shown holds a character near 0.75 of the book {"finger at character": 4199, "accepted characters": [4171, 4367], "page shown, characters": [4324, 4370], "of": 5599, "status": {"ready": true, "error": null, "page": 2, "pages": 9, "cols": 1, "mode": "V", "seq": 2, "ms": 3200, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}, "page info": "3/3 · 3/9"}
+PASS percent shown and saved whole-book progress are those of the first character of that page {"percent shown": 77, "saved total": 0.7722807644222183, "first character / book": 0.7723}
+=== 18 done (10:10:37)
+=== 19: slider 8 10 epub-horizontal 0.25 (10:10:37)
+PASS slider shown with the menu "1/3 · 6/8"
+PASS while dragging, the bar shows a table of contents title instead of the page {"bar texts while dragging": ["第1章"], "page info before": "1/3 · 6/8", "finger held at (fraction of the track)": 0.182, "dump took (s)": 5.9}
+PASS released at 0.25 of the track (left to right): the page shown holds a character near 0.25 of the book {"finger at character": 1400, "accepted characters": [1232, 1428], "page shown, characters": [1059, 1322], "of": 5599, "status": {"ready": true, "error": null, "page": 4, "pages": 8, "cols": 1, "mode": "H", "seq": 1, "ms": 2565, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}, "page info": "1/3 · 5/8"}
+PASS percent shown and saved whole-book progress are those of the first character of that page {"percent shown": 19, "saved total": 0.1891409180210752, "first character / book": 0.1891}
+=== 19 done (10:13:10)

@@ -1,0 +1,10 @@
+animation scales {'animator_duration_scale': '1', 'transition_animation_scale': 'null', 'window_animation_scale': '1'}
+{"round": 0, "field before": [859, 1669, 1027, 1794], "tap after recording started (host clock, s)": 3.0, "keyboard reported shown after the tap (host clock, s)": 10.78, "frames": 8, "first FIELD change": {"t": 19.302989, "frame": "f0007.png", "FIELD": 11.6, "KB": 0.8, "MOVED": 0.3}, "first KB change": null, "first MOVED change": null, "last frame": {"t": 20.574556, "frame": "f0008.png", "FIELD": 11.5, "KB": 0.8, "MOVED": 0.3}}
+0 field after (859, 1044, 1027, 1170)
+0 panel open after back 1, 2, 3: True True False reader in front: True
+{"round": 1, "field before": [859, 1622, 1027, 1732], "tap after recording started (host clock, s)": 3.0, "keyboard reported shown after the tap (host clock, s)": 10.32, "frames": 10, "first FIELD change": {"t": 12.390533, "frame": "f0006.png", "FIELD": 8.0, "KB": 1.7, "MOVED": 0.2}, "first KB change": null, "first MOVED change": null, "last frame": {"t": 20.4409, "frame": "f0010.png", "FIELD": 37.6, "KB": 10.9, "MOVED": 0.4}}
+1 field after (859, 997, 1027, 1107)
+1 panel open after back 1, 2, 3: True True False reader in front: True
+{"round": 2, "field before": [859, 1648, 1027, 1758], "tap after recording started (host clock, s)": 3.0, "keyboard reported shown after the tap (host clock, s)": 12.77, "frames": 10, "first FIELD change": {"t": 16.018011, "frame": "f0006.png", "FIELD": 8.1, "KB": 1.3, "MOVED": 0.2}, "first KB change": null, "first MOVED change": null, "last frame": {"t": 23.678378, "frame": "f0010.png", "FIELD": 43.3, "KB": 9.9, "MOVED": 0.4}}
+2 field after (859, 1023, 1027, 1133)
+2 panel open after back 1, 2, 3: True True False reader in front: True

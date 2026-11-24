@@ -1,0 +1,10 @@
+=== 7: restore 14 16 epub-vertical-2col-landscape --columns landscape --landscape --pages 6 (14:01:08)
+.. start: 1/3 · 1–2/18
+.. shown: OEBPS/text/ch01.xhtml page 12/18 cols 2 {'chars': 1880, 'page': 12, 'pages': 18, 'cols': 2, 'location': [112, 0], 'text': '【第２８段】長一點的段落：閱讀程式需要依照使用者', 'before': 1236}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{ceebaa1 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t1248}"
+PASS saved position = position shown at exit {"saved": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [112, 0], "text": "【第２８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.6574468085106383, "total": 0.22075370601893196, "chapterPage": 12, "updatedAt": 1795528976308}, "shown": {"chars": 1880, "page": 12, "pages": 18, "cols": 2, "location": [112, 0], "text": "【第２８段】長一點的段落：閱讀程式需要依照使用者", "before": 1236}, "doc": "OEBPS/text/ch01.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [12, 42], "expected": [12, 42], "page": 12, "pages": 18, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 13 of 54"}
+PASS history: reading time added at exit {"before": 42643709, "after": 42747534, "added ms": 103825, "reader open ms (upper bound)": 158567}
+PASS history: last read is the exit time {"last_read": 1795528986277, "exit": 1795529039571}
+PASS reopened at the same page and character {"doc": ["OEBPS/text/ch01.xhtml", "OEBPS/text/ch01.xhtml"], "page": [12, 12], "location": [[112, 0], [112, 0]], "visible": [true, false]}
+=== 7 done (14:05:33)

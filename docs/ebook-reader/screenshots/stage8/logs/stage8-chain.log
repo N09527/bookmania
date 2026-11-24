@@ -1,0 +1,74 @@
+=== 08:32:09 stage 8 checks
+PASS 35 FAIL 0
+=== 09:17:43 regression: stage 5.5 items 12-16 27
+=== 09:42:52 regression: stage 5 items 7 8 9 10 18 19
+=== 10:13:14 regression: s4checks s4pages s3 (run-regression.sh, RUN=out8)
+=== 12:07:24 regression: stage 7 bold and gutter
+=== s4checks start 10:13:14
+=== s4checks end 10:30:45 exit 143
+=== s4pages start 10:30:45
+=== s4pages end 11:20:12 exit 0
+=== s3 start 11:20:12
+=== s3 end 12:07:24 exit 0
+REGRESSION DONE 12:07:24
+=== 12:42:34 stop emulator for the final builds
+=== 12:42:44 final: bookmania unit tests (rerun) and signed release
+exit 0
+BUILD SUCCESSFUL in 5m 16s
+=== 12:48:02 final: upstream CI command (standard flavour)
+exit 0
+BUILD SUCCESSFUL in 3m 23s
+=== 12:51:25 start emulator for the release checks
+restarting adbd as root
+=== 13:35:29 release smoke
+PASS the release APK installs ["Success"]
+PASS the installed App is the release build (not debuggable) "versionCode=162 minSdk=26 targetSdk=36\n    versionName=1.10.3\n    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]\n    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]"
+PASS the books and the library are in place for the release App {"files in the debug folder": "39", "copied": "39", "uid": "10082"}
+dismissed: mCurrentFocus=Window{ffcc5e6 u0 Application Not Responding: com.android.systemui}
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1249}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.039}
+PASS no crash while the book is open {"crashes": []}
+.. vertical-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1250}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.287}
+PASS no crash while the book is open {"crashes": []}
+.. horizontal-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1251}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.039}
+PASS no crash while the book is open {"crashes": []}
+.. vertical-azw3: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1252}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.234}
+PASS no crash while the book is open {"crashes": []}
+.. horizontal-mobi6: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1253}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.087}
+PASS no crash while the book is open {"crashes": []}
+.. joint-mobi: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains the DRM {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1254}"], "screen": ["This book is protected by DRM", "Protection: Adobe ADEPT\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. drm-adept-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains the DRM {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1255}"], "screen": ["This book is protected by DRM", "Protection: Mobipocket / Kindle\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. drm-flagged-mobi: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains that the file is damaged {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1256}"], "screen": ["Cannot open this book", "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. corrupt-truncated: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains that the file is damaged {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1257}"], "screen": ["Cannot open this book", "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. not-an-ebook: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the image reader {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t1258}"]}
+PASS no crash while the book is open {"crashes": []}
+.. comic-cbz: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the image reader {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t1259}"]}
+PASS no crash while the book is open {"crashes": []}
+.. comic-fixed-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+=== 13:52:31 release features and strings
+PASS release, two columns: the fold's shadow on the centre of the gap {"darkest column x": 540, "expected x": 540.8, "brightness at the darkest column": 175.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "rel-01-two-columns"}
+PASS release, two columns, shadow switch off: no shadow {"darkest column x": 401, "expected x": 540.8, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "rel-02-two-columns-shadow-off"}
+PASS release, bold on: the page has more ink than with bold off {"dark share, bold off": 0.0894, "dark share, bold on": 0.1475, "ratio": 1.649}
+PASS the test comic is in the release App's library {"ids": [20, 32]}
+PASS release, double pages: the shadow is on the seam {"seam x": 540, "darkening left of the seam (ratio)": 0.714, "darkening right of the seam (ratio)": 0.724, "shot": "rel-05-comic-double-pages"}
+PASS release, double pages, shadow switch off: none on the seam {"seam x": 540, "darkening left of the seam (ratio)": 1.0, "darkening right of the seam (ratio)": 1.0, "shot": "rel-06-comic-shadow-off"}
+FAIL release, work page: 探索 found ["探索", "Browse"]
+=== 14:00:31 all done

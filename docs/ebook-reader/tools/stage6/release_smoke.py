@@ -102,11 +102,29 @@ def grab():
     return np.asarray(Image.open(io.BytesIO(png)).convert('L').resize((270, 480)), dtype=np.int16)
 
 
+def settled(timeout=120):
+    """The first page drawn: two screenshots 5 s apart that are the same and have ink on them. Stage 8: the
+    fixed wait after opening ended while two books still showed the loading spinner or a blank page, so the
+    screen before the key was not a page."""
+    t = time.time()
+    last = grab()
+    while time.time() - t < timeout:
+        time.sleep(5)
+        now = grab()
+        if float((abs(now - last) > 30).mean()) < 0.001 and float((now < 128).mean()) > 0.01:
+            return now, round(time.time() - t, 1)
+        last = now
+    return last, None
+
+
 def page_turn(label):
     """A page key turns the page: the screen before and after the key differ. The release App has no DevTools
     to ask the reader for its page, and its page number is in the menu, which did not open for the check on
     this emulator (stage 6); the screen is compared instead (the reader shows a page and nothing else)."""
-    before = grab()
+    before, waited = settled()
+    d.shot(f'release-{label}-1-settled')
+    c.check('the first page is drawn before the key (two same screens with text)', waited is not None,
+            {'seconds after the fixed wait': waited})
     root(f'input keyevent {KEY_PAGE_DOWN}')
     time.sleep(15)
     after = grab()

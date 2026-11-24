@@ -1,0 +1,8 @@
+stage8-final-bookmania.log:> Task :app:testBookmaniaDebugUnitTest
+stage8-final-bookmania.log:> Task :app:testBookmaniaDebugUnitTest
+stage8-final-bookmania.log:> Task :app:assembleBookmaniaRelease
+stage8-final-bookmania.log:BUILD SUCCESSFUL in 5m 16s
+stage8-final-standard.log:> Task :app:testStandardReleaseUnitTest
+stage8-final-standard.log:> Task :app:testStandardReleaseUnitTest
+stage8-final-standard.log:> Task :app:assembleStandardRelease
+stage8-final-standard.log:BUILD SUCCESSFUL in 3m 23s

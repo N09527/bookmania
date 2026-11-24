@@ -1,0 +1,2 @@
+--- 10:13:10 after slider 8 10 epub-horizontal 0.25
+11-24 10:12:11.979  5988  5989 F libc    : Fatal signal 11 (SIGSEGV), code 1, fault addr 0x0 in tid 5989 (Binder:5988_1)

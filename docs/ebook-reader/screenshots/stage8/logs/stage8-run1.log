@@ -1,0 +1,37 @@
+FAIL the work page shows null
+FAIL the description header reads 內容簡介 []
+PASS no header starts with 關於此 []
+FAIL the chapter count reads 共 N 冊 []
+FAIL value fields on the rows (text tab) []
+PASS font size typed: the keyboard shows {"field": [859, 1349, 1027, 1459], "keyboard shown": true, "field with the keyboard": [859, 724, 1027, 834], "laid out again while the keyboard was up": false, "seq": [1, 2], "status": {"ready": true, "error": null, "page": 0, "pages": 12, "cols": 1, "mode": "H", "seq": 2, "ms": 1738, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}}
+PASS font size typed: the field moves above the keyboard {"field": [859, 1349, 1027, 1459], "keyboard shown": true, "field with the keyboard": [859, 724, 1027, 834], "laid out again while the keyboard was up": false, "seq": [1, 2], "status": {"ready": true, "error": null, "page": 0, "pages": 12, "cols": 1, "mode": "H", "seq": 2, "ms": 1738, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}}
+PASS font size typed: no relayout while the keyboard is up {"field": [859, 1349, 1027, 1459], "keyboard shown": true, "field with the keyboard": [859, 724, 1027, 834], "laid out again while the keyboard was up": false, "seq": [1, 2], "status": {"ready": true, "error": null, "page": 0, "pages": 12, "cols": 1, "mode": "H", "seq": 2, "ms": 1738, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}}
+PASS font size 26 applied (stored, on the page) {"stored": "26", "css": "26px"}
+PASS the keyboard is hidden after Done null
+PASS font size 60 refused: the allowed range shows {"texts": ["可輸入 12～48 的整數"], "stored": "26", "seq": [2, 2]}
+PASS leaving the field puts the value back and hides the note {"field": "26", "notes": []}
+PASS 行距 1.75 applied (stored, on the page) {"stored": "1.75", "css": "45.5px", "seq": [2, 3]}
+PASS 字距 0.07 applied (stored, on the page) {"stored": "0.07", "css": "1.82px", "seq": [3, 4]}
+PASS 首行縮排: no field while it follows the book, a field once switched off {"field before": false, "switch": [890, 1510, 1027, 1636]}
+PASS 首行縮排 1.5 applied (stored, on the page) {"stored": "1.5", "css": "39px", "seq": [5, 6]}
+PASS 段落間距: no field while it follows the book, a field once switched off {"field before": false, "switch": [890, 1701, 1027, 1794]}
+PASS 段落間距 0.35 applied (stored, on the page) {"stored": "0.35", "css": ["0px", "0px", "9.1px", "0px"], "seq": [7, 8]}
+PASS margin 上 40 stored {"stored": "40", "seq": [8, 9]}
+PASS margin 下 25 stored {"stored": "25", "seq": [9, 10]}
+PASS margin 左 25 stored {"stored": "25", "seq": [10, 11]}
+PASS margin 右 31 stored {"stored": "31", "seq": [11, 12]}
+PASS the page box follows the typed margins (left, top, width, height) {"frame": [17, 32, 372, 683], "expected": [17, 32, 372, 683]}
+PASS two columns, font size typed: each frame shows its page, nothing focused in them {"frames": [{"sx": 0, "active": "BODY"}, {"sx": 190, "active": "BODY"}], "expected scroll": [0, 190], "status": {"page": 0, "pages": 23, "cols": 2, "seq": 2}}
+PASS two columns in portrait: the shell reports the limit (412 - 2 x 120 - 40 = 132) {"twoWanted": true, "marginMost": 132, "cols": 2, "vw": 412}
+PASS the panel says how far the side margins go with two columns null
+PASS left 120 refused with two columns (right 20): 0 to 112 allowed {"notes": ["可輸入 0～112 的整數"], "stored": null, "seq": [1, 1]}
+PASS left 112 applied: still two columns of 120 {"cols": 2, "marginLeft": 112, "marginRight": 20, "pages": 20, "seq": 2}
+FAIL the right slider ends at the limit (132 - 60 = 72): still two columns {"stored": null, "status": {"cols": 2, "marginLeft": 60, "marginRight": 20}}
+PASS left margin moved back and forth: two columns every time [[80, 2, "60"], [40, 2, "40"], [70, 2, "60"]]
+PASS margins 80 + 90 stored, limit 132: two columns, margins narrowed in proportion {"cols": 2, "marginLeft": 62, "marginRight": 70, "marginMost": 132}
+PASS the panel says the stored margins are narrowed null
+PASS landscape: two columns, the stored margins fit (no narrowing) {"cols": 2, "marginLeft": 80, "marginRight": 90, "marginMost": 452, "vw": 732}
+PASS landscape: no two-column margin note ["雙欄", "雙欄", "雙欄", "雙欄", "雙欄"]
+PASS one column: no limit reported, no note, left 120 accepted {"twoWanted": false, "stored": "120"}
+.. typesetting settings back to their defaults
+=== done 07:28:51 exit 0

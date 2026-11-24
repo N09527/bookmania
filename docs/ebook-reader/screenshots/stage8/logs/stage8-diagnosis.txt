@@ -1,0 +1,46 @@
+Stage 8 diagnoses on the emulator (11/24). Scripts: repro_margins.py, frames_check.py, frames_steps.py,
+frames_poll.py, kb_check.py (scratch scripts, not kept in the repository); their output is copied here.
+
+1) Two columns: margins set from the panel's layout tab (taps on the sliders), App before stage 8 (05:30)
+   左 -> 60: stored L=60 R=None {"cols": 2, "page": 0, "pages": 18, "gutter": 226, "vw": 412, "seq": 2}
+   右 -> 60: stored L=60 R=60 {"cols": 2, "page": 0, "pages": 20, "gutter": 206, "vw": 412, "seq": 3}
+   右 -> 80: stored L=60 R=82 {"cols": 1, "page": 0, "pages": 10, "gutter": null, "vw": 412, "seq": 4}
+   右 -> 70: stored L=60 R=70 {"cols": 2, "page": 0, "pages": 20, "gutter": 201, "vw": 412, "seq": 5}
+   左 -> 80: stored L=80 R=70 {"cols": 1, "page": 0, "pages": 10, "gutter": null, "vw": 412, "seq": 6}
+   左 -> 40: stored L=38 R=70 {"cols": 2, "page": 0, "pages": 20, "gutter": 190, "vw": 412, "seq": 7}
+   (the taps aimed at 80 and 40 gave 82 and 38: the slider steps by 2 dp, hard to hit exactly)
+
+2) The first frame scrolled away after a value typed in a field (two columns, first stage 8 build)
+   frames_check.py (frame scroll positions; expected [0, 190] on page 0):
+     opened        {"page": 0, "pages": 15, "seq": 1, "frames sx": [0, 190]}
+     A-slider-22   {"page": 0, "pages": 19, "seq": 2, "frames sx": [0, 190]}
+     B-field-24    {"page": 0, "pages": 23, "seq": 3, "frames sx": [4121, 190]}
+     A-slider-22   {"page": 0, "pages": 19, "seq": 4, "frames sx": [0, 190]}
+   What sat in the first frame then: {"sx":4121,"scrollWidth":4354,"clientWidth":182,"maxScroll":4172,
+     "active":"A","links":3,"linkPos":[["註一",4188],["example.",4188],["第二章",4188]],"focusVisible":"A"}
+     -> a link of the chapter's end had the focus, and 4121 brings it into view.
+   The WebView and the page's viewport kept their size with the keyboard up: before {"w":412,"h":732},
+     keyboard up {"w":412,"h":732}, WebView (0, 0, 1080, 1794) both times.
+   The keyboard's Done key (a tap on the check mark) gave the same 4121 as an Enter key event.
+   Listeners added by the shell inside the frames do not run (the frames are sandboxed without scripts):
+     a scroll and a focusin listener stayed silent while the frame was scrolled and a link focused.
+   After the fix (Done gives the focus to the panel instead of clearing it): frames [0, 190], active BODY in
+     both; closing the panel with the field focused, or the back key: frames unchanged, active BODY.
+
+3) The panel and the keyboard (fixed App): the font size field's position after a tap, three rounds
+   0 before (859, 1639, 1027, 1749) | 3s (859, 1014, 1027, 1124) | 6s same | 10s same
+   1 before (859, 1646, 1027, 1756) | 3s (859, 1646, 1027, 1756) | 6s (859, 1021, 1027, 1131) | 10s same
+   2 before (859, 1616, 1027, 1726) | 3s (859, 991, 1027, 1101)  | 6s same | 10s same
+   -> the panel moves above the keyboard every time, on this emulator sometimes later than the keyboard is
+      reported shown.
+
+4) A tap on the very end of a slider: the right margin slider (27..1053), tap at x 1047 -> nothing stored;
+   tap at 80 % (x 848) -> 58 stored.
+
+5) The emulator after the final builds (12:51): did not start. emulator.log (kept as emulator-failed-disk.log):
+   "FATAL | Your device does not have enough disk space to run avd: `api26g`." df: 1.7 GB available.
+   The chain waited for the boot without a time limit; seen at 13:30. Freed at 13:31 (rebuildable, not delivered):
+   app/build/intermediates (1.4 GB), app/build/tmp, the upstream standard APKs and their mapping, four of the five
+   debug APKs (x86_64 kept; the debug App was installed), Gradle daemon logs; the daemon stopped. 4.7 GB available.
+   The two release APKs were not touched (SHA-256 4d340f79... and a3bf9196... before and after).
+   Emulator started again 13:32, booted 13:33:37; the chain went on by itself.

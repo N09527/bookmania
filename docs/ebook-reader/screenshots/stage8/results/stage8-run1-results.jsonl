@@ -1,0 +1,35 @@
+{"time": "06:46:40", "step": "strings", "check": "the work page shows", "ok": false, "detail": null}
+{"time": "06:47:21", "step": "strings", "check": "the description header reads 內容簡介", "ok": false, "detail": []}
+{"time": "06:47:21", "step": "strings", "check": "no header starts with 關於此", "ok": true, "detail": []}
+{"time": "06:47:21", "step": "strings", "check": "the chapter count reads 共 N 冊", "ok": false, "detail": []}
+{"time": "06:49:16", "step": "fields", "check": "value fields on the rows (text tab)", "ok": false, "detail": []}
+{"time": "06:50:37", "step": "fields", "check": "font size typed: the keyboard shows", "ok": true, "detail": {"field": [859, 1349, 1027, 1459], "keyboard shown": true, "field with the keyboard": [859, 724, 1027, 834], "laid out again while the keyboard was up": false, "seq": [1, 2], "status": {"ready": true, "error": null, "page": 0, "pages": 12, "cols": 1, "mode": "H", "seq": 2, "ms": 1738, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}}}
+{"time": "06:50:37", "step": "fields", "check": "font size typed: the field moves above the keyboard", "ok": true, "detail": {"field": [859, 1349, 1027, 1459], "keyboard shown": true, "field with the keyboard": [859, 724, 1027, 834], "laid out again while the keyboard was up": false, "seq": [1, 2], "status": {"ready": true, "error": null, "page": 0, "pages": 12, "cols": 1, "mode": "H", "seq": 2, "ms": 1738, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}}}
+{"time": "06:50:37", "step": "fields", "check": "font size typed: no relayout while the keyboard is up", "ok": true, "detail": {"field": [859, 1349, 1027, 1459], "keyboard shown": true, "field with the keyboard": [859, 724, 1027, 834], "laid out again while the keyboard was up": false, "seq": [1, 2], "status": {"ready": true, "error": null, "page": 0, "pages": 12, "cols": 1, "mode": "H", "seq": 2, "ms": 1738, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}}}
+{"time": "06:50:37", "step": "fields", "check": "font size 26 applied (stored, on the page)", "ok": true, "detail": {"stored": "26", "css": "26px"}}
+{"time": "06:50:37", "step": "fields", "check": "the keyboard is hidden after Done", "ok": true, "detail": null}
+{"time": "06:51:25", "step": "fields", "check": "font size 60 refused: the allowed range shows", "ok": true, "detail": {"texts": ["可輸入 12～48 的整數"], "stored": "26", "seq": [2, 2]}}
+{"time": "06:51:45", "step": "fields", "check": "leaving the field puts the value back and hides the note", "ok": true, "detail": {"field": "26", "notes": []}}
+{"time": "06:52:22", "step": "fields", "check": "行距 1.75 applied (stored, on the page)", "ok": true, "detail": {"stored": "1.75", "css": "45.5px", "seq": [2, 3]}}
+{"time": "06:53:09", "step": "fields", "check": "字距 0.07 applied (stored, on the page)", "ok": true, "detail": {"stored": "0.07", "css": "1.82px", "seq": [3, 4]}}
+{"time": "06:53:41", "step": "fields", "check": "首行縮排: no field while it follows the book, a field once switched off", "ok": true, "detail": {"field before": false, "switch": [890, 1510, 1027, 1636]}}
+{"time": "06:54:16", "step": "fields", "check": "首行縮排 1.5 applied (stored, on the page)", "ok": true, "detail": {"stored": "1.5", "css": "39px", "seq": [5, 6]}}
+{"time": "06:57:19", "step": "fields", "check": "段落間距: no field while it follows the book, a field once switched off", "ok": true, "detail": {"field before": false, "switch": [890, 1701, 1027, 1794]}}
+{"time": "06:58:03", "step": "fields", "check": "段落間距 0.35 applied (stored, on the page)", "ok": true, "detail": {"stored": "0.35", "css": ["0px", "0px", "9.1px", "0px"], "seq": [7, 8]}}
+{"time": "07:00:33", "step": "fields", "check": "margin 上 40 stored", "ok": true, "detail": {"stored": "40", "seq": [8, 9]}}
+{"time": "07:01:16", "step": "fields", "check": "margin 下 25 stored", "ok": true, "detail": {"stored": "25", "seq": [9, 10]}}
+{"time": "07:02:01", "step": "fields", "check": "margin 左 25 stored", "ok": true, "detail": {"stored": "25", "seq": [10, 11]}}
+{"time": "07:02:36", "step": "fields", "check": "margin 右 31 stored", "ok": true, "detail": {"stored": "31", "seq": [11, 12]}}
+{"time": "07:02:37", "step": "fields", "check": "the page box follows the typed margins (left, top, width, height)", "ok": true, "detail": {"frame": [17, 32, 372, 683], "expected": [17, 32, 372, 683]}}
+{"time": "07:06:07", "step": "fields", "check": "two columns, font size typed: each frame shows its page, nothing focused in them", "ok": true, "detail": {"frames": [{"sx": 0, "active": "BODY"}, {"sx": 190, "active": "BODY"}], "expected scroll": [0, 190], "status": {"page": 0, "pages": 23, "cols": 2, "seq": 2}}}
+{"time": "07:07:35", "step": "margins", "check": "two columns in portrait: the shell reports the limit (412 - 2 x 120 - 40 = 132)", "ok": true, "detail": {"twoWanted": true, "marginMost": 132, "cols": 2, "vw": 412}}
+{"time": "07:10:02", "step": "margins", "check": "the panel says how far the side margins go with two columns", "ok": true, "detail": null}
+{"time": "07:11:05", "step": "margins", "check": "left 120 refused with two columns (right 20): 0 to 112 allowed", "ok": true, "detail": {"notes": ["可輸入 0～112 的整數"], "stored": null, "seq": [1, 1]}}
+{"time": "07:12:01", "step": "margins", "check": "left 112 applied: still two columns of 120", "ok": true, "detail": {"cols": 2, "marginLeft": 112, "marginRight": 20, "pages": 20, "seq": 2}}
+{"time": "07:13:54", "step": "margins", "check": "the right slider ends at the limit (132 - 60 = 72): still two columns", "ok": false, "detail": {"stored": null, "status": {"cols": 2, "marginLeft": 60, "marginRight": 20}}}
+{"time": "07:17:17", "step": "margins", "check": "left margin moved back and forth: two columns every time", "ok": true, "detail": [[80, 2, "60"], [40, 2, "40"], [70, 2, "60"]]}
+{"time": "07:18:41", "step": "margins", "check": "margins 80 + 90 stored, limit 132: two columns, margins narrowed in proportion", "ok": true, "detail": {"cols": 2, "marginLeft": 62, "marginRight": 70, "marginMost": 132}}
+{"time": "07:21:19", "step": "margins", "check": "the panel says the stored margins are narrowed", "ok": true, "detail": null}
+{"time": "07:21:39", "step": "margins", "check": "landscape: two columns, the stored margins fit (no narrowing)", "ok": true, "detail": {"cols": 2, "marginLeft": 80, "marginRight": 90, "marginMost": 452, "vw": 732}}
+{"time": "07:23:41", "step": "margins", "check": "landscape: no two-column margin note", "ok": true, "detail": ["雙欄", "雙欄", "雙欄", "雙欄", "雙欄"]}
+{"time": "07:28:19", "step": "margins", "check": "one column: no limit reported, no note, left 120 accepted", "ok": true, "detail": {"twoWanted": false, "stored": "120"}}

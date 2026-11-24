@@ -1,0 +1,52 @@
+=== s4checks start 10:13:14
+=== s4checks end 10:30:45 exit 143
+=== s4pages start 10:30:45
+=== s4pages end 11:20:12 exit 0
+=== s3 start 11:20:12
+=== s3 end 12:07:24 exit 0
+REGRESSION DONE 12:07:24
+
+stage5_5 (items 12-16 27): 47/47 ok, steps: settings_ui, text:t-curl-ltr-2col, text:t-curl-ltr-2col-back, text:t-curl-rtl-2col, text:t-curl-rtl-2col-back, text:t-slide-ltr-2col
+stage5 (items 7 8 9 10 18 19): 22/22 ok, steps: restore:epub-horizontal-2col, rotate:epub-vertical, settings:epub-horizontal, slider:epub-horizontal, slider:epub-vertical
+stage5 item 7 again: 6/6 ok, steps: restore:epub-vertical-2col-landscape
+stage4 checks (stopped at 10:30: the books opened at saved positions): 12/18 ok, steps: links, panel, rotate, rotate-busy
+  FAIL  rotate-busy | B: menu shown in portrait, indicator for one column | ["3/3 · 3/9", {"ready": true, "error": null, "page": 2, "pages": 9, "cols": 1, "mode": "V", "seq": 1, "ms": 3610, "rubyFix": false, "gutter": null, "vw": 412, "twoWanted": false, "marginMost": 132, "marginLeft": 20, "marginRight": 20}]
+  FAIL  rotate-busy | B: after rotating to landscape the indicator shows the spread of the new layout | ["3/3 · 5–6/17", {"ready": true, "error": null, "page": 4, "pages": 17, "cols": 2, "mode": "V", "seq": 2, "ms": 4414, "rubyFix": false, "gutter": 366, "vw": 732, "twoWanted": true, "marginMost": 452, "marginLeft": 20, "marginRight": 20}]
+  FAIL  panel | page indicator shows both pages of the spread | ["3/3 · 7–8/21", {"ready": true, "error": null, "page": 6, "pages": 21, "cols": 2, "mode": "V", "seq": 2, "ms": 4949, "rubyFix": true, "gutter": 206, "vw": 412, "twoWanted": true, "marginMost": 132, "marginLeft": 20, "marginRight": 20}]
+  FAIL  panel | keys: indicator on the first spread | ["3/3 · 7–8/21", {"ready": true, "error": null, "page": 6, "pages": 21, "cols": 2, "mode": "V", "seq": 1, "ms": 6576, "rubyFix": true, "gutter": 206, "vw": 412, "twoWanted": true, "marginMost": 132, "marginLeft": 20, "marginRight": 20}]
+  FAIL  panel | after Page Down: next spread, indicator 3–4 | ["3/3 · 9–10/21", {"ready": true, "error": null, "page": 8, "pages": 21, "cols": 2, "mode": "V", "seq": 1, "ms": 6576, "rubyFix": true, "gutter": 206, "vw": 412, "twoWanted": true, "marginMost": 132, "marginLeft": 20, "marginRight": 20}]
+  FAIL  links | external link found on a spread | null
+stage4 checks again from the start of the books: 44/44 ok, steps: links, panel, rotate, rotate-busy, ruby
+stage3: 79/79 ok, steps: defaults, direction, font_speed, fonts, global, persist, reset, reset_levels, rotate, scopes, side_panel, toolbar, vol2
+stage7 bold and gutter: 31/31 ok, steps: bold:horizontal, bold:vertical, gutter
+s4pages:
+  v-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  h-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  h-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-epub-2col-ltr.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-epub-2col-ltr.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-azw3-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-azw3-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  h-mobi6-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  h-mobi6-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-jointmobi-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-jointmobi-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  v-epub-1col-default.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  h-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  h-epub-1col-default.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-epub-1col-size30-rubyfix.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  v-epub-1col-size30-rubyfix.ruby.jsonl: documents 3, misplaced ruby in total: 0
+kb-events.log: 0 lines
+s3-events.log: 0 lines
+s4checks-events.log: 0 lines
+s4checks-rerun-events.log: 0 lines
+s4pages-events.log: 0 lines
+s5-events.log: 0 lines
+s5-rerun-events.log: 0 lines
+s55-events.log: 0 lines
+s7-events.log: 0 lines
+s8-events.log: 0 lines
+stage5_5/out8/system-events.log: 0 lines
+stage5/out8/system-events.log: 2 lines

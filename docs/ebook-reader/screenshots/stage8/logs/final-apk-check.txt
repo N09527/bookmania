@@ -1,0 +1,17 @@
+app-bookmania-arm64-v8a-release.apk: 28,912,805 bytes, SHA-256 4d340f79a944c98ffabd478fc570f1d15ae66eaa337ffcef2c41c580ba83536a, modified 1795524481
+app-bookmania-universal-release.apk: 68,599,472 bytes, SHA-256 a3bf91963f3e21d4640fb0472d15416439c5d3cb025d4aa46b33f17227d3f9ce, modified 1795524481
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Signer #1 certificate DN: CN=Bookmania
+Signer #1 certificate SHA-256 digest: e760ea6456c7c0082f77bad0fa3728dcbdd5266c2d4884e6ae81f9df1235589c
+package: name='io.github.n09527.bookmania' versionCode='162' versionName='1.10.3' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+targetSdkVersion:'36'
+application-label:'Bookmania'
+google keys in resources: {'google_app_id': 0, 'google_api_key': 0, 'gcm_defaultSenderId': 0, 'google_crash_reporting_api_key': 0, 'google_storage_bucket': 0, 'project_id': 0} AIza in strings: 0
+licence list res/M7.json: 300 libraries, foliate ['johnfactotum:foliate-js'], GPL-family [], MIT entries ['MIT', 'foliate-js-mit']
+foliate MIT text present: True
+app-bookmania-arm64-v8a-release.apk: minSdkVersion:'26' native-code: 'arm64-v8a' 
+app-bookmania-arm64-v8a-release.apk: apksigner verify ok
+app-bookmania-universal-release.apk: minSdkVersion:'26' native-code: 'arm64-v8a' 'armeabi-v7a' 'x86' 'x86_64' 
+app-bookmania-universal-release.apk: apksigner verify ok

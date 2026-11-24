@@ -1,0 +1,30 @@
+{"time": "13:39:01", "step": "release:install", "check": "the release APK installs", "ok": true, "detail": ["Success"]}
+{"time": "13:39:02", "step": "release:install", "check": "the installed App is the release build (not debuggable)", "ok": true, "detail": "versionCode=162 minSdk=26 targetSdk=36\n    versionName=1.10.3\n    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]\n    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]"}
+{"time": "13:39:21", "step": "release:data", "check": "the books and the library are in place for the release App", "ok": true, "detail": {"files in the debug folder": "39", "copied": "39", "uid": "10082"}}
+{"time": "13:40:31", "step": "release:vertical-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1249}"]}}
+{"time": "13:40:53", "step": "release:vertical-epub", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.039}}
+{"time": "13:40:54", "step": "release:vertical-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:41:50", "step": "release:horizontal-epub", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1250}"]}}
+{"time": "13:42:16", "step": "release:horizontal-epub", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.287}}
+{"time": "13:42:16", "step": "release:horizontal-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:43:15", "step": "release:vertical-azw3", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1251}"]}}
+{"time": "13:43:39", "step": "release:vertical-azw3", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.039}}
+{"time": "13:43:39", "step": "release:vertical-azw3", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:44:39", "step": "release:horizontal-mobi6", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1252}"]}}
+{"time": "13:45:02", "step": "release:horizontal-mobi6", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.234}}
+{"time": "13:45:02", "step": "release:horizontal-mobi6", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:46:03", "step": "release:joint-mobi", "check": "the book opens in the text reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1253}"]}}
+{"time": "13:46:26", "step": "release:joint-mobi", "check": "a page key turns the page (the screen changed)", "ok": true, "detail": {"share of the screen that changed": 0.087}}
+{"time": "13:46:26", "step": "release:joint-mobi", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:47:23", "step": "release:drm-adept-epub", "check": "the text reader explains the DRM", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1254}"], "screen": ["This book is protected by DRM", "Protection: Adobe ADEPT\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}}
+{"time": "13:47:24", "step": "release:drm-adept-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:48:19", "step": "release:drm-flagged-mobi", "check": "the text reader explains the DRM", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1255}"], "screen": ["This book is protected by DRM", "Protection: Mobipocket / Kindle\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}}
+{"time": "13:48:19", "step": "release:drm-flagged-mobi", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:49:17", "step": "release:corrupt-truncated", "check": "the text reader explains that the file is damaged", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1256}"], "screen": ["Cannot open this book", "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.", "Back"]}}
+{"time": "13:49:18", "step": "release:corrupt-truncated", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:50:14", "step": "release:not-an-ebook", "check": "the text reader explains that the file is damaged", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1257}"], "screen": ["Cannot open this book", "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.", "Back"]}}
+{"time": "13:50:14", "step": "release:not-an-ebook", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:51:20", "step": "release:comic-cbz", "check": "the book opens in the image reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t1258}"]}}
+{"time": "13:51:20", "step": "release:comic-cbz", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}
+{"time": "13:52:29", "step": "release:comic-fixed-epub", "check": "the book opens in the image reader", "ok": true, "detail": {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t1259}"]}}
+{"time": "13:52:29", "step": "release:comic-fixed-epub", "check": "no crash while the book is open", "ok": true, "detail": {"crashes": []}}

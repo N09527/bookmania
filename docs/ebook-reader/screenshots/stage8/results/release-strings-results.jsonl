@@ -1,0 +1,2 @@
+{"time": "15:00:09", "step": "release-features:strings", "check": "release, work page (English): the description header reads \"About this book\"", "ok": true, "detail": ["About this book"]}
+{"time": "15:00:09", "step": "release-features:strings", "check": "release, work page (English): the chapter count is unchanged (\"N chapters\")", "ok": true, "detail": ["5 chapters"]}
