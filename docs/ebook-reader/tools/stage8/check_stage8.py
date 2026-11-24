@@ -145,7 +145,7 @@ def open_work_page(title):
                 time.sleep(3)
             s7.shot('strings-work-page-not-shown')
             return False
-        d.swipe(540, 1500, 540, 800, 800, 3)
+        d.swipe(540, 1350, 540, 550, 800, 3)  # above the floating filter bar of the list
     s7.shot('strings-work-not-in-list')
     return False
 

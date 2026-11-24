@@ -172,7 +172,7 @@ def step_strings():
             if n:
                 break
             if labels[0].startswith('橫排'):
-                d.swipe(540, 1500, 540, 800, 800, 3)
+                d.swipe(540, 1350, 540, 550, 800, 3)  # above the floating filter bar of the list
             else:
                 time.sleep(3)
         if n is None:
