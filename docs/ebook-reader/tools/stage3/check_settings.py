@@ -347,7 +347,11 @@ def step_reset_levels():
 
 
 def pick_font_file(file_name):
-    """From the panel's text tab: 匯入字型… → system picker (DocumentsUI) → Downloads → the file."""
+    """From the panel's text tab: 匯入字型… → system picker (DocumentsUI) → Downloads → the file. The picker lists
+    the newest files first, in a grid; newer test files in Download (backups, test books) had pushed the fonts
+    out of view, so the list view is chosen and the list scrolled until the file shows (stage 7; the stage 6
+    acceptance checks had met the same problem). Before, the fallback to the storage root could press BACK and
+    close the picker."""
     for _ in range(4):
         n = d.find('匯入字型', exact=False)
         if n:
@@ -362,33 +366,24 @@ def pick_font_file(file_name):
             raise RuntimeError('picker did not open: ' + d.resumed())
         time.sleep(2)
     time.sleep(4)
-    if not d.wait_for(file_name, tries=2):
+    if not d.find('Downloads', exact=True):
         roots = d.find('Show roots', exact=True)
         if roots:
             d.tap(roots['x'], roots['y'], 3)
         if d.find('Downloads', exact=True):
             d.tap_label('Downloads', exact=True, wait=5)
-    if not d.wait_for(file_name, tries=2):
-        # Fallback: show the device storage root and open its Download folder.
-        more = d.find('More options', exact=True)
-        if more:
-            d.tap(more['x'], more['y'], 3)
-            if d.find('Show internal storage', exact=True):
-                d.tap_label('Show internal storage', exact=True, wait=3)
-            else:
-                d.shell('input keyevent 4')
-                time.sleep(2)
-        roots = d.find('Show roots', exact=True)
-        if roots:
-            d.tap(roots['x'], roots['y'], 3)
-        for name in ('Android SDK built for x86_64', 'Internal storage'):
-            if d.find(name, exact=True):
-                d.tap_label(name, exact=True, wait=5)
-                break
-        if d.find('Download', exact=True):
-            d.tap_label('Download', exact=True, wait=5)
-    d.shot('s3-30-picker-' + file_name.split('.')[0])
-    d.tap_label(file_name, exact=True, wait=8)
+    view = d.find('List view', exact=True)
+    if view:
+        d.tap(view['x'], view['y'], 3)
+    for _ in range(10):
+        f = d.find(file_name, exact=True)
+        if f:
+            d.shot('s3-30-picker-' + file_name.split('.')[0])
+            d.tap(f['x'], f['y'], 8)
+            return
+        d.swipe(540, 1500, 540, 800, 800, 2)
+    d.shot('s3-30-picker-not-found-' + file_name.split('.')[0])
+    raise RuntimeError(f'not found in the picker: {file_name}')
 
 
 def font_row(name, ns=None):
