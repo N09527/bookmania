@@ -167,11 +167,13 @@ def step_strings():
     c.clear_dialogs()
     for labels, wait in ((('探索', 'Browse'), 5), (('本機來源', 'Local source'), 10), (('橫排測試書 EPUB',), 30)):
         n = None
+        work = labels[0].startswith('橫排')
         for _ in range(10):  # the list of works is longer than a screen: scrolled until the work shows
-            n = next((m for m in (d.find(x, exact=True) for x in labels) if m and m['y'] < 1650), None)
+            # The work must show above the list's floating filter bar; Browse is in the bottom navigation bar.
+            n = next((m for m in (d.find(x, exact=True) for x in labels) if m and (m['y'] < 1650 or not work)), None)
             if n:
                 break
-            if labels[0].startswith('橫排'):
+            if work:
                 d.swipe(540, 1350, 540, 550, 800, 3)  # above the floating filter bar of the list
             else:
                 time.sleep(3)
