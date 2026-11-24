@@ -78,11 +78,7 @@ object SettingsAdvancedScreen : ComposableSettings() {
         val isUpdaterEnabled = BuildConfig.INCLUDE_UPDATER
 
         return buildList {
-            add(Preference.PreferenceItem.SwitchPreference(
-                pref = basePreferences.crashReport(),
-                title = stringResource(MR.strings.send_crash_report),
-                subtitle = stringResource(MR.strings.helps_fix_bugs),
-            ))
+            // Bookmania sends no crash reports (no Firebase), so there is no "Send crash reports" switch.
             add(getDumpCrashLog())
             add(Preference.PreferenceItem.SwitchPreference(
                 pref = networkPreferences.verboseLogging(),

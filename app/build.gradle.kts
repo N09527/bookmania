@@ -1,5 +1,3 @@
-import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
-import com.google.gms.googleservices.GoogleServicesPlugin
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -12,13 +10,6 @@ plugins {
     alias(kotlinx.plugins.parcelize)
     alias(libs.plugins.aboutlibraries)
     alias(libs.plugins.aboutlibraries.android)
-    alias(libs.plugins.firebase.crashlytics) apply false
-    alias(libs.plugins.google.services) apply false
-}
-
-if (gradle.startParameter.taskRequests.toString().contains("standard", true)) {
-    apply<CrashlyticsPlugin>()
-    apply<GoogleServicesPlugin>()
 }
 
 fun runCommand(command: String): String {
@@ -26,8 +17,10 @@ fun runCommand(command: String): String {
     return result.standardOutput.asText.get().trim()
 }
 
+// Bookmania's own version line (it started at 1.0.0 when it left Yōkai's 1.10.3; versionCode went on from 162 to 200,
+// so installed copies update in place).
 @Suppress("PropertyName")
-val _versionName = "1.10.3"
+val _versionName = "1.0.0"
 val betaCount by lazy {
     val betaTags = runCommand("git tag -l --sort=refname v${_versionName}-b*")
 
@@ -49,8 +42,8 @@ val supportedAbis = setOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
 android {
     defaultConfig {
-        applicationId = "eu.kanade.tachiyomi"
-        versionCode = 162
+        applicationId = "io.github.n09527.bookmania"
+        versionCode = 200
         versionName = _versionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled = true
@@ -59,13 +52,14 @@ android {
         buildConfigField("String", "BETA_COUNT", "\"${betaCount}\"")
         buildConfigField("String", "COMMIT_SHA", "\"${commitHash}\"")
         buildConfigField("String", "BUILD_TIME", "\"${buildTime}\"")
+        // No self-updater: the in-app update check stays off (Bookmania is distributed as APKs on GitHub Releases).
         buildConfigField("Boolean", "INCLUDE_UPDATER", "false")
         buildConfigField("Boolean", "BETA", "false")
         buildConfigField("Boolean", "NIGHTLY", "false")
-        // Whether the "Updated to vX / What's new" sheet (upstream release notes) is shown after an update.
-        buildConfigField("Boolean", "SHOW_UPDATE_NOTES", "true")
-        // Whether onboarding requires the "install apps" permission (used by the self-updater and extensions).
-        buildConfigField("Boolean", "ONBOARDING_REQUIRES_INSTALL_PERMISSION", "true")
+        // Whether the "Updated to vX / What's new" sheet is shown after an update.
+        buildConfigField("Boolean", "SHOW_UPDATE_NOTES", "false")
+        // Whether onboarding requires the "install apps" permission (used by a self-updater and extensions).
+        buildConfigField("Boolean", "ONBOARDING_REQUIRES_INSTALL_PERMISSION", "false")
 
         ndk {
             // False positive, we have x86 abi support
@@ -87,31 +81,13 @@ android {
 
     buildTypes {
         getByName("debug") {
-            applicationIdSuffix = ".debugYokai"
+            applicationIdSuffix = ".debug"
             versionNameSuffix = "-d${commitCount}"
         }
         getByName("release") {
-            applicationIdSuffix = ".yokai"
             isShrinkResources = true
             isMinifyEnabled = true
             proguardFiles("proguard-android-optimize.txt", "proguard-rules.pro")
-        }
-        create("beta") {
-            initWith(getByName("release"))
-            buildConfigField("boolean", "BETA", "true")
-
-            matchingFallbacks.add("release")
-            versionNameSuffix = "-b${betaCount}"
-        }
-        create("nightly") {
-            initWith(getByName("release"))
-            buildConfigField("boolean", "BETA", "true")
-            buildConfigField("boolean", "NIGHTLY", "true")
-
-            signingConfig = signingConfigs.getByName("debug")
-            matchingFallbacks.add("release")
-            versionNameSuffix = "-r${commitCount}"
-            applicationIdSuffix = ".nightlyYokai"
         }
     }
 
@@ -126,10 +102,10 @@ android {
         shaders = false
     }
 
-    // Bookmania release signing. The keystore and its passwords never go into the repository: set
+    // Release signing. The keystore and its passwords never go into the repository: set
     // bookmaniaStoreFile, bookmaniaStorePassword, bookmaniaKeyAlias and bookmaniaKeyPassword in
-    // ~/.gradle/gradle.properties (or as ORG_GRADLE_PROJECT_* environment variables).
-    // Without them the bookmania release APK is built unsigned, as before.
+    // ~/.gradle/gradle.properties (or as ORG_GRADLE_PROJECT_* environment variables, as the release workflow does).
+    // Without them the release APK is built unsigned.
     providers.gradleProperty("bookmaniaStoreFile").orNull?.let { path ->
         signingConfigs.create("bookmania") {
             storeFile = file(path)
@@ -141,22 +117,10 @@ android {
 
     flavorDimensions.add("default")
 
+    // A single flavor: it keeps the task and APK names (assembleBookmaniaRelease, app-bookmania-*.apk).
     productFlavors {
-        create("standard") {
-            buildConfigField("Boolean", "INCLUDE_UPDATER", "true")
-            dimension = "default"
-        }
-        create("dev") {
-            resourceConfigurations.clear()
-            resourceConfigurations.add("en")
-            dimension = "default"
-        }
-        // Bookmania (fork): no Firebase configuration, no self-updater, all languages.
-        // Its application id is set in androidComponents below.
         create("bookmania") {
             dimension = "default"
-            buildConfigField("Boolean", "SHOW_UPDATE_NOTES", "false")
-            buildConfigField("Boolean", "ONBOARDING_REQUIRES_INSTALL_PERMISSION", "false")
             // Debug builds keep the debug key (the build type's signing config wins).
             signingConfigs.findByName("bookmania")?.let { signingConfig = it }
         }
@@ -195,11 +159,6 @@ dependencies {
     // Android X libraries
     implementation(androidx.bundles.androidx)
 
-    implementation(platform(libs.firebase))
-
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
-
     // ReactiveX
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
@@ -208,8 +167,6 @@ dependencies {
     // Chucker
     debugImplementation(libs.chucker.library)
     releaseImplementation(libs.chucker.library.no.op)
-    "nightlyImplementation"(libs.chucker.library.no.op)
-    "betaImplementation"(libs.chucker.library.no.op)
 
     implementation(kotlin("reflect", version = kotlinx.versions.kotlin.get()))
 
@@ -296,17 +253,6 @@ dependencies {
 aboutLibraries {
     collect {
         configPath = file("aboutlibraries")
-    }
-}
-
-// Bookmania uses its own application id, without Yōkai's build-type suffixes (".yokai", ".debugYokai" …).
-androidComponents {
-    onVariants(selector().withFlavor("default" to "bookmania")) { variant ->
-        val suffix = when (variant.buildType) {
-            "release" -> ""
-            else -> ".${variant.buildType}"
-        }
-        variant.applicationId.set("io.github.n09527.bookmania$suffix")
     }
 }
 

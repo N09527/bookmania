@@ -117,12 +117,7 @@ class SettingsAdvancedLegacyController : SettingsLegacyController() {
     override fun setupPreferenceScreen(screen: PreferenceScreen) = screen.apply {
         titleMRes = MR.strings.advanced
 
-        switchPreference {
-            bindTo(basePreferences.crashReport())
-            titleMRes = MR.strings.send_crash_report
-            summaryMRes = MR.strings.helps_fix_bugs
-        }
-
+        // Bookmania sends no crash reports (no Firebase), so there is no "Send crash reports" switch.
         preference {
             key = "dump_crash_logs"
             titleMRes = MR.strings.dump_crash_logs

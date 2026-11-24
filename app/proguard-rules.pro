@@ -105,6 +105,3 @@
 -keep public enum nl.adaptivity.xmlutil.EventType { *; }
 ##---------------End: proguard configuration for kotlinx.serialization  ----------
 
-# Firebase
--keep class com.google.firebase.installations.** { *; }
--keep interface com.google.firebase.installations.** { *; }
