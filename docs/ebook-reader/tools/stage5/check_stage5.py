@@ -677,8 +677,11 @@ def go_to_start():
 def step_restore(manga, chapter, label, pages, columns, landscape):
     STEP[0] = 'restore:' + label
     set_prefs({'pref_ebook_columns': columns} if columns != 'off' else {}, reset_typesetting=True)
-    rotate(landscape)
+    # The chapter is marked unread in portrait: in landscape its row in the chapter list sits at the screen's
+    # bottom edge, where the swipe is not taken (stage 8 regression, item 7).
+    rotate(False)
     before = ensure_unread(manga, chapter)
+    rotate(landscape)
     t_open = time.time()
     open_book(manga, chapter)
     note('start: ' + str(go_to_start()))
