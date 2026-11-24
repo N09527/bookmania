@@ -1,0 +1,90 @@
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": true, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-epub-2col-portrait: steps 36, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-epub-2col-portrait.jsonl
+  OEBPS/text/ch01.xhtml: cols 2, pages 23, spreads seen 12/12, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 2, pages 21, spreads seen 11/11, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 2, pages 21, spreads seen 11/11, chars 1832, visible==all: True
+v-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  OEBPS/text/ch01.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix True, annotations 16, misplaced 0
+v-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+h-epub-2col-portrait: steps 26, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/h-epub-2col-portrait.jsonl
+  OEBPS/text/ch01.xhtml: cols 2, pages 15, spreads seen 8/8, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 2, pages 15, spreads seen 8/8, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 2, pages 15, spreads seen 8/8, chars 1832, visible==all: True
+h-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  OEBPS/text/ch01.xhtml: ruby fix False, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix False, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix False, annotations 16, misplaced 0
+h-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": true, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-epub-2col-ltr: steps 36, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-epub-2col-ltr.jsonl
+  OEBPS/text/ch01.xhtml: cols 2, pages 23, spreads seen 12/12, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 2, pages 21, spreads seen 11/11, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 2, pages 21, spreads seen 11/11, chars 1832, visible==all: True
+v-epub-2col-ltr.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  OEBPS/text/ch01.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix True, annotations 16, misplaced 0
+v-epub-2col-ltr.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "text/part0002.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-azw3-2col-landscape: steps 29, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-azw3-2col-landscape.jsonl
+  text/part0000.xhtml: cols 2, pages 18, spreads seen 9/9, chars 1840, visible==all: True
+  text/part0001.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1807, visible==all: True
+  text/part0002.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1832, visible==all: True
+v-azw3-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  text/part0000.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0001.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0002.xhtml: ruby fix False, annotations 16, misplaced 0
+v-azw3-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "text/section0002.html", "rubyFix": false, "ruby": 0, "misplaced": 0, "examples": [], "error": null}
+h-mobi6-2col-landscape: steps 32, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/h-mobi6-2col-landscape.jsonl
+  text/section0000.html: cols 2, pages 20, spreads seen 10/10, chars 1880, visible==all: True
+  text/section0001.html: cols 2, pages 19, spreads seen 10/10, chars 1847, visible==all: True
+  text/section0002.html: cols 2, pages 19, spreads seen 10/10, chars 1872, visible==all: True
+h-mobi6-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  text/section0000.html: ruby fix False, annotations 0, misplaced 0
+  text/section0001.html: ruby fix False, annotations 0, misplaced 0
+  text/section0002.html: ruby fix False, annotations 0, misplaced 0
+h-mobi6-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "text/part0002.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-jointmobi-2col-landscape: steps 29, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-jointmobi-2col-landscape.jsonl
+  text/part0000.xhtml: cols 2, pages 18, spreads seen 9/9, chars 1840, visible==all: True
+  text/part0001.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1807, visible==all: True
+  text/part0002.xhtml: cols 2, pages 17, spreads seen 9/9, chars 1832, visible==all: True
+v-jointmobi-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  text/part0000.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0001.xhtml: ruby fix False, annotations 16, misplaced 0
+  text/part0002.xhtml: ruby fix False, annotations 16, misplaced 0
+v-jointmobi-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-epub-1col-default: steps 30, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-epub-1col-default.jsonl
+  OEBPS/text/ch01.xhtml: cols 1, pages 10, spreads seen 10/10, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 1, pages 9, spreads seen 9/9, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 1, pages 9, spreads seen 9/9, chars 1832, visible==all: True
+v-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  OEBPS/text/ch01.xhtml: ruby fix False, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix False, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix False, annotations 16, misplaced 0
+v-epub-1col-default.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": false, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+h-epub-1col-default: steps 25, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/h-epub-1col-default.jsonl
+  OEBPS/text/ch01.xhtml: cols 1, pages 8, spreads seen 8/8, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 1, pages 7, spreads seen 7/7, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 1, pages 8, spreads seen 8/8, chars 1832, visible==all: True
+h-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  OEBPS/text/ch01.xhtml: ruby fix False, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix False, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix False, annotations 16, misplaced 0
+h-epub-1col-default.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  ruby {"src": "OEBPS/text/ch03.xhtml", "rubyFix": true, "ruby": 16, "misplaced": 0, "examples": [], "error": null}
+v-epub-1col-size30-rubyfix: steps 62, log /home/user/bookmania/docs/ebook-reader/tools/stage4/out7/runs/v-epub-1col-size30-rubyfix.jsonl
+  OEBPS/text/ch01.xhtml: cols 1, pages 22, spreads seen 22/22, chars 1840, visible==all: True
+  OEBPS/text/ch02.xhtml: cols 1, pages 19, spreads seen 19/19, chars 1807, visible==all: True
+  OEBPS/text/ch03.xhtml: cols 1, pages 19, spreads seen 19/19, chars 1832, visible==all: True
+v-epub-1col-size30-rubyfix.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  OEBPS/text/ch01.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch02.xhtml: ruby fix True, annotations 16, misplaced 0
+  OEBPS/text/ch03.xhtml: ruby fix True, annotations 16, misplaced 0
+v-epub-1col-size30-rubyfix.ruby.jsonl: documents 3, misplaced ruby in total: 0

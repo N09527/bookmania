@@ -1,0 +1,150 @@
+=== 27: settings_ui 8 10 (18:57:50)
+PASS the text reader panel has 翻頁動畫 with 無／滑動／捲曲 ["捲曲", "滑動", "無", "翻頁動畫"]
+PASS 捲曲 is chosen by default {"無": false, "滑動": false, "捲曲": true}
+PASS choosing 滑動 stores pref_ebook_page_turn = slide null
+PASS Settings > Reader has 捲曲翻頁 right after 翻頁轉場動畫 {"捲曲翻頁": [42, 1193, 210, 1250], "翻頁轉場動畫": [42, 1052, 294, 1109]}
+PASS the switch stores pref_bookmania_pager_curl = true null
+--- exit 0 (19:03:22)
+=== 30: text 8 10 default t-default (19:03:23)
+failed to clear the 'main' log
+PASS the screen is in portrait {"screen": [1080, 1920], "columns shown": 1}
+.. t-default: 21 frames, key sent 1795460677.3
+PASS the page turned {"before": {"ready": true, "error": null, "page": 2, "pages": 8, "cols": 1, "mode": "H", "seq": 1, "ms": 2233, "rubyFix": false, "gutter": null, "vw": 412}, "after": {"ready": true, "error": null, "page": 3, "pages": 8, "cols": 1, "mode": "H", "seq": 1, "ms": 2233, "rubyFix": false, "gutter": null, "vw": 412}, "expected page": 3}
+PASS the App logged the turn (debug log) {"log": ["page turn: the page is held after 3595 ms (copy 656, overlay 223, first frame 3532)", "page turn: CURL starts 439 ms after the page changed", "page turn: 17 frames in 21773 ms"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 40.477, "old": 0.0, "new": 0.625, "new_at": [0.471, 0.487], "old_at": null, "new_right_half": 0.473, "new_bottom_half": 0.488}, "most new": 0.625, "most old": 0.7}
+PASS the turn is animated (frames between the two pages) {"frames": 21, "frames during the turn": 5, "sheet": "shots/t-default-frames.png"}
+PASS during the curl, part of the page that was on the screen is still shown {"old during the turn": [0.498, 0.263, 0.0, 0.0, 0.0]}
+PASS the new page shows on the right first {"frames": 21, "frames during the turn": 5, "sheet": "shots/t-default-frames.png", "first": {"t": 22.897, "old": 0.498, "new": 0.027, "new_at": [0.862, 0.789], "old_at": [0.39, 0.4], "new_right_half": 1.0, "new_bottom_half": 1.0}}
+PASS the curl starts at the bottom corner {"first": {"t": 22.897, "old": 0.498, "new": 0.027, "new_at": [0.862, 0.789], "old_at": [0.39, 0.4], "new_right_half": 1.0, "new_bottom_half": 1.0}}
+--- exit 0 (19:05:57)
+=== 31: image 10 12 l2r i-swipe-l2r --swipe (19:05:57)
+failed to clear the 'main' log
+.. i-swipe-l2r: the screen was still after 12.1 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+.. i-swipe-l2r: 31 frames, key sent 1795460830.9
+PASS the page turned {"last_page_read after the turn": 1, "started at": 0, "turned forward once first": false, "swipe": "input swipe 864 960 216 960 400"}
+PASS the page did not follow the finger before the curl (its frame stayed in place) {"largest shift of the page frame (pixels of the recording, a quarter of the screen)": 1, "frames before the new page shows": 6}
+FAIL the App logged the curl (debug log) {"log": ["page turn: not animated (copied true after 1874 ms, overlay false after 1564 ms)"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 28.073, "old": 0.0, "new": 0.813, "new_at": [0.511, 0.503], "old_at": null, "new_right_half": 0.538, "new_bottom_half": 0.505}, "most new": 0.813, "most old": 0.813}
+FAIL the turn is animated (frames between the two pages) {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-l2r-frames.png"}
+FAIL a frame of the turn shows part of the new page {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-l2r-frames.png"}
+--- exit 0 (19:08:46)
+=== 32: image 10 12 l2r i-swipe-l2r-back --swipe --back (19:08:46)
+failed to clear the 'main' log
+.. i-swipe-l2r-back: the screen was still after 6.4 s more
+.. i-swipe-l2r-back: after the first turn, the screen was still after 5.8 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 8 >= 8
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 16 >= 16
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 22 >= 22
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 26 >= 26
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 38 >= 38
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 42 >= 42
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 43 >= 43
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 44 >= 44
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 45 >= 45
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 49 >= 49
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 50 >= 50
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 52 >= 52
+[image2 @ 0x560d93604ec0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 53 >= 53
+.. i-swipe-l2r-back: 56 frames, key sent 1795461007.7
+PASS the page turned back to the first page {"last_page_read after the turn": 0, "started at": 0, "turned forward once first": true, "swipe": "input swipe 216 960 864 960 400"}
+PASS the page did not follow the finger before the curl (its frame stayed in place) {"largest shift of the page frame (pixels of the recording, a quarter of the screen)": 1, "frames before the new page shows": 17}
+PASS the App logged the curl (debug log) {"log": ["page turn: the page is held after 5362 ms (copy 2278, overlay 807, first frame 5328)", "page turn: CURL starts 1330 ms after the page changed", "page turn: 36 frames in 21771 ms"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 34.204, "old": 0.0, "new": 0.813, "new_at": [0.511, 0.503], "old_at": null, "new_right_half": 0.538, "new_bottom_half": 0.505}, "most new": 0.813, "most old": 0.813}
+PASS the turn is animated (frames between the two pages) {"frames": 56, "frames during the turn": 12, "sheet": "shots/i-swipe-l2r-back-frames.png"}
+PASS during the curl, part of the page that was on the screen is still shown {"old during the turn": [0.595, 0.405, 0.386, 0.386, 0.27, 0.204, 0.196, 0.196, 0.083, 0.045, 0.042, 0.042]}
+PASS the new page shows on the left first {"frames": 56, "frames during the turn": 12, "sheet": "shots/i-swipe-l2r-back-frames.png", "first": {"t": 15.914, "old": 0.595, "new": 0.062, "new_at": [0.152, 0.532], "old_at": [0.639, 0.504], "new_right_half": 0.0, "new_bottom_half": 0.537}}
+--- exit 0 (19:11:42)
+=== 33: image 10 12 r2l i-swipe-r2l --swipe (19:11:43)
+failed to clear the 'main' log
+.. i-swipe-r2l: the screen was still after 18.8 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+.. i-swipe-r2l: 40 frames, key sent 1795461173.2
+PASS the page turned {"last_page_read after the turn": 1, "started at": 0, "turned forward once first": false, "swipe": "input swipe 216 960 864 960 400"}
+PASS the page did not follow the finger before the curl (its frame stayed in place) {"largest shift of the page frame (pixels of the recording, a quarter of the screen)": 1, "frames before the new page shows": 13}
+PASS the App logged the curl (debug log) {"log": ["page turn: the page is held after 1578 ms (copy 1398, overlay 1058, first frame 1529)", "page turn: CURL starts 2538 ms after the page changed", "page turn: 23 frames in 20630 ms"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 45.284, "old": 0.0, "new": 0.813, "new_at": [0.511, 0.503], "old_at": null, "new_right_half": 0.538, "new_bottom_half": 0.505}, "most new": 0.813, "most old": 0.813}
+PASS the turn is animated (frames between the two pages) {"frames": 40, "frames during the turn": 13, "sheet": "shots/i-swipe-r2l-frames.png"}
+PASS during the curl, part of the page that was on the screen is still shown {"old during the turn": [0.598, 0.598, 0.466, 0.265, 0.265, 0.096, 0.061, 0.061, 0.061, 0.062, 0.067, 0.05, 0.05]}
+PASS the new page shows on the left first {"frames": 40, "frames during the turn": 13, "sheet": "shots/i-swipe-r2l-frames.png", "first": {"t": 13.992, "old": 0.598, "new": 0.056, "new_at": [0.109, 0.815], "old_at": [0.594, 0.417], "new_right_half": 0.0, "new_bottom_half": 1.0}}
+PASS the curl starts at the bottom corner {"first": {"t": 13.992, "old": 0.598, "new": 0.056, "new_at": [0.109, 0.815], "old_at": [0.594, 0.417], "new_right_half": 0.0, "new_bottom_half": 1.0}}
+--- exit 0 (19:14:28)
+=== 34: image 10 12 vertical i-swipe-vertical --swipe (19:14:28)
+failed to clear the 'main' log
+.. i-swipe-vertical: the screen was still after 17.4 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+.. i-swipe-vertical: 31 frames, key sent 1795461341.6
+PASS the page turned {"last_page_read after the turn": 1, "started at": 0, "turned forward once first": false, "swipe": "input swipe 540 1440 540 576 400"}
+PASS the page did not follow the finger before the curl (its frame stayed in place) {"largest shift of the page frame (pixels of the recording, a quarter of the screen)": 1, "frames before the new page shows": 5}
+FAIL the App logged the curl (debug log) {"log": ["page turn: not animated (copied true after 2281 ms, overlay false after 1726 ms)"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 56.887, "old": 0.0, "new": 0.813, "new_at": [0.511, 0.503], "old_at": null, "new_right_half": 0.538, "new_bottom_half": 0.505}, "most new": 0.813, "most old": 0.813}
+FAIL the turn is animated (frames between the two pages) {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-vertical-frames.png"}
+FAIL a frame of the turn shows part of the new page {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-vertical-frames.png"}
+--- exit 0 (19:17:15)
+=== 35: image 10 12 l2r i-swipe-off-drag --swipe --curl off (19:17:16)
+failed to clear the 'main' log
+.. i-swipe-off-drag: the screen was still after 12.4 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+.. i-swipe-off-drag: 38 frames, key sent 1795461505.6
+PASS the page turned {"last_page_read after the turn": 1, "started at": 0, "turned forward once first": false, "swipe": "input swipe 1004 960 75 960 4000"}
+PASS the page followed the finger (the pager's own drag) {"largest shift of the page frame (pixels of the recording, a quarter of the screen)": 219, "frames before the new page shows": 6}
+PASS no curl: the App did not play a page turn of its own (debug log) {"log": [], "frames during the turn": 4, "sheet": "shots/i-swipe-off-drag-frames.png"}
+--- exit 0 (19:20:01)
+=== 36: image 10 12 webtoon i-swipe-webtoon-up --swipe (19:20:01)
+failed to clear the 'main' log
+.. i-swipe-webtoon-up: the screen was still after 6.1 s more
+PASS the screen is in portrait {"screen": [1080, 1920]}
+.. i-swipe-webtoon-up: 7 frames, key sent 1795461668.3
+PASS the strip scrolled up with the finger {"moved up (pixels of the screen)": 528, "difference there": 0.0, "difference unmoved": 9.1, "last_page_read": 0, "swipe": "input swipe 540 1440 540 576 400"}
+PASS no curl: the App did not play a page turn of its own (debug log) {"log": [], "frames during the turn": 3, "sheet": "shots/i-swipe-webtoon-up-frames.png"}
+--- exit 0 (19:22:41)
+=== 37: text 8 0 slide t-slide-ltr-varied --file zh-varied.epub (19:22:42)
+failed to clear the 'main' log
+PASS the screen is in portrait {"screen": [1080, 1920], "columns shown": 1}
+.. t-slide-ltr-varied: 18 frames, key sent 1795461838.2
+PASS the page turned {"before": {"ready": true, "error": null, "page": 2, "pages": 15, "cols": 1, "mode": "H", "seq": 1, "ms": 2419, "rubyFix": false, "gutter": null, "vw": 412}, "after": {"ready": true, "error": null, "page": 3, "pages": 15, "cols": 1, "mode": "H", "seq": 1, "ms": 2419, "rubyFix": false, "gutter": null, "vw": 412}, "expected page": 3}
+PASS the App logged the turn (debug log) {"log": ["page turn: the page is held after 2553 ms (copy 355, overlay 117, first frame 2401)", "page turn: the new page is copied after 975 ms (1 copies)", "page turn: SLIDE starts 1388 ms after the page changed", "page turn: 12 frames in 11884 ms"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 40.42, "old": 0.0, "new": 0.661, "new_at": [0.481, 0.555], "old_at": null, "new_right_half": 0.498, "new_bottom_half": 0.598}, "most new": 0.661, "most old": 0.553}
+PASS the turn is animated (frames between the two pages) {"frames": 18, "frames during the turn": 5, "sheet": "shots/t-slide-ltr-varied-frames.png"}
+PASS the old page moves left and the new page comes in from the right {"frames": 18, "frames during the turn": 5, "sheet": "shots/t-slide-ltr-varied-frames.png", "shifts (text patches)": [{"t": 12.989, "old page shifted by": -36, "patches": 12, "new page shifted by": null, "patches new": 8}, {"t": 14.125, "old page shifted by": -322, "patches": 15, "new page shifted by": 218, "patches new": 38}, {"t": 15.195, "old page shifted by": null, "patches": 9, "new page shifted by": 92, "patches new": 49}, {"t": 16.808, "old page shifted by": null, "patches": 9, "new page shifted by": 46, "patches new": 50}, {"t": 18.513, "old page shifted by": null, "patches": 9, "new page shifted by": 4, "patches new": 23}], "by patches": true, "whole-frame fits": [{"t": 14.125, "dx": -320, "fit the expected way": 19.25, "fit the other way": 30.33, "decides": "expected"}, {"t": 15.195, "dx": -448, "fit the expected way": 4.08, "fit the other way": 26.37, "decides": "expected"}, {"t": 16.808, "dx": -492, "fit the expected way": 16.94, "fit the other way": 24.09, "decides": "expected"}, {"t": 18.513, "dx": -496, "fit the expected way": 20.04, "fit the other way": 20.2, "decides": null}], "by fits": true}
+PASS the page that comes in is the new page, not a copy of the old one {"frames": [{"dx": -320, "strip": 320, "fit": 19.25, "error against the new page sliding in": 19.1, "error against the new page uncovered": 28.94, "error against a copy of the old page": 37.79, "t": 14.125, "shows": "the new page sliding in"}, {"dx": -448, "strip": 448, "fit": 4.08, "error against the new page sliding in": 4.35, "error against the new page uncovered": 28.67, "error against a copy of the old page": 38.17, "t": 15.195, "shows": "the new page sliding in"}, {"dx": -492, "strip": 492, "fit": 16.94, "error against the new page sliding in": 18.48, "error against the new page uncovered": 27.64, "error against a copy of the old page": 37.98, "t": 16.808, "shows": "the new page sliding in"}, {"dx": -496, "strip": 496, "fit": 20.04, "error against the new page sliding in": 27.6, "error against the new page uncovered": 21.68, "error against a copy of the old page": 38.51, "t": 18.513, "shows": "the new page uncovered"}]}
+--- exit 0 (19:25:18)
+=== 38: text 8 0 slide t-slide-ltr-varied-second --warm --file zh-varied.epub (19:25:18)
+failed to clear the 'system' log
+PASS the screen is in portrait {"screen": [1080, 1920], "columns shown": 1}
+.. t-slide-ltr-varied-second: 17 frames, key sent 1795462020.7
+PASS the page turned {"before": {"ready": true, "error": null, "page": 2, "pages": 15, "cols": 1, "mode": "H", "seq": 1, "ms": 2138, "rubyFix": false, "gutter": null, "vw": 412}, "after": {"ready": true, "error": null, "page": 3, "pages": 15, "cols": 1, "mode": "H", "seq": 1, "ms": 2138, "rubyFix": false, "gutter": null, "vw": 412}, "expected page": 3}
+PASS the App logged the turn (debug log) {"log": ["page turn: the page is held after 784 ms (copy 210, overlay 90, first frame 734)", "page turn: the new page is copied after 1151 ms (2 copies)", "page turn: SLIDE starts 1578 ms after the page changed", "page turn: 11 frames in 12520 ms"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 37.828, "old": 0.0, "new": 0.653, "new_at": [0.482, 0.555], "old_at": null, "new_right_half": 0.5, "new_bottom_half": 0.599}, "most new": 0.653, "most old": 0.553}
+PASS the turn is animated (frames between the two pages) {"frames": 17, "frames during the turn": 6, "sheet": "shots/t-slide-ltr-varied-second-frames.png"}
+PASS the old page moves left and the new page comes in from the right {"frames": 17, "frames during the turn": 6, "sheet": "shots/t-slide-ltr-varied-second-frames.png", "shifts (text patches)": [{"t": 10.731, "old page shifted by": -10, "patches": 18, "new page shifted by": null, "patches new": 7}, {"t": 11.807, "old page shifted by": null, "patches": 11, "new page shifted by": 194, "patches new": 11}, {"t": 12.898, "old page shifted by": null, "patches": 11, "new page shifted by": 112, "patches new": 23}, {"t": 14.257, "old page shifted by": null, "patches": 9, "new page shifted by": 56, "patches new": 13}, {"t": 17.618, "old page shifted by": null, "patches": 9, "new page shifted by": 8, "patches new": 23}, {"t": 19.049, "old page shifted by": null, "patches": 9, "new page shifted by": 0, "patches new": 12}], "by patches": true, "whole-frame fits": [{"t": 11.807, "dx": -344, "fit the expected way": 12.13, "fit the other way": 28.45, "decides": "expected"}, {"t": 12.898, "dx": -428, "fit the expected way": 7.24, "fit the other way": 27.56, "decides": "expected"}, {"t": 14.257, "dx": -484, "fit the expected way": 11.05, "fit the other way": 25.45, "decides": "expected"}, {"t": 17.618, "dx": -532, "fit the expected way": 6.94, "fit the other way": 21.36, "decides": "expected"}, {"t": 19.049, "dx": -500, "fit the expected way": 10.96, "fit the other way": 10.98, "decides": null}], "by fits": true}
+PASS the page that comes in is the new page, not a copy of the old one {"frames": [{"dx": -344, "strip": 344, "fit": 12.13, "error against the new page sliding in": 12.11, "error against the new page uncovered": 28.49, "error against a copy of the old page": 37.75, "t": 11.807, "shows": "the new page sliding in"}, {"dx": -428, "strip": 428, "fit": 7.24, "error against the new page sliding in": 7.69, "error against the new page uncovered": 28.24, "error against a copy of the old page": 38.41, "t": 12.898, "shows": "the new page sliding in"}, {"dx": -484, "strip": 484, "fit": 11.05, "error against the new page sliding in": 12.16, "error against the new page uncovered": 27.86, "error against a copy of the old page": 38.33, "t": 14.257, "shows": "the new page sliding in"}, {"dx": -532, "strip": 532, "fit": 6.94, "error against the new page sliding in": 7.02, "error against the new page uncovered": 21.66, "error against a copy of the old page": 34.72, "t": 17.618, "shows": "the new page sliding in"}, {"dx": -500, "strip": 500, "fit": 10.96, "error against the new page sliding in": 27.53, "error against the new page uncovered": 11.74, "error against a copy of the old page": 38.28, "t": 19.049, "shows": "the new page uncovered"}]}
+--- exit 0 (19:28:21)
+=== 39: text 8 0 slide t-slide-rtl-varied --direction rtl --file zh-varied.epub (19:28:22)
+failed to clear the 'main' log
+PASS the screen is in portrait {"screen": [1080, 1920], "columns shown": 1}
+[image2 @ 0x55e368d19380] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 3 >= 3
+[image2 @ 0x55e368d19380] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 4 >= 4
+    Last message repeated 1 times
+[image2 @ 0x55e368d19380] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 6 >= 6
+    Last message repeated 1 times
+[image2 @ 0x55e368d19380] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 7 >= 7
+[image2 @ 0x55e368d19380] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 17 >= 17
+.. t-slide-rtl-varied: 18 frames, key sent 1795462183.8
+PASS the page turned {"before": {"ready": true, "error": null, "page": 2, "pages": 15, "cols": 1, "mode": "H", "seq": 1, "ms": 2222, "rubyFix": false, "gutter": null, "vw": 412}, "after": {"ready": true, "error": null, "page": 3, "pages": 15, "cols": 1, "mode": "H", "seq": 1, "ms": 2222, "rubyFix": false, "gutter": null, "vw": 412}, "expected page": 3}
+PASS the App logged the turn (debug log) {"log": ["page turn: the page is held after 3095 ms (copy 447, overlay 167, first frame 3048)", "page turn: no copy of the new page after 1240 ms (1 copies)", "page turn: SLIDE starts 1686 ms after the page changed", "page turn: 10 frames in 11828 ms"]}
+PASS nothing is left over the page after the turn {"changed cells": 0.0}
+PASS the recording ends on the new page {"last": {"t": 56.529, "old": 0.0, "new": 0.679, "new_at": [0.479, 0.553], "old_at": null, "new_right_half": 0.493, "new_bottom_half": 0.596}, "most new": 0.679, "most old": 0.553}
+PASS the turn is animated (frames between the two pages) {"frames": 18, "frames during the turn": 2, "sheet": "shots/t-slide-rtl-varied-frames.png"}
+PASS the old page moves right and the new page comes in from the left {"frames": 18, "frames during the turn": 2, "sheet": "shots/t-slide-rtl-varied-frames.png", "shifts (text patches)": [{"t": 14.245, "old page shifted by": 30, "patches": 28, "new page shifted by": null, "patches new": 9}, {"t": 15.93, "old page shifted by": 324, "patches": 28, "new page shifted by": 0, "patches new": 39}], "by patches": true, "whole-frame fits": [{"t": 15.93, "dx": 324, "fit the expected way": 4.48, "fit the other way": 16.38, "decides": "expected"}], "by fits": true}
+PASS the page that comes in is the new page, not a copy of the old one {"frames": [{"dx": 324, "strip": 324, "fit": 4.48, "error against the new page sliding in": 28.95, "error against the new page uncovered": 4.32, "error against a copy of the old page": 38.24, "t": 15.93, "shows": "the new page uncovered"}]}
+--- exit 0 (19:31:03)
+RUN-ALL DONE 19:31:03

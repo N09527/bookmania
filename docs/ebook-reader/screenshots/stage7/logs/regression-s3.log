@@ -1,0 +1,75 @@
+PASS ebook prefs cleared {}
+PASS vertical book opens in V mode {"ready": true, "error": null, "page": 0, "pages": 10, "cols": 1, "mode": "V", "seq": 1, "ms": 1874, "rubyFix": false, "gutter": null, "vw": 412}
+PASS default font size 20px "20px"
+PASS default line height 1.8 (36px) "36px"
+PASS default margins 32/32/20/20 [12, 24, 388, 684]
+PASS letter spacing not overridden at 0 "normal"
+PASS book's own indent kept (1em = 20px) "20px"
+PASS panel starts on the global level "全部書籍"
+PASS font size 30px "30px"
+PASS stored as global pref_ebook_fontSize=30 {"pref_ebook_fontSize": "30"}
+PASS same text position after relayout {"before": {"node": 1, "offset": 0, "text": "第１章　測試章節"}, "after": {"node": 1, "offset": 0, "text": "第１章　測試章節"}}
+PASS line height 2.4 (72px) "72px"
+PASS letter spacing 0.1em (3px) "3px"
+PASS indent: "follow the book" switch on by default [890, 1546, 1027, 1672]
+PASS indent switched to 2 characters (60px) "60px"
+PASS indent 3 characters (90px) "90px"
+PASS paragraph spacing: "follow the book" switch on by default [890, 1647, 1027, 1773]
+PASS paragraph spacing 0.5em (15px, left side in vertical text) ["0px", "0px", "0px", "15px"]
+PASS paragraph spacing 1em (30px) ["0px", "0px", "0px", "30px"]
+PASS writing mode forced horizontal ["H", "horizontal-tb"]
+PASS writing mode back to the book (vertical) "V"
+PASS top margin set near 60 and the page box follows it (top = margin - 8) {"stored": 60, "frame": [12, 52, 388, 656]}
+PASS left margin set near 40 and the page box follows it (x = margin - 8, width = W - left - 20 + 16) {"stored": 38, "frame": [30, 52, 370, 656]}
+PASS auto, vertical: left tap = next page [0, 1]
+PASS left-opening: right tap = next page [1, 2]
+PASS left-opening: DPAD_RIGHT = next page [2, 3]
+PASS direction stored as auto again {"pref_ebook_paragraphSpacing": "1", "pref_ebook_fontSize": "30", "pref_ebook_marginTop": "60", "pref_ebook_letterSpacing": "0.1", "pref_ebook_indent": "3", "pref_ebook_lineHeight": "2.4", "pref_ebook_pageDirection": "auto", "pref_ebook_writingMode": "book", "pref_ebook_marginLeft": "38"}
+PASS after restart: font size 30 "30px"
+PASS after restart: line height 72px "72px"
+PASS after restart: indent 90px "90px"
+PASS after restart: paragraph spacing 30px ["0px", "0px", "0px", "30px"]
+PASS after restart: letter spacing 3px "3px"
+PASS after restart: page box from the stored margins [[30, 52, 370, 656], "38", "60"]
+{
+ "pref_ebook_paragraphSpacing": "1",
+ "pref_ebook_fontSize": "30",
+ "pref_ebook_marginTop": "60",
+ "pref_ebook_letterSpacing": "0.1",
+ "pref_ebook_indent": "3",
+ "pref_ebook_lineHeight": "2.4",
+ "pref_ebook_pageDirection": "auto",
+ "pref_ebook_writingMode": "book",
+ "pref_ebook_marginLeft": "38"
+}
+PASS other book (another work) uses the global font size ["30px", 30.0]
+PASS work level selected "這部作品"
+PASS work level font size stored (near 24) and applied {"stored": {"_source": "0", "_manga": "橫排測試書 EPUB", "fontSize": "24"}, "css": "24px"}
+PASS global value unchanged 30.0
+PASS global view notes the work-level override ["「這部作品」也有設定，這本書以那一層為準"]
+PASS file level line height stored (near 1.5) and applied {"stored": {"_source": "0", "_manga": "橫排測試書 EPUB", "_chapter": "橫排測試書 EPUB/zh-horizontal.epub", "lineHeight": "1.5"}, "css": "36px"}
+PASS override entries carry the identity (_source, _manga; file also _chapter) [{"_source": "0", "_manga": "橫排測試書 EPUB", "fontSize": "24"}, {"_source": "0", "_manga": "橫排測試書 EPUB", "_chapter": "橫排測試書 EPUB/zh-horizontal.epub", "lineHeight": "1.5"}]
+PASS after restart: work font size "24px"
+PASS after restart: file line height "36px"
+PASS panel starts on the file level "這個檔案"
+PASS other work keeps the global values ["30px", "72px"]
+PASS same work, other file: work font size ["24px", 24.0]
+PASS same work, other file: global line height (not the other file's) ["57.6px", 57.599999999999994]
+PASS panel starts on the file level "這個檔案"
+PASS file level cleared: line height back to global ["57.6px", 57.599999999999994]
+PASS work level selected for clearing "這部作品"
+PASS work level cleared: font size back to global ["30px", 30.0]
+PASS no override entries left ["pref_ebook_fontSize", "pref_ebook_indent", "pref_ebook_letterSpacing", "pref_ebook_lineHeight", "pref_ebook_marginLeft", "pref_ebook_marginTop", "pref_ebook_pageDirection", "pref_ebook_paragraphSpacing", "pref_ebook_writingMode"]
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/check_settings.py", line 642, in <module>
+    fn()
+    ~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/check_settings.py", line 403, in step_fonts
+    pick_font_file('DejaVuSans.ttf')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/check_settings.py", line 391, in pick_font_file
+    d.tap_label(file_name, exact=True, wait=8)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage3/drive.py", line 79, in tap_label
+    raise RuntimeError(f'not found: {label}')
+RuntimeError: not found: DejaVuSans.ttf

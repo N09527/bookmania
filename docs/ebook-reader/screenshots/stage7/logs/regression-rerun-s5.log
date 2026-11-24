@@ -1,0 +1,28 @@
+=== 10: settings 8 10 epub-horizontal --pages 5 (00:03:15)
+.. chapter 10 is read; marking it unread in the chapter list
+.. swipe 1 on 橫排測試書 at y=1414: snackbar 標示為未讀
+.. start: 1/3 · 1/8
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1667, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1605, in main
+    run_step(a, x)
+    ~~~~~~~~^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1623, in run_step
+    step_settings(int(x[0]), int(x[1]), x[2], a.pages)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 788, in step_settings
+    d.set_slider('字級', (30 - 12) / 36)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/../stage3/drive.py", line 329, in set_slider
+    raise RuntimeError(f'no slider under {label}')
+RuntimeError: no slider under 字級
+=== 10 done (00:10:01)
+=== 18: slider 14 16 epub-vertical 0.25 (00:10:01)
+PASS slider shown with the menu "1/3 · 1/10"
+FAIL while dragging, the bar shows a table of contents title instead of the page {"bar texts while dragging": ["3/3 · 3/9"], "page info before": "1/3 · 1/10", "times (s)": {"swipe length": 24.0, "dump asked": 13.2, "dump returned": 29.8, "swipe command returned": 29.8}}
+.. page_span: the page shown again is not the same: {'chars': 1872, 'page': 2, 'pages': 9, 'cols': 1, 'location': [39, 0], 'text': '【第９０段】這是一段用來測試的文字，包含「引號」', 'before': 413}
+PASS released at 0.25 of the track (right to left): the page shown holds a character near 0.75 of the book {"finger at character": 4199, "accepted characters": [4171, 4367], "page shown, characters": [4325, 4370], "of": 5599, "status": {"ready": true, "error": null, "page": 2, "pages": 9, "cols": 1, "mode": "V", "seq": 2, "ms": 1859, "rubyFix": false, "gutter": null, "vw": 412}, "page info": "3/3 · 3/9"}
+PASS percent shown and saved whole-book progress are those of the first character of that page {"percent shown": 77, "saved total": 0.7724593677442401, "first character / book": 0.7725}
+=== 18 done (00:12:20)

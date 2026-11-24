@@ -1,0 +1,65 @@
+=== 23:52:29 wait for the emulator started after the restart
+package:/data/app/io.github.n09527.bookmania.debug-BlNKLkLv_05dlHiLwJf6Rw==/base.apk
+=== 23:55:48 warmup
+dismissed: mCurrentFocus=Window{3e72335 u0 Application Not Responding: com.android.systemui}
+.. warm-up: mResumedActivity: ActivityRecord{b6a1290 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1050} {'ready': True, 'error': None, 'page': 0, 'pages': 34, 'cols': 2, 'mode': 'V', 'seq': 1, 'ms': 4663, 'rubyFix': True, 'gutter': 206, 'vw': 412}
+=== 23:58:04 rerun stage 5.5 items 31 34
+=== 00:03:14 rerun stage 5 items 10 18
+=== 00:12:21 reruns done
+=== 00:12:21 rest of the regression (RUN=out7): s4checks again, s4pages, s3, s2
+=== 00:38:54 rest of the regression (RUN=out7): s4checks again, s4pages, s3, s2
+=== 02:30:24 stage 3: the steps that did not run (fonts toolbar rotate; font_speed side_panel), after the picker fix
+=== s3-rest start 02:30:24
+=== s3-rest end 02:48:30 exit  fonts:0 toolbar:0 rotate:0 font_speed+side_panel:0
+=== 02:48:30 stop emulator for the final builds
+=== 02:48:40 final: bookmania unit tests (rerun) and signed release
+exit 0
+BUILD SUCCESSFUL in 6m 35s
+=== 02:55:18 final: upstream CI command (standard flavour)
+exit 0
+BUILD SUCCESSFUL in 3m 23s
+=== 02:58:42 start emulator for the release smoke test
+restarting adbd as root
+=== 03:01:49 release smoke
+PASS the release APK installs ["Success"]
+PASS the installed App is the release build (not debuggable) "versionCode=162 minSdk=26 targetSdk=36\n    versionName=1.10.3\n    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]\n    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ALLOW_BACKUP LARGE_HEAP ]"
+PASS the books and the library are in place for the release App {"files in the debug folder": "39", "copied": "39", "uid": "10082"}
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1131}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.088}
+PASS no crash while the book is open {"crashes": []}
+.. vertical-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1132}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.287}
+PASS no crash while the book is open {"crashes": []}
+.. horizontal-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1133}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.087}
+PASS no crash while the book is open {"crashes": []}
+.. vertical-azw3: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1134}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.234}
+PASS no crash while the book is open {"crashes": []}
+.. horizontal-mobi6: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the text reader {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1135}"]}
+PASS a page key turns the page (the screen changed) {"share of the screen that changed": 0.087}
+PASS no crash while the book is open {"crashes": []}
+.. joint-mobi: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains the DRM {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1136}"], "screen": ["This book is protected by DRM", "Protection: Adobe ADEPT\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. drm-adept-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains the DRM {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1137}"], "screen": ["This book is protected by DRM", "Protection: Mobipocket / Kindle\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. drm-flagged-mobi: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains that the file is damaged {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1138}"], "screen": ["Cannot open this book", "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. corrupt-truncated: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the text reader explains that the file is damaged {"front": ["io.github.n09527.bookmania/yokai.ebook.EbookReaderActivity", "t1139}"], "screen": ["Cannot open this book", "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.", "Back"]}
+PASS no crash while the book is open {"crashes": []}
+.. not-an-ebook: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the image reader {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t1140}"]}
+PASS no crash while the book is open {"crashes": []}
+.. comic-cbz: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+PASS the book opens in the image reader {"front": ["io.github.n09527.bookmania/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "t1141}"]}
+PASS no crash while the book is open {"crashes": []}
+.. comic-fixed-epub: Firebase log lines: ['Default FirebaseApp failed to initialize because no default options were found. This usually means that com.google.gms:google-services was not applied to your gradle project.', 'FirebaseApp initialization unsuccessful']
+=== 03:15:23 all done

@@ -1,0 +1,7 @@
+PASS release, two columns: the fold's shadow on the centre of the gap {"darkest column x": 540, "expected x": 540.8, "brightness at the darkest column": 175.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [217.0, 236.0, 249.0], "brightness 20 / 40 / 80 px right": [216.0, 235.0, 249.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "rel-01-two-columns"}
+PASS release, two columns, shadow switch off: no shadow {"darkest column x": 401, "expected x": 540.8, "brightness at the darkest column": 250.0, "page background": 250.0, "brightness 20 / 40 / 80 px left": [250.0, 250.0, 250.0], "brightness 20 / 40 / 80 px right": [250.0, 250.0, 250.0], "text-free gap": [482, 595], "gap centre": 538.5, "shot": "rel-02-two-columns-shadow-off"}
+PASS release, bold on: the page has more ink than with bold off {"dark share, bold off": 0.0889, "dark share, bold on": 0.1428, "ratio": 1.605}
+PASS the test comic is in the release App's library {"ids": [20, 32]}
+PASS release, double pages: the shadow is on the seam {"seam x": 540, "darkening left of the seam (ratio)": 0.714, "darkening right of the seam (ratio)": 0.724, "shot": "rel-05-comic-double-pages"}
+PASS release, double pages, shadow switch off: none on the seam {"seam x": 540, "darkening left of the seam (ratio)": 1.0, "darkening right of the seam (ratio)": 1.0, "shot": "rel-06-comic-shadow-off"}
+exit 0

@@ -1,0 +1,86 @@
+=== warmup start 18:56:29
+=== warmup end 18:57:50 exit 0
+=== s55new start 18:57:50
+=== s55new end 19:31:07 exit 0
+=== s55 start 19:31:07
+=== s55 end 20:52:39 exit 0
+=== s5 start 20:52:39
+=== s5 end 23:17:19 exit 0
+=== s4checks start 23:17:19
+=== s4checks interrupted by the container restart at about 23:50 (started 23:17:19)
+=== s4checks start 00:12:21
+=== s4checks stopped by hand at 00:15:14 (test tool fix, see the stage 7 report)
+=== s4checks start 00:38:54
+=== s4checks end 01:15:30 exit 0
+=== s4pages start 01:15:30
+=== s4pages end 01:55:59 exit 0
+=== s3 start 01:55:59
+=== s3 end 02:20:15 exit 1
+=== s2 start 02:20:15
+=== s2 end 02:29:58 exit 0
+REGRESSION DONE 02:29:58
+=== s3-rest start 02:30:24
+=== s3-rest end 02:48:30 exit  fonts:0 toolbar:0 rotate:0 font_speed+side_panel:0
+
+s55new: 74/80 ok
+  FAIL 19:08:38 image:i-swipe-l2r | the App logged the curl (debug log) | {"log": ["page turn: not animated (copied true after 1874 ms, overlay false after 1564 ms)"]}
+  FAIL 19:08:38 image:i-swipe-l2r | the turn is animated (frames between the two pages) | {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-l2r-frames.png"}
+  FAIL 19:08:38 image:i-swipe-l2r | a frame of the turn shows part of the new page | {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-l2r-frames.png"}
+  FAIL 19:17:07 image:i-swipe-vertical | the App logged the curl (debug log) | {"log": ["page turn: not animated (copied true after 2281 ms, overlay false after 1726 ms)"]}
+  FAIL 19:17:07 image:i-swipe-vertical | the turn is animated (frames between the two pages) | {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-vertical-frames.png"}
+  FAIL 19:17:07 image:i-swipe-vertical | a frame of the turn shows part of the new page | {"frames": 31, "frames during the turn": 0, "sheet": "shots/i-swipe-vertical-frames.png"}
+s55: 192/192 ok
+stage5: 118/119 ok
+  FAIL 22:11:53 slider:epub-vertical | while dragging, the bar shows a table of contents title instead of the page | {"bar texts while dragging": ["3/3 · 3/9"], "page info before": "3/3 · 1/9"}
+stage4: 44/44 ok
+stage3: 79/79 ok
+s4pages:
+  v-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  h-epub-2col-portrait.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  h-epub-2col-portrait.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-epub-2col-ltr.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-epub-2col-ltr.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-azw3-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-azw3-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  h-mobi6-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  h-mobi6-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-jointmobi-2col-landscape.jsonl: documents 3, columns [2], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: True
+  v-jointmobi-2col-landscape.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  v-epub-1col-default.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  h-epub-1col-default.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  h-epub-1col-default.ruby.jsonl: documents 3, misplaced ruby in total: 0
+  v-epub-1col-size30-rubyfix.jsonl: documents 3, columns [1], paragraphs 120 in order: True, all spreads complete: True, first page on the expected side: not checked
+  v-epub-1col-size30-rubyfix.ruby.jsonl: documents 3, misplaced ruby in total: 0
+s2:
+  [drm-flagged-mobi] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+  [drm-adept-epub] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+  [not-an-ebook] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+  [corrupt-truncated] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+  [comic-fixed-epub] front: eu.kanade.tachiyomi.ui.reader.ReaderActivity
+    crashes: 0
+  [comic-reflowable-epub] front: eu.kanade.tachiyomi.ui.reader.ReaderActivity
+    crashes: 0
+  [comic-cbz] front: eu.kanade.tachiyomi.ui.reader.ReaderActivity
+    crashes: 0
+  [epub2-ncx] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+  [text-with-images-mobi6] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+  [text-with-images-epub] front: yokai.ebook.EbookReaderActivity
+    crashes: 0
+reruns-events.log: 0 lines
+s2-events.log: 0 lines
+s3-events.log: 30 lines
+s3-rest-events.log: 0 lines
+s4checks-events.log: 0 lines
+s4pages-events.log: 30 lines
+s5-events.log: 0 lines
+s55-events.log: 0 lines
+s55new-events.log: 0 lines
+warmup-events.log: 0 lines

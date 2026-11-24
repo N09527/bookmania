@@ -1,0 +1,23 @@
+=== warmup start 18:56:29
+=== warmup end 18:57:50 exit 0
+=== s55new start 18:57:50
+=== s55new end 19:31:07 exit 0
+=== s55 start 19:31:07
+=== s55 end 20:52:39 exit 0
+=== s5 start 20:52:39
+=== s5 end 23:17:19 exit 0
+=== s4checks start 23:17:19
+=== s4checks interrupted by the container restart at about 23:50 (started 23:17:19)
+=== s4checks start 00:12:21
+=== s4checks stopped by hand at 00:15:14 (test tool fix, see the stage 7 report)
+=== s4checks start 00:38:54
+=== s4checks end 01:15:30 exit 0
+=== s4pages start 01:15:30
+=== s4pages end 01:55:59 exit 0
+=== s3 start 01:55:59
+=== s3 end 02:20:15 exit 1
+=== s2 start 02:20:15
+=== s2 end 02:29:58 exit 0
+REGRESSION DONE 02:29:58
+=== s3-rest start 02:30:24
+=== s3-rest end 02:48:30 exit  fonts:0 toolbar:0 rotate:0 font_speed+side_panel:0

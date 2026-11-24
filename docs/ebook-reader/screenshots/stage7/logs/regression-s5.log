@@ -1,0 +1,316 @@
+=== 1: restore 14 16 epub-vertical --pages 12 (20:52:44)
+.. start: 1/3 · 1/10
+.. shown: OEBPS/text/ch02.xhtml page 2/9 cols 1 {'chars': 1847, 'page': 2, 'pages': 9, 'cols': 1, 'location': [39, 0], 'text': '【第５０段】這是一段用來測試的文字，包含「引號」', 'before': 413}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 1, "href": "OEBPS/text/ch02.xhtml", "location": [39, 0], "text": "【第５０段】這是一段用來測試的文字，包含「引號」", "progression": 0.22360584731997835, "total": 0.40953741739596355, "chapterPage": 11, "updatedAt": 1795467327959}, "shown": {"chars": 1847, "page": 2, "pages": 9, "cols": 1, "location": [39, 0], "text": "【第５０段】這是一段用來測試的文字，包含「引號」", "before": 413}, "doc": "OEBPS/text/ch02.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [11, 16], "expected": [11, 16], "page": 2, "pages": 9, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 12 of 27"}
+PASS history: reading time added at exit {"before": 38853780, "after": 39016291, "added ms": 162511, "reader open ms (upper bound)": 205050}
+PASS history: last read is the exit time {"last_read": 1795467337708, "exit": 1795467379071}
+PASS reopened at the same page and character {"doc": ["OEBPS/text/ch02.xhtml", "OEBPS/text/ch02.xhtml"], "page": [2, 2], "location": [[39, 0], [39, 0]], "visible": [true]}
+=== 1 done (20:57:38)
+=== 2: restore 13 15 azw3-vertical --pages 12 (20:57:38)
+.. chapter 15 is read; marking it unread in the chapter list
+.. swipe 1 on 直排測試書 at y=1092: snackbar 標示為未讀
+.. start: 1/3 · 1/10
+.. shown: text/part0001.xhtml page 2/9 cols 1 {'chars': 1847, 'page': 2, 'pages': 9, 'cols': 1, 'location': [39, 0], 'text': '【第５０段】這是一段用來測試的文字，包含「引號」', 'before': 413}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 1, "href": "text/part0001.xhtml", "location": [39, 0], "text": "【第５０段】這是一段用來測試的文字，包含「引號」", "progression": 0.22360584731997835, "total": 0.40953741739596355, "chapterPage": 11, "updatedAt": 1795467670154}, "shown": {"chars": 1847, "page": 2, "pages": 9, "cols": 1, "location": [39, 0], "text": "【第５０段】這是一段用來測試的文字，包含「引號」", "before": 413}, "doc": "text/part0001.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [11, 16], "expected": [11, 16], "page": 2, "pages": 9, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 12 of 27"}
+PASS history: reading time added at exit {"before": 4026382, "after": 4153740, "added ms": 127358, "reader open ms (upper bound)": 167391}
+PASS history: last read is the exit time {"last_read": 1795467679450, "exit": 1795467721706}
+PASS reopened at the same page and character {"doc": ["text/part0001.xhtml", "text/part0001.xhtml"], "page": [2, 2], "location": [[39, 0], [39, 0]], "visible": [true]}
+=== 2 done (21:03:21)
+=== 3: restore 3 1 mobi-joint-vertical --pages 12 (21:03:21)
+.. chapter 1 is read; marking it unread in the chapter list
+.. swipe 1 on 直排測試書 at y=1092: snackbar 標示為未讀
+.. start: 1/3 · 1/10
+.. shown: text/part0001.xhtml page 2/9 cols 1 {'chars': 1847, 'page': 2, 'pages': 9, 'cols': 1, 'location': [39, 0], 'text': '【第５０段】這是一段用來測試的文字，包含「引號」', 'before': 413}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 1, "href": "text/part0001.xhtml", "location": [39, 0], "text": "【第５０段】這是一段用來測試的文字，包含「引號」", "progression": 0.22360584731997835, "total": 0.40953741739596355, "chapterPage": 11, "updatedAt": 1795468014063}, "shown": {"chars": 1847, "page": 2, "pages": 9, "cols": 1, "location": [39, 0], "text": "【第５０段】這是一段用來測試的文字，包含「引號」", "before": 413}, "doc": "text/part0001.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [11, 16], "expected": [11, 16], "page": 2, "pages": 9, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 12 of 27"}
+PASS history: reading time added at exit {"before": 2644510, "after": 2778415, "added ms": 133905, "reader open ms (upper bound)": 171940}
+PASS history: last read is the exit time {"last_read": 1795468025365, "exit": 1795468067294}
+PASS reopened at the same page and character {"doc": ["text/part0001.xhtml", "text/part0001.xhtml"], "page": [2, 2], "location": [[39, 0], [39, 0]], "visible": [true]}
+=== 3 done (21:09:10)
+=== 4: restore 8 10 epub-horizontal --pages 8 (21:09:10)
+.. start: 1/3 · 1/8
+.. shown: OEBPS/text/ch02.xhtml page 0/7 cols 1 {'chars': 1847, 'page': 0, 'pages': 7, 'cols': 1, 'location': [1, 0], 'text': '第２章測試章節【第４１段】英文單字WebView', 'before': 0}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 1, "href": "OEBPS/text/ch02.xhtml", "location": [1, 0], "text": "第２章測試章節【第４１段】英文單字WebView", "total": 0.33577424540096446, "chapterPage": 7, "updatedAt": 1795468300375}, "shown": {"chars": 1847, "page": 0, "pages": 7, "cols": 1, "location": [1, 0], "text": "第２章測試章節【第４１段】英文單字WebView", "before": 0}, "doc": "OEBPS/text/ch02.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [7, 14], "expected": [7, 14], "page": 0, "pages": 7, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 8 of 21"}
+PASS history: reading time added at exit {"before": 24752130, "after": 24898489, "added ms": 146359, "reader open ms (upper bound)": 189822}
+PASS history: last read is the exit time {"last_read": 1795468307733, "exit": 1795468349322}
+PASS reopened at the same page and character {"doc": ["OEBPS/text/ch02.xhtml", "OEBPS/text/ch02.xhtml"], "page": [0, 0], "location": [[1, 0], [1, 0]], "visible": [true]}
+=== 4 done (21:13:51)
+=== 5: restore 9 11 mobi6-horizontal --pages 8 (21:13:51)
+.. chapter 11 is read; marking it unread in the chapter list
+.. swipe 1 on 橫排測試書 at y=1092: snackbar 標示為未讀
+.. start: 1/3 · 1/9
+.. shown: text/section0000.html page 8/9 cols 1 {'chars': 1880, 'page': 8, 'pages': 9, 'cols': 1, 'location': [40, 0], 'text': '【第４０段】這是一段用來測試的文字，包含「引號」', 'before': 1782}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 0, "href": "text/section0000.html", "location": [40, 0], "text": "【第４０段】這是一段用來測試的文字，包含「引號」", "progression": 0.9478723404255319, "total": 0.3182711198428291, "chapterPage": 8, "updatedAt": 1795468631685}, "shown": {"chars": 1880, "page": 8, "pages": 9, "cols": 1, "location": [40, 0], "text": "【第４０段】這是一段用來測試的文字，包含「引號」", "before": 1782}, "doc": "text/section0000.html"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [8, 19], "expected": [8, 19], "page": 8, "pages": 9, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 9 of 27"}
+PASS history: reading time added at exit {"before": 5819386, "after": 5927792, "added ms": 108406, "reader open ms (upper bound)": 150008}
+PASS history: last read is the exit time {"last_read": 1795468640359, "exit": 1795468681902}
+PASS reopened at the same page and character {"doc": ["text/section0000.html", "text/section0000.html"], "page": [8, 8], "location": [[40, 0], [40, 0]], "visible": [true]}
+=== 5 done (21:19:20)
+=== 6: restore 7 9 azw3-horizontal --pages 8 (21:19:20)
+.. start: 1/3 · 1/8
+.. shown: text/part0001.xhtml page 0/8 cols 1 {'chars': 1847, 'page': 0, 'pages': 8, 'cols': 1, 'location': [1, 0], 'text': '第２章測試章節【第４１段】英文單字WebView', 'before': 0}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 1, "href": "text/part0001.xhtml", "location": [1, 0], "text": "第２章測試章節【第４１段】英文單字WebView", "total": 0.33577424540096446, "chapterPage": 8, "updatedAt": 1795468913846}, "shown": {"chars": 1847, "page": 0, "pages": 8, "cols": 1, "location": [1, 0], "text": "第２章測試章節【第４１段】英文單字WebView", "before": 0}, "doc": "text/part0001.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [8, 16], "expected": [8, 16], "page": 0, "pages": 8, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 9 of 24"}
+PASS history: reading time added at exit {"before": 1564714, "after": 1719257, "added ms": 154543, "reader open ms (upper bound)": 193749}
+PASS history: last read is the exit time {"last_read": 1795468921932, "exit": 1795468963495}
+PASS reopened at the same page and character {"doc": ["text/part0001.xhtml", "text/part0001.xhtml"], "page": [0, 0], "location": [[1, 0], [1, 0]], "visible": [true]}
+=== 6 done (21:24:07)
+=== 7: restore 14 16 epub-vertical-2col-landscape --columns landscape --landscape --pages 6 (21:24:07)
+.. start: 1/3 · 1–2/18
+.. shown: OEBPS/text/ch01.xhtml page 12/18 cols 2 {'chars': 1880, 'page': 12, 'pages': 18, 'cols': 2, 'location': [112, 0], 'text': '【第２８段】長一點的段落：閱讀程式需要依照使用者', 'before': 1236}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [112, 0], "text": "【第２８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.6574468085106383, "total": 0.22075370601893196, "chapterPage": 12, "updatedAt": 1795469196792}, "shown": {"chars": 1880, "page": 12, "pages": 18, "cols": 2, "location": [112, 0], "text": "【第２８段】長一點的段落：閱讀程式需要依照使用者", "before": 1236}, "doc": "OEBPS/text/ch01.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [12, 42], "expected": [12, 42], "page": 12, "pages": 18, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 13 of 54"}
+PASS history: reading time added at exit {"before": 39038339, "after": 39183404, "added ms": 145065, "reader open ms (upper bound)": 192584}
+PASS history: last read is the exit time {"last_read": 1795469206513, "exit": 1795469248096}
+PASS reopened at the same page and character {"doc": ["OEBPS/text/ch01.xhtml", "OEBPS/text/ch01.xhtml"], "page": [12, 12], "location": [[112, 0], [112, 0]], "visible": [true, false]}
+=== 7 done (21:28:57)
+=== 8: restore 8 10 epub-horizontal-2col --columns on --pages 6 (21:28:57)
+.. start: 1/3 · 1–2/15
+.. shown: OEBPS/text/ch01.xhtml page 12/15 cols 2 {'chars': 1880, 'page': 12, 'pages': 15, 'cols': 2, 'location': [134, 0], 'text': '【第３５段】這是一段用來測試的文字，包含「引號」', 'before': 1552}
+PASS normal exit with BACK "mResumedActivity: ActivityRecord{77b44ab u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t903}"
+PASS saved position = position shown at exit {"saved": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [134, 0], "text": "【第３５段】這是一段用來測試的文字，包含「引號」", "progression": 0.825531914893617, "total": 0.2771923557778175, "chapterPage": 12, "updatedAt": 1795469483970}, "shown": {"chars": 1880, "page": 12, "pages": 15, "cols": 2, "location": [134, 0], "text": "【第３５段】這是一段用來測試的文字，包含「引號」", "before": 1552}, "doc": "OEBPS/text/ch01.xhtml"}
+PASS chapter list page numbers (last_page_read, pages_left) from the page shown {"db": [12, 33], "expected": [12, 33], "page": 12, "pages": 15, "char_counts": [1880, 1847, 1872], "Page X of Y": "Page 13 of 45"}
+PASS history: reading time added at exit {"before": 24920404, "after": 25065658, "added ms": 145254, "reader open ms (upper bound)": 188445}
+PASS history: last read is the exit time {"last_read": 1795469493472, "exit": 1795469534886}
+PASS reopened at the same page and character {"doc": ["OEBPS/text/ch01.xhtml", "OEBPS/text/ch01.xhtml"], "page": [12, 12], "location": [[134, 0], [134, 0]], "visible": [true, false]}
+=== 8 done (21:33:40)
+=== 9: rotate 14 16 epub-vertical --pages 5 (21:33:40)
+.. start: 1/3 · 1/10
+PASS rotated to landscape: the first character stays the reading position and is on screen {"before": {"chars": 1880, "page": 5, "pages": 10, "cols": 1, "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "before": 776}, "after": {"chars": 1880, "page": 8, "pages": 18, "cols": 2, "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "before": 776}, "status": {"ready": true, "error": null, "page": 8, "pages": 18, "cols": 2, "mode": "V", "seq": 2, "ms": 4122, "rubyFix": false, "gutter": 366, "vw": 732}, "visible": [true, false]}
+PASS landscape exit: saved position is the same character {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.4127659574468085, "total": 0.13859617788890874, "chapterPage": 8, "updatedAt": 1795469767928}
+PASS reopened in landscape: the character is on screen [true, false]
+PASS rotated back to portrait: the character is on screen [true]
+PASS reopened in portrait: same page as before the rotations {"page before": 5, "page now": 5, "location": [74, 0], "visible": [true]}
+=== 9 done (21:39:44)
+=== 10: settings 8 10 epub-horizontal --pages 5 (21:39:44)
+.. start: 1/3 · 1/8
+Traceback (most recent call last):
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1659, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1597, in main
+    run_step(a, x)
+    ~~~~~~~~^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 1615, in run_step
+    step_settings(int(x[0]), int(x[1]), x[2], a.pages)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/check_stage5.py", line 788, in step_settings
+    d.set_slider('字級', (30 - 12) / 36)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/bookmania/docs/ebook-reader/tools/stage5/../stage3/drive.py", line 329, in set_slider
+    raise RuntimeError(f'no slider under {label}')
+RuntimeError: no slider under 字級
+=== 10 done (21:46:26)
+=== 11: fallback 14 16 epub-vertical (21:46:26)
+PASS wrong location: restored by the saved text {"saved": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.4127659574468085, "total": 0.13859617788890874, "chapterPage": 5, "updatedAt": 1795469928189}, "shown": {"chars": 1880, "page": 5, "pages": 10, "cols": 1, "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "before": 776}, "page": 5}
+PASS wrong location and text: restored by the fraction {"progression": 0.4127659574468085, "chars": 1880, "expected first character": 776, "shown": {"chars": 1880, "page": 5, "pages": 10, "cols": 1, "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "before": 776}}
+=== 11 done (21:49:07)
+=== 12: chapter_list 14 16 (21:49:07)
+PASS chapter list shows the page of the text book {"expected": "Page 6 of 30", "node": "5 天前 • Page 6 of 30 • Bookmania 測試", "read": 0}
+PASS Recents shows the page of the text book {"expected": "Page 6 of 30", "node": "閱讀 1 分鐘前\nPage 6 of 30", "tab": true}
+=== 12 done (21:50:53)
+=== 13: incognito 14 16 (21:50:53)
+PASS incognito: the saved position is unchanged {"before": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.4127659574468085, "total": 0.13859617788890874, "chapterPage": 5, "updatedAt": 1795470491105}, "after": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.4127659574468085, "total": 0.13859617788890874, "chapterPage": 5, "updatedAt": 1795470491105}, "shown at exit": {"chars": 1880, "page": 8, "pages": 10, "cols": 1, "location": [131, 0], "text": "【第３３段】長一點的段落：閱讀程式需要依照使用者", "before": 1466}}
+PASS incognito: chapter progress unchanged {"read": [0, 0], "last_page_read": [5, 5], "pages_left": [25, 25]}
+PASS incognito: history unchanged {"history_last_read": [1795470498281, 1795470498281], "history_time_read": [39453622, 39453622]}
+=== 13 done (21:52:34)
+=== 14: parity 14 16 OEBPS/text/ch01.xhtml (21:52:34)
+PASS starting point: unread, a saved position past the first page {"chapter": {"read": 0, "last_page_read": 5, "pages_left": 25}, "saved": {"spine": 0, "href": "OEBPS/text/ch01.xhtml", "location": [74, 0], "text": "【第１８段】長一點的段落：閱讀程式需要依照使用者", "progression": 0.4127659574468085, "total": 0.13859617788890874, "chapterPage": 5, "updatedAt": 1795470491105}}
+.. swipe 1 on 直排測試書 at y=1092: snackbar 標示為已讀
+.. swipe 2 on 直排測試書 at y=1092: snackbar 標示為未讀
+PASS chapter list: marked read, then unread (page cleared) {"after first swipe": {"read": 1, "last_page_read": 5, "pages_left": 25}, "after second swipe": {"read": 0, "last_page_read": 0, "pages_left": 0}}
+PASS marked unread (page cleared): opens at the start, not at the saved position {"doc": "OEBPS/text/ch01.xhtml", "page": 0, "saved position was": ["OEBPS/text/ch01.xhtml", [74, 0]]}
+.. swipe 3 on 直排測試書 at y=1092: snackbar 標示為已讀
+PASS marked read: opens at the start, not at the saved position {"read": 1, "doc": "OEBPS/text/ch01.xhtml", "page": 0, "saved position": ["OEBPS/text/ch01.xhtml", [93, 0]], "left at": ["OEBPS/text/ch01.xhtml", [93, 0]]}
+.. swipe 4 on 直排測試書 at y=1092: snackbar 標示為未讀
+=== 14 done (22:01:53)
+=== 15: toc 14 16 epub-vertical 2 (22:01:53)
+PASS table of contents listed ["第1章", "第2章", "第3章"]
+PASS jumped to the entry: its title is on the page {"entry": "第3章", "doc": "OEBPS/text/ch03.xhtml", "page": 0, "visible text": "第３章測試章節【第８１段】英文單字WebView與阿拉伯數字81混在其中；年份寫成二〇二六年；省略號……與破折號——也要檢查。【第８２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12月31日使用縱中橫。【第８３段】長一點的段落：閱讀程式需要依照使用"}
+PASS the current entry is marked when the contents open again {"checked": [2], "expected": 2}
+=== 15 done (22:04:43)
+=== 16: toc 9 11 mobi6-horizontal 2 (22:04:43)
+PASS table of contents listed ["第1章", "第2章", "第3章"]
+PASS jumped to the entry: its title is on the page {"entry": "第3章", "doc": "text/section0002.html", "page": 0, "visible text": "第３章測試章節【第８１段】英文單字WebView與阿拉伯數字81混在其中；年份寫成二〇二六年；省略號……與破折號——也要檢查。【第８２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12月31日使用縱中橫。【第８３段】長一點的段落：閱讀程式需要依照使用"}
+PASS the current entry is marked when the contents open again {"checked": [2], "expected": 2}
+=== 16 done (22:07:23)
+=== 17: toc 13 15 azw3-vertical 1 (22:07:23)
+PASS table of contents listed ["第1章", "第2章", "第3章"]
+PASS jumped to the entry: its title is on the page {"entry": "第2章", "doc": "text/part0001.xhtml", "page": 0, "visible text": "第２章測試章節【第４１段】英文單字WebView與阿拉伯數字41混在其中；年份寫成二〇二六年；省略號……與破折號——也要檢查。【第４２段】漢ㄏㄢˋ字ㄗˋ可以加上注音；日期12月31日使用縱中橫。【第４３段】長一點的段落：閱讀程式需要依照使用"}
+PASS the current entry is marked when the contents open again {"checked": [1], "expected": 1}
+=== 17 done (22:10:07)
+=== 18: slider 14 16 epub-vertical 0.25 (22:10:07)
+PASS slider shown with the menu "3/3 · 1/9"
+FAIL while dragging, the bar shows a table of contents title instead of the page {"bar texts while dragging": ["3/3 · 3/9"], "page info before": "3/3 · 1/9"}
+PASS released at 0.25 of the track (right to left): the page shown holds a character near 0.75 of the book {"finger at character": 4199, "accepted characters": [4171, 4367], "page shown, characters": [4140, 4370], "of": 5599, "status": {"ready": true, "error": null, "page": 2, "pages": 9, "cols": 1, "mode": "V", "seq": 1, "ms": 2228, "rubyFix": false, "gutter": null, "vw": 412}, "page info": "3/3 · 3/9"}
+PASS percent shown and saved whole-book progress are those of the first character of that page {"percent shown": 74, "saved total": 0.739417753170209, "first character / book": 0.7394}
+=== 18 done (22:12:31)
+=== 19: slider 8 10 epub-horizontal 0.25 (22:12:31)
+PASS slider shown with the menu "1/3 · 6/8"
+PASS while dragging, the bar shows a table of contents title instead of the page {"bar texts while dragging": ["第1章"], "page info before": "1/3 · 6/8"}
+PASS released at 0.25 of the track (left to right): the page shown holds a character near 0.25 of the book {"finger at character": 1400, "accepted characters": [1232, 1428], "page shown, characters": [1059, 1322], "of": 5599, "status": {"ready": true, "error": null, "page": 4, "pages": 8, "cols": 1, "mode": "H", "seq": 1, "ms": 2065, "rubyFix": false, "gutter": null, "vw": 412}, "page info": "1/3 · 5/8"}
+PASS percent shown and saved whole-book progress are those of the first character of that page {"percent shown": 19, "saved total": 0.1891409180210752, "first character / book": 0.1891}
+=== 19 done (22:14:54)
+=== 20: end 8 10 epub-horizontal (22:14:54)
+PASS slider near the end, then page turns: the last page of the book {"after the slider": {"ready": true, "error": null, "page": 7, "pages": 8, "cols": 1, "mode": "H", "seq": 2, "ms": 2793, "rubyFix": false, "gutter": null, "vw": 412}, "page turns": 0, "status": {"ready": true, "error": null, "page": 7, "pages": 8, "cols": 1, "mode": "H", "seq": 2, "ms": 2793, "rubyFix": false, "gutter": null, "vw": 412}, "doc": "OEBPS/text/ch03.xhtml", "percent": null}
+PASS the last page marks the chapter read {"read": 1, "last_page_read": 23, "pages_left": 1, "saved": {"spine": 2, "href": "OEBPS/text/ch03.xhtml", "location": [153, 54], "text": "？", "progression": 0.999465811965812, "total": 1.0, "atEnd": true, "chapterPage": 23, "updatedAt": 1795472143404}}
+PASS a finished book opens at its start again {"doc": "OEBPS/text/ch01.xhtml", "status": {"ready": true, "error": null, "page": 0, "pages": 8, "cols": 1, "mode": "H", "seq": 1, "ms": 1926, "rubyFix": false, "gutter": null, "vw": 412}}
+=== 20 done (22:18:22)
+=== 21: tapzones 14 16 epub-vertical 0 NONE (22:18:22)
+.. {'point': (0.17, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.83), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.17, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+PASS tap zones mode 0 (RightAndLeft), inverted NONE, right-to-left book [{"point": [0.17, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.83], "expected": "MENU", "got": "MENU"}, {"point": [0.17, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.17], "expected": "PREV", "got": "PREV"}]
+=== 21 done (22:21:50)
+=== 22: tapzones 14 16 epub-vertical 1 NONE (22:21:50)
+.. {'point': (0.17, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.5, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.17, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.17, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+PASS tap zones mode 1 (L), inverted NONE, right-to-left book [{"point": [0.17, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "PREV", "got": "PREV"}, {"point": [0.5, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.17, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.17], "expected": "PREV", "got": "PREV"}, {"point": [0.17, 0.17], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.83], "expected": "NEXT", "got": "NEXT"}]
+=== 22 done (22:24:35)
+=== 23: tapzones 14 16 epub-vertical 2 NONE (22:24:35)
+.. {'point': (0.17, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.17, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+PASS tap zones mode 2 (Kindlish), inverted NONE, right-to-left book [{"point": [0.17, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.17], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.17, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.17], "expected": "MENU", "got": "MENU"}]
+=== 23 done (22:27:42)
+=== 24: tapzones 14 16 epub-vertical 3 NONE (22:27:42)
+.. {'point': (0.17, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.17, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+PASS tap zones mode 3 (Edge), inverted NONE, right-to-left book [{"point": [0.17, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.17, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.17], "expected": "NEXT", "got": "NEXT"}]
+=== 24 done (22:30:43)
+=== 25: tapzones 14 16 epub-vertical 4 NONE (22:30:43)
+.. {'point': (0.17, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.83), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.17, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+PASS tap zones mode 4 (RightAndLeft), inverted NONE, right-to-left book [{"point": [0.17, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.83], "expected": "MENU", "got": "MENU"}, {"point": [0.17, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.17], "expected": "PREV", "got": "PREV"}]
+=== 25 done (22:34:14)
+=== 26: tapzones 14 16 epub-vertical 5 NONE (22:34:14)
+.. {'point': (0.17, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.83, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.83), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.17, 0.83), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.83, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+PASS tap zones mode 5 (Disabled), inverted NONE, right-to-left book [{"point": [0.17, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.83, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.83], "expected": "MENU", "got": "MENU"}, {"point": [0.17, 0.83], "expected": "MENU", "got": "MENU"}, {"point": [0.83, 0.17], "expected": "MENU", "got": "MENU"}]
+=== 26 done (22:39:39)
+=== 27: tapzones 14 16 epub-vertical 1 HORIZONTAL (22:39:39)
+.. {'point': (0.17, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.5, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.17, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.17, 0.17), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.83), 'expected': 'NEXT', 'got': 'NEXT'}
+PASS tap zones mode 1 (L), inverted HORIZONTAL, right-to-left book [{"point": [0.17, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "PREV", "got": "PREV"}, {"point": [0.5, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.17, 0.83], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.17], "expected": "PREV", "got": "PREV"}, {"point": [0.17, 0.17], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.83], "expected": "NEXT", "got": "NEXT"}]
+=== 27 done (22:42:22)
+=== 28: tapzones 14 16 epub-vertical 1 VERTICAL (22:42:22)
+.. {'point': (0.17, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.17, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.17, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+PASS tap zones mode 1 (L), inverted VERTICAL, right-to-left book [{"point": [0.17, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.17, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.17], "expected": "NEXT", "got": "NEXT"}, {"point": [0.17, 0.17], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.83], "expected": "PREV", "got": "PREV"}]
+=== 28 done (22:45:09)
+=== 29: tapzones 14 16 epub-vertical 1 BOTH (22:45:09)
+.. {'point': (0.17, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.17, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.17, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.83, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+PASS tap zones mode 1 (L), inverted BOTH, right-to-left book [{"point": [0.17, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.17, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.17], "expected": "NEXT", "got": "NEXT"}, {"point": [0.17, 0.17], "expected": "NEXT", "got": "NEXT"}, {"point": [0.83, 0.83], "expected": "PREV", "got": "PREV"}]
+=== 29 done (22:47:53)
+=== 30: tapzones 8 10 epub-horizontal 0 NONE (22:47:53)
+.. {'point': (0.17, 0.5), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.5), 'expected': 'NEXT', 'got': 'NEXT'}
+.. {'point': (0.5, 0.5), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.17), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.5, 0.83), 'expected': 'MENU', 'got': 'MENU'}
+.. {'point': (0.17, 0.83), 'expected': 'PREV', 'got': 'PREV'}
+.. {'point': (0.83, 0.17), 'expected': 'NEXT', 'got': 'NEXT'}
+PASS tap zones mode 0 (RightAndLeft), inverted NONE, left-to-right book [{"point": [0.17, 0.5], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.5], "expected": "NEXT", "got": "NEXT"}, {"point": [0.5, 0.5], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.17], "expected": "MENU", "got": "MENU"}, {"point": [0.5, 0.83], "expected": "MENU", "got": "MENU"}, {"point": [0.17, 0.83], "expected": "PREV", "got": "PREV"}, {"point": [0.83, 0.17], "expected": "NEXT", "got": "NEXT"}]
+=== 30 done (22:51:23)
+=== 31: volume 14 16 (22:51:23)
+PASS volume keys option True, inverted False [{"key": "VOLUME_DOWN", "expected": "NEXT", "got": "NEXT"}, {"key": "VOLUME_UP", "expected": "PREV", "got": "PREV"}]
+PASS volume keys option True, inverted True [{"key": "VOLUME_DOWN", "expected": "PREV", "got": "PREV"}, {"key": "VOLUME_UP", "expected": "NEXT", "got": "NEXT"}]
+PASS volume keys option False, inverted False [{"key": "VOLUME_DOWN", "expected": "NONE", "got": "NONE"}, {"key": "VOLUME_UP", "expected": "NONE", "got": "NONE"}]
+=== 31 done (22:56:09)
+=== 32: switch 4 5 epub-with-pictures images (22:56:09)
+PASS text reader 以圖片模式開啟: the image reader shows the book "mResumedActivity: ActivityRecord{ecd37fc u0 io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity t1015}"
+PASS the choice is kept: kind_user = COMIC {"kind_auto": "TEXT", "kind_user": "COMIC", "file_size": 11726, "file_modified": 1794986591000, "char_counts": [1376, 1387]}
+PASS after a restart the chapter opens in the image reader "mResumedActivity: ActivityRecord{942aebb u0 io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity t1016}"
+PASS image reader 以文字模式開啟: the text reader opens "mResumedActivity: ActivityRecord{2fede9c u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1016}"
+PASS the choice is kept: kind_user = TEXT {"kind_auto": "TEXT", "kind_user": "TEXT", "file_size": 11726, "file_modified": 1794986591000, "char_counts": [1376, 1387]}
+PASS after a restart the chapter opens in the text reader "mResumedActivity: ActivityRecord{3a147e6 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1017}"
+=== 32 done (23:01:00)
+=== 33: switch 8 10 epub-without-pictures no-images (23:01:00)
+PASS book without pictures: the image reader finds no pages and the text reader opens again {"starts": ["io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity"], "resumed": "mResumedActivity: ActivityRecord{b493d45 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1018}"}
+PASS the text reader shows the book again {"ready": true, "error": null, "page": 0, "pages": 8, "cols": 1, "mode": "H", "seq": 1, "ms": 2511, "rubyFix": false, "gutter": null, "vw": 412}
+PASS text is kept as the choice (kind_user = TEXT), so the next open goes straight to text {"kind_auto": "TEXT", "kind_user": "TEXT", "file_size": 5597, "file_modified": 1794986587000, "char_counts": [1880, 1847, 1872]}
+=== 33 done (23:03:20)
+=== 34: switch_back 14 16 epub-one-picture 12 (23:03:20)
+.. start: 1/3 · 1/10
+PASS text reader 以圖片模式開啟 with a text page past the pictures: the image reader shows the book, no crash {"resumed": "mResumedActivity: ActivityRecord{e7b6e27 u0 io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity t1019}", "starts": ["io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity"], "crash log": "", "text position": ["OEBPS/text/ch02.xhtml", [39, 0]]}
+PASS image reader 以文字模式開啟: the text reader returns to the text position {"before": ["OEBPS/text/ch02.xhtml", [39, 0]], "after": ["OEBPS/text/ch02.xhtml", [39, 0]], "status": {"ready": true, "error": null, "page": 2, "pages": 9, "cols": 1, "mode": "V", "seq": 1, "ms": 2253, "rubyFix": false, "gutter": null, "vw": 412}}
+.. chapter after the image reader: read=1 last_page_read=11 pages_left=16
+=== 34 done (23:08:52)
+=== 35: switch_comic 11 13 (23:08:52)
+PASS comic EPUB opens in the image reader "mResumedActivity: ActivityRecord{a22244c u0 io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity t1020}"
+PASS image reader 以文字模式開啟: the comic opens in the text reader {"resumed": "mResumedActivity: ActivityRecord{4b00a3 u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1020}", "status": {"ready": true, "error": null, "page": 0, "pages": 1, "cols": 1, "mode": "H", "seq": 1, "ms": 2716, "rubyFix": false, "gutter": null, "vw": 412}}
+PASS kind_user = TEXT, kind_auto stays COMIC {"kind_auto": "COMIC", "kind_user": "TEXT", "file_size": 22455, "file_modified": 1794986592000, "char_counts": [0, 0, 0, 0, 0, 0]}
+PASS picture pages: saved by page (no text location), whole-book progress by documents {"saved": {"spine": 4, "href": "OEBPS/text/p005.xhtml", "pageProgression": 0.0, "total": 0.6666666666666666, "updatedAt": 1795475426353}, "shown": {"doc": "OEBPS/text/p005.xhtml", "page": 0, "position": {"chars": 0, "page": 0, "pages": 1, "cols": 1, "location": null, "text": "", "before": null}}, "char counts": [0, 0, 0, 0, 0, 0], "expected total": 0.6666666666666666, "percent shown": 67}
+PASS picture pages: reopened at the same document and page {"doc": ["OEBPS/text/p005.xhtml", "OEBPS/text/p005.xhtml"], "page": [0, 0]}
+PASS back to images with 以圖片模式開啟 "mResumedActivity: ActivityRecord{5c74187 u0 io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity t1021}"
+PASS kind_user = COMIC {"kind_auto": "COMIC", "kind_user": "COMIC", "file_size": 22455, "file_modified": 1794986592000, "char_counts": [0, 0, 0, 0, 0, 0]}
+=== 35 done (23:13:40)
+=== 36: classify 15 17 (23:13:40)
+.. classify: the book had been opened before ({'kind_auto': 'TEXT', 'kind_user': None, 'file_size': 3556, 'file_modified': 1794986588000, 'char_counts': [914, 914]}); its rows in ebook.db were removed
+PASS not classified yet null
+PASS first open from the chapter list: image reader, then the text reader {"resumed": "mResumedActivity: ActivityRecord{96b4ab u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1022}", "activity starts": ["io.github.n09527.bookmania.debug/eu.kanade.tachiyomi.ui.reader.ReaderActivity", "io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity"]}
+PASS classification stored in ebook.db {"kind_auto": "TEXT", "kind_user": null, "file_size": 3556, "file_modified": 1794986588000, "char_counts": [914, 914]}
+PASS after an App restart: opened directly in the text reader {"resumed": "mResumedActivity: ActivityRecord{386eafe u0 io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity t1023}", "activity starts": ["io.github.n09527.bookmania.debug/yokai.ebook.EbookReaderActivity"]}
+=== 36 done (23:17:15)
