@@ -70,6 +70,11 @@
   - 程式沒有變的兩次建置（`1bc8668`、`476d90a`），IPA 大小相同、雜湊值不同（【推論】壓縮檔內記錄的時間不同）。Releases 上的 IPA 是另一次建置，雜湊值以 Releases 附的 `SHA256SUMS.txt` 為準。
 - **`main` 上的一次建置被 GitHub 取消**：提交 `8c9890d`（程式與 `476d90a` 相同，只多了這份報告）推到 `main` 時，核心測試通過，App 的工作卻在排隊 15 分鐘後被取消，標註是「The job was not acquired by Runner of type hosted even after multiple attempts」，並有 macOS arm64 執行器容量不足的通知。建置沒有開始，不是程式的問題。發布時的 iOS 建置也可能遇到；遇到時什麼都不會發布，在 Actions 頁面重新執行即可（docs/RELEASING.md）。
 
+- **發布 v1.1.0**：`main` 快轉到 `c9e05c2` 後，發布流程的工作全部成功（版本檢查、Android、iOS 核心測試、iOS、發布），2026-11-25 21:03（UTC）發布 [v1.1.0](https://github.com/N09527/bookmania/releases/tag/v1.1.0)，標籤指向 `c9e05c2`，是 Releases 的最新版本。附件 7 個：五個 APK、`bookmania-v1.1.0-ios-unsigned.ipa`（479,832 bytes）、`SHA256SUMS.txt`。
+  - 我從 Releases 下載 IPA 與 `SHA256SUMS.txt`，雜湊值一致（`6868c642a98983729ccce2eec177bb73d85cb5a8382ea8636c96a3b10811845c`）。
+  - IPA 內是 `Payload/Bookmania.app`，`Info.plist`：`io.github.n09527.bookmania`、顯示名稱 Bookmania、1.1.0（201）、最低 iOS 26.0、iPhone 與 iPad（裝置類型 1、2）、開放「檔案」App 存取；以 iOS 26.5 SDK、Xcode 26.6 建置。
+  - 發布說明有 Android 與 iPhone／iPad 兩段下載說明，iOS 段連到這個提交的 INSTALL.md。
+
 沒有做的：在模擬器或實機上執行 App（你說不需要模擬器；實機由你進行）。
 
 ## 6. 請你在裝置上檢查
