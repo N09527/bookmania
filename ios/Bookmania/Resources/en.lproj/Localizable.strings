@@ -1,3 +1,9 @@
 /* Text keys that are not English sentences; English sentences are their own keys. */
 "local_source_help" = "In the Files app, open On My iPhone (or On My iPad) › Bookmania › local, and put each work in a folder of its own with its books (EPUB, MOBI, AZW3) inside.";
 "recents_help" = "Your reading history and new books will appear here.";
+"drm_message" = "Protection: %@\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.";
+"corrupt_message" = "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.";
+"kfx_message" = "KFX books are not supported. Bookmania reads EPUB, MOBI and AZW3 books without DRM.";
+"comic_reader_later" = "This book is mostly pictures. The comic reader of the iOS version comes in a later test build.";
+"shell_failed" = "The reader's layout program did not start. Please report this.";
+"layout_timeout" = "The layout did not finish within 90 seconds.";

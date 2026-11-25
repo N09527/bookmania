@@ -4,7 +4,7 @@ import SwiftUI
 /// The work page: cover, title, the description and the list of books (chapters).
 struct WorkView: View {
     let work: LocalWork
-    @State private var showingReaderNote = false
+    @State private var openChapter: LocalChapter?
 
     var body: some View {
         List {
@@ -31,7 +31,7 @@ struct WorkView: View {
             Section {
                 ForEach(work.chapters) { chapter in
                     Button {
-                        showingReaderNote = true
+                        openChapter = chapter
                     } label: {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(chapter.fileTitle).foregroundStyle(.primary)
@@ -47,8 +47,9 @@ struct WorkView: View {
         }
         .navigationTitle(work.title)
         .navigationBarTitleDisplayMode(.inline)
-        .alert("The reader comes in the next test build.", isPresented: $showingReaderNote) {
-            Button("OK", role: .cancel) {}
+        .fullScreenCover(item: $openChapter) { chapter in
+            ReaderScreen(chapter: chapter) { openChapter = nil }
+                .ignoresSafeArea()
         }
     }
 }
