@@ -1,0 +1,9 @@
+# Swift Package Manager and Xcode output
+.build/
+.swiftpm/
+DerivedData/
+# The Xcode project is generated from project.yml (XcodeGen) on the build machine
+*.xcodeproj/
+*.xcworkspace/
+build/
+*.ipa
