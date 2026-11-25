@@ -3,9 +3,9 @@ import UIKit
 import WebKit
 
 /// The text reader (EbookReaderActivity on Android, stage 2 scope): the shared shell lays out one book document in a
-/// WKWebView; this controller opens documents, turns pages with taps and swipes, moves to the next or previous
-/// document at the ends, and shows the page number. Typesetting settings, two columns, page turn animations,
-/// positions and the table of contents come in later stages.
+/// WKWebView; this controller opens documents, turns pages with taps, swipes and a hardware keyboard, moves to the
+/// next or previous document at the ends, and shows the page number. Typesetting settings, two columns, page turn
+/// animations, positions and the table of contents come in later stages.
 final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     private let chapter: LocalChapter
     private let onClose: () -> Void
@@ -32,6 +32,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     private var columns = 1
     private var chromeVisible = false
     private var layoutTask: Task<Void, Never>?
+    private var turnTask: Task<Void, Never>?
 
     init(chapter: LocalChapter, onClose: @escaping () -> Void) {
         self.chapter = chapter
@@ -48,6 +49,14 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
 
     override var prefersStatusBarHidden: Bool { !chromeVisible }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
+
+    // The reader takes the keyboard (the page keys below), not the web view.
+    override var canBecomeFirstResponder: Bool { true }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        becomeFirstResponder()
+    }
 
     // MARK: Setup
 
@@ -375,6 +384,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
                         self.columns = max(1, s.cols)
                         self.updatePageLabel()
                     }
+                    if !self.isFirstResponder { self.becomeFirstResponder() }
                     return
                 }
                 try? await Task.sleep(nanoseconds: 100_000_000)
@@ -409,10 +419,43 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         turn(forward: rtl ? !towardsLeft : towardsLeft)
     }
 
+    /// The page keys of Android's reader (dispatchKeyEvent): left and right follow the page direction (with
+    /// right-to-left pages the left key turns forward), space and Page Down turn forward, Page Up back.
+    private lazy var pageKeyCommands: [UIKeyCommand] = [
+        UIKeyCommand.inputLeftArrow, UIKeyCommand.inputRightArrow, " ", UIKeyCommand.inputPageDown, UIKeyCommand.inputPageUp,
+    ].map { input in
+        let command = UIKeyCommand(input: input, modifierFlags: [], action: #selector(pageKey(_:)))
+        command.wantsPriorityOverSystemBehavior = true
+        command.allowsAutomaticMirroring = false // the book's direction decides, not the interface's
+        return command
+    }
+
+    override var keyCommands: [UIKeyCommand]? { pageKeyCommands }
+
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        // As on Android, the page keys are left to the system while the bars or a message are shown.
+        if action == #selector(pageKey(_:)) { return !chromeVisible && messageView.isHidden }
+        return super.canPerformAction(action, withSender: sender)
+    }
+
+    @objc private func pageKey(_ command: UIKeyCommand) {
+        guard !chromeVisible, messageView.isHidden else { return }
+        switch command.input ?? "" {
+        case UIKeyCommand.inputLeftArrow: turn(forward: rtl)
+        case UIKeyCommand.inputRightArrow: turn(forward: !rtl)
+        case UIKeyCommand.inputPageUp: turn(forward: false)
+        default: turn(forward: true) // space, Page Down
+        }
+    }
+
     private func turn(forward: Bool) {
         guard !busy, publication != nil else { return }
-        Task { [weak self] in
-            guard let self else { return }
+        // Turns run one after another and check `busy` again before they start (Android: turnLock), so quick taps
+        // or a held key cannot open the next document twice and skip one.
+        let previous = turnTask
+        turnTask = Task { [weak self] in
+            await previous?.value
+            guard let self, !self.busy else { return }
             let result = await self.eval(forward ? "String(window.__reader.next())" : "String(window.__reader.prev())")
             switch result {
             case "ok":
