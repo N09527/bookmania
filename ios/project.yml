@@ -1,0 +1,75 @@
+# XcodeGen project for the iOS version (docs/ios/design.md). The Xcode project is generated from this file
+# (`xcodegen generate` in ios/); it is not kept in the repository.
+name: Bookmania
+options:
+  bundleIdPrefix: io.github.n09527
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+packages:
+  BookmaniaCore:
+    path: BookmaniaCore
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    # The release workflow passes the version of app/build.gradle.kts; these are the defaults for local builds.
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "200"
+targets:
+  Bookmania:
+    type: application
+    platform: iOS
+    sources:
+      - path: Bookmania
+        excludes:
+          - "Info.plist"
+      # The Android reader shell (reader.html, reader.js), shared as is: copied into the app as the folder "ebook".
+      - path: ../app/src/main/assets/ebook
+        type: folder
+        buildPhase: resources
+      # Shown in More > Open source licenses.
+      - path: ../LICENSE
+        buildPhase: resources
+      - path: BookmaniaCore/NOTICE-foliate-js.txt
+        buildPhase: resources
+    dependencies:
+      - package: BookmaniaCore
+    info:
+      path: Bookmania/Info.plist
+      properties:
+        CFBundleDisplayName: Bookmania
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        # The Documents folder appears in the Files app (On My iPhone > Bookmania): books go in its "local" folder.
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        ITSAppUsesNonExemptEncryption: false
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.n09527.bookmania
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+schemes:
+  Bookmania:
+    build:
+      targets:
+        Bookmania: all
+    run:
+      config: Debug
+    archive:
+      config: Release

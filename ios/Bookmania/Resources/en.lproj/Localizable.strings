@@ -1,0 +1,3 @@
+/* Text keys that are not English sentences; English sentences are their own keys. */
+"local_source_help" = "In the Files app, open On My iPhone (or On My iPad) › Bookmania › local, and put each work in a folder of its own with its books (EPUB, MOBI, AZW3) inside.";
+"recents_help" = "Your reading history and new books will appear here.";
