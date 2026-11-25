@@ -4,6 +4,23 @@ Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在�
 
 格式參考 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本號依 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.1.0] - 2026-11-25
+
+第一個附上 iPhone／iPad 版的版本。iOS 版還在開發中，這一版是它的測試版（iOS 階段 1），設計與報告見 [docs/ios](./docs/ios)。Android 版沒有變更，APK 只有版本號不同。
+
+### 新增
+
+- iPhone／iPad 測試版，需要 iOS／iPadOS 26 以上。Releases 上的 IPA 沒有簽章，要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)。這一版包含：
+  - 本機來源：「檔案」App 裡的「Bookmania > local」，作品資料夾的結構與 Android 版相同。
+  - 書櫃、作品頁（內容簡介、共 N 冊）、關於與開放原始碼授權；正體中文與英文。
+  - 文字閱讀器：EPUB、MOBI、AZW3，直排與橫排，與 Android 版用同一份排版程式；點擊、滑動或實體鍵盤（左右方向鍵、空白鍵、Page Up／Page Down）翻頁，讀完一個檔案接著下一個。
+  - 受 DRM 保護、損毀與 KFX 格式的檔案顯示說明，不會當機。
+- 發布流程同時建置 Android 的 APK 與 iOS 的 IPA，兩者都建置成功才發布。
+
+### 變更
+
+- 版本 1.1.0（內部編號 201）。
+
 ## [1.0.0] - 2026-11-24
 
 第一個以 Bookmania 為名的版本，包含 2026-11-16 起的全部開發。各階段的設計、測試與報告見 [docs/ebook-reader](./docs/ebook-reader)。
@@ -35,4 +52,5 @@ Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在�
 - Yōkai 的建置版本（standard、dev）、發布管道（beta、nightly）與更新來源。「關於」頁每次打開時向 Yōkai 查詢新版本的檢查不再執行（App 沒有內建更新功能）。
 - 「關於」頁的 Mihon 網站、Discord 與翻譯平台連結。
 
+[1.1.0]: https://github.com/N09527/bookmania/releases/tag/v1.1.0
 [1.0.0]: https://github.com/N09527/bookmania/releases/tag/v1.0.0
