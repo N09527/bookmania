@@ -2,14 +2,15 @@
 
 - 日期：2026-11-25
 - 分支：`ebook-reader/stage1-design`（之後併入 `main`）
+- 版本：1.1.0（內部編號 201），在 Releases 與 Android 的 APK 一起發布
 - 標示：【已查證】＝本次實際執行或實測；【推論】＝由事實推導、未實測；【決定】＝我在你同意的範圍內自行決定的細節，可以改。
 - 設計說明：[docs/ios/design.md](./design.md)；安裝步驟：[docs/ios/INSTALL.md](./INSTALL.md)。
 
 ## 0. 摘要
 
-- **核心解析**：Android 的 `core/ebook`（約 2,500 行 Kotlin）逐檔移植成 Swift 套件 `ios/BookmaniaCore`，可在 Linux 與 iOS 編譯。Android 的 41 個單元測試全部移植，用同一批測試書、同樣的預期值；加上新的測試，共 50 個，在這裡（Linux）全部通過【已查證】。
+- **核心解析**：Android 的 `core/ebook`（約 2,500 行 Kotlin）逐檔移植成 Swift 套件 `ios/BookmaniaCore`，可在 Linux 與 iOS 編譯。Android 的 41 個單元測試全部移植，用同一批測試書、同樣的預期值；加上新的測試，共 55 個，在這裡（Linux）全部通過【已查證】。
 - **App**：四個分頁（書櫃、最新、探索、其他）、本機來源（「檔案」App 裡的 `Bookmania/local`，結構與 Android 相同）、作品頁（內容簡介、共 N 冊）、關於與開放原始碼授權、正體中文與英文。
-- **文字閱讀器**：直接使用 Android 的排版殼層（`reader.html`、`reader.js`），在 WKWebView 中排版；點擊左右三分之一或滑動翻頁、章節之間接續、中間點擊顯示書名與頁碼；DRM、損毀、KFX 檔案顯示與 Android 相同的說明。
+- **文字閱讀器**：直接使用 Android 的排版殼層（`reader.html`、`reader.js`），在 WKWebView 中排版；點擊左右三分之一、滑動或實體鍵盤翻頁、檔案之間接續、中間點擊顯示書名與頁碼；DRM、損毀、KFX 檔案顯示與 Android 相同的說明。
 - **建置**：GitHub Actions 的 `iOS` 工作流程在 Linux 跑核心測試、在 macOS 26（Xcode 26.6）建置未簽章的 IPA。這一階段推送的 5 次建置全部成功【已查證】；最後一次的 IPA 約 467 KB，App 內容檢查通過（第 5 節）。
 - **沒有驗證的**：App 的介面與閱讀器都還沒有在實機或模擬器上執行過（第 5 節）。這一版要請你在 iPhone 與 iPad 上試。
 
@@ -43,17 +44,19 @@
   - 不保存網站資料；書的 iframe 不接受觸控（所有操作由原生端處理）。
   - 【決定】CSP 除了 `'self'` 也列出 `bookmania:`，以防 WebKit 不把自訂協定視為同源；這個協定只回應上面列的路徑，所以範圍相同。
 - 操作：點擊左／右三分之一翻頁（依書的方向，直排右翻左），左右滑動翻頁，中間點擊顯示上方的關閉與書名、下方的「頁數／總頁數　檔案序號／檔案數」；一個檔案的最後一頁再往後，接下一個檔案。
+- 實體鍵盤（你在 11/25 的決定，設計說明第 7 節第 2 項）：按鍵與 Android 版相同。左右方向鍵依翻頁方向（右開的書按左鍵是下一頁），空白鍵與 Page Down 是下一頁，Page Up 是上一頁；上下方向鍵不翻頁。上方與下方的列顯示時，這些按鍵不翻頁（Android 版也一樣）。
+- 翻頁依序執行：連按或按住按鍵時，每次翻頁等前一次完成，開始前再確認沒有正在載入的檔案（同 Android 版的做法），避免在檔案末頁連按時跳過一個檔案。
 - 外觀：跟隨系統的淺色／深色（深色用 Android 閱讀器的 rgb(32,33,37) 與 #E0E0E0）。
 - 預設排版：與 Android 的預設值相同（字級 20、行距 1.8、上下邊距 32、左右 20、橫向畫面時雙欄）。
 
 ## 4. 建置與發布
 
-- `.github/workflows/ios.yml`：推送到任何分支、而且改到 `ios/`、殼層或測試書時執行。
+- `.github/workflows/ios.yml`：推送到任何分支、而且改到 `ios/`、殼層、測試書或 iOS 的建置腳本時執行。
   - 核心測試（Ubuntu 24.04，Swift 6.4.2）。
-  - App：`xcodegen generate` 產生專案，`xcodebuild` 以 Release 設定、不簽章建置，打包成 `Bookmania-unsigned.ipa`，放在執行結果的 Artifacts（名稱 `Bookmania-ios-unsigned`）。
+  - App：`xcodegen generate` 產生專案，以 Release 設定、不簽章建置（`.github/scripts/ios-build.sh`），檢查後打包成 `Bookmania-unsigned.ipa`（`.github/scripts/ios-package.sh`），放在執行結果的 Artifacts（名稱 `Bookmania-ios-unsigned`）。
   - 編譯錯誤會寫成標註（annotation），我可以從這裡讀到，不必請你貼記錄【已查證：第一次建置後讀到了標註】。
-- 版本號沿用 `app/build.gradle.kts`（目前 1.0.0、內部編號 200）。
-- 正式發布（Releases 放 IPA）：等你回覆設計說明第 7 節第 4 項；目前 `release.yml` 沒有改。
+- `.github/workflows/release.yml`（你在 11/25 決定測試版直接在 Releases 發布）：`main` 的版本號改變時，Android 與 iOS 分開建置，全部成功才建立版本，一起發布五個 APK、`bookmania-v版本-ios-unsigned.ipa` 與 `SHA256SUMS.txt`。iOS 的建置與打包用上面同樣的兩個腳本；打包前檢查 App 的版本號與 `app/build.gradle.kts` 相同。步驟見 [docs/RELEASING.md](../RELEASING.md)。
+- 版本號沿用 `app/build.gradle.kts`：這一版 1.1.0、內部編號 201【決定】。Android 版沒有變更，APK 只有版本號不同。
 
 ## 5. 驗證
 
@@ -76,10 +79,11 @@
 2. **檔案 App**：「我的 iPhone（我的 iPad）> Bookmania > local」存在；在 `local` 建一個作品資料夾、放書，回到 App 的書櫃下拉重新整理，作品出現。
 3. **作品頁**：顯示「內容簡介」（沒有就是「沒有簡介」）與「共 N 冊」，列出書檔。
 4. **閱讀**：直排與橫排各開一本，文字是否照書的方向排版（直排由右往左）；點擊左右、左右滑動翻頁；讀到一個檔案的最後一頁再往後，是否接下一個檔案。
-5. **雙欄**：iPad 橫放（或 iPhone 橫放）時是否變成兩欄。
-6. **旋轉與深色模式**：閱讀中旋轉、切換深色模式，版面是否重新排好。
-7. **錯誤處理**：放一個受 DRM 保護或壞掉的檔案，打開時是否顯示說明而不是閃退。
-8. **關閉**：點中間，左上角的 ✕ 關閉閱讀器。
+5. **實體鍵盤**（有的話，iPad 或 iPhone 接藍牙或 USB 鍵盤）：閱讀中按左右方向鍵、空白鍵、Page Up／Page Down，是否照第 3 節的對應翻頁；直排與橫排的書各試一次左右鍵；點中間顯示上下的列時，按鍵是否不翻頁。鍵盤沒有 Page Up／Page Down 鍵時略過這兩個。
+6. **雙欄**：iPad 橫放（或 iPhone 橫放）時是否變成兩欄。
+7. **旋轉與深色模式**：閱讀中旋轉、切換深色模式，版面是否重新排好。
+8. **錯誤處理**：放一個受 DRM 保護或壞掉的檔案，打開時是否顯示說明而不是閃退。
+9. **關閉**：點中間，左上角的 ✕ 關閉閱讀器。
 
 有問題時，請告訴我是哪一項、哪台裝置與系統版本，最好附上截圖。
 
@@ -94,5 +98,6 @@
 
 - App 從未在實機或模擬器上執行；介面、閱讀器、檔案 App 整合、側載流程，都要等你的實機測試。
 - WebKit 對殼層的直排、多欄、注音排版是否與 Android WebView 一致。
+- 實體鍵盤翻頁：這裡沒有 iPad 與鍵盤，只確認了程式能編譯；按鍵是否送到閱讀器、會不會被系統的鍵盤操作先拿走，要在實機上確認。
 - CSP 在自訂網址協定下是否生效（書的 iframe 本身沒有 `allow-scripts`，書中腳本無論如何不會執行）。
 - 【推論】7 天後重新簽章安裝會保留資料，要在第一次重簽時確認。
