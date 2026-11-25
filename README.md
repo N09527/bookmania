@@ -46,11 +46,11 @@ Yōkai 原有的線上來源擴充與追蹤服務仍在 App 中，但 Bookmania 
 - 到 [Releases](https://github.com/N09527/bookmania/releases) 下載 APK。一般手機選 `arm64-v8a`；如果裝不了，再選 `universal`。
 - Releases 上的是 debug 版（App 名稱「Bookmania Debug」），供自用；它和 release 版的差異見 [docs/RELEASING.md](./docs/RELEASING.md)。
 - 需要 Android 8.0 以上。
-- 每個版本都附上 APK 的 SHA-256，可以用來核對檔案。
+- 每個版本都附上各檔案的 SHA-256，可以用來核對檔案。
 
 ### iOS 版（開發中）
 
-iPhone 與 iPad 版在 [ios/](./ios) 開發中，需要 iOS／iPadOS 26 以上。目前的測試版要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
+iPhone 與 iPad 版在 [ios/](./ios) 開發中，需要 iOS／iPadOS 26 以上。1.1.0 起，[Releases](https://github.com/N09527/bookmania/releases) 的每個版本也附上 iOS 的測試版 `bookmania-v版本-ios-unsigned.ipa`。它沒有簽章，要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
 
 ## 從原始碼建置
 

@@ -1,6 +1,6 @@
 # 在 iPhone／iPad 安裝 Bookmania（測試版）
 
-Bookmania 的 iOS 版沒有上架 App Store。GitHub 建置的是**未簽章**的 IPA，要用電腦上的側載工具、以你自己的 Apple ID 簽章後安裝。以下以 Sideloadly 為例。
+Bookmania 的 iOS 版沒有上架 App Store。Releases 上的是**未簽章**的 IPA，要用電腦上的側載工具、以你自己的 Apple ID 簽章後安裝。以下以 Sideloadly 為例。
 
 ## 限制【已查證】
 
@@ -12,14 +12,15 @@ Sideloadly 不是 Apple 的軟體；它的說明是第三方資料，步驟以�
 
 ## 1. 取得 IPA
 
-- **測試版**：到存放庫的「Actions」分頁 > 左側的「iOS」> 點最新一次成功（綠色勾）的執行 > 頁面下方「Artifacts」的 `Bookmania-ios-unsigned`。下載的是 zip，解壓後得到 `Bookmania-unsigned.ipa`。要登入 GitHub 才能下載，檔案保存 90 天。
-- **正式版**：之後會放在 Releases，和 APK 一起。
+到存放庫的 [Releases](https://github.com/N09527/bookmania/releases)，在最新版本的「Assets」下載 `bookmania-v版本-ios-unsigned.ipa`（例如 `bookmania-v1.1.0-ios-unsigned.ipa`）。iOS 版完成之前，這些都是測試版。同一個版本也附上 Android 的 APK，以及各檔案的 SHA-256（`SHA256SUMS.txt`），可以用來核對下載的檔案（Mac：`shasum -a 256 檔名`；Windows：`certutil -hashfile 檔名 SHA256`）。
+
+兩次發布之間的建置：每次推送改到 iOS 的程式時，「Actions」分頁 > 左側的「iOS」> 該次執行頁面下方的「Artifacts」也有 `Bookmania-ios-unsigned`（zip，解壓後是 `Bookmania-unsigned.ipa`）。要登入 GitHub 才能下載，檔案保存 90 天。一般請用 Releases 上的版本。
 
 ## 2. 用 Sideloadly 安裝
 
 1. 在電腦安裝 Sideloadly（[sideloadly.io](https://sideloadly.io/)）。Windows 先裝好網頁版的 iTunes 與 iCloud。
 2. 用 USB 線連接 iPhone 或 iPad，在裝置上按「信任這部電腦」。
-3. 打開 Sideloadly，把 `Bookmania-unsigned.ipa` 拖進視窗，在「Apple ID」欄輸入你的 Apple ID，按「Start」，依提示輸入密碼與雙重認證碼。
+3. 打開 Sideloadly，把下載的 IPA 拖進視窗，在「Apple ID」欄輸入你的 Apple ID，按「Start」，依提示輸入密碼與雙重認證碼。
 4. 完成後，在裝置上：
    - 「設定 > 隱私權與安全性 > 開發者模式」打開（裝置會要求重新開機，開機後確認開啟）。
    - 「設定 > 一般 > VPN 與裝置管理」，點你的 Apple ID，選「信任」。
