@@ -91,8 +91,9 @@ jobs:
           mkdir -p ios/dist/Payload
           cp -R ios/build/Build/Products/Release-iphoneos/Bookmania.app ios/dist/Payload/
           (cd ios/dist && zip -qry Bookmania-unsigned.ipa Payload)
-          ls -l ios/dist/Bookmania-unsigned.ipa
-          shasum -a 256 ios/dist/Bookmania-unsigned.ipa
+          size=$(stat -f %z ios/dist/Bookmania-unsigned.ipa)
+          sum=$(shasum -a 256 ios/dist/Bookmania-unsigned.ipa | cut -d' ' -f1)
+          echo "::notice title=IPA::Bookmania-unsigned.ipa ${size} bytes, SHA-256 ${sum}"
 
       - name: Upload the IPA
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

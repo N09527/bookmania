@@ -48,6 +48,10 @@ Yōkai's online source extensions and trackers are still in the App, but Bookman
 - Requires Android 8.0 or later.
 - Each release lists the SHA-256 of its APKs, so a download can be checked.
 
+### iOS version (in development)
+
+The iPhone and iPad version is being developed in [ios/](./ios) and needs iOS/iPadOS 26 or later. Test builds are sideloaded with your own Apple ID, see [docs/ios/INSTALL.md](./docs/ios/INSTALL.md) (Chinese); design and progress are in [docs/ios/](./docs/ios).
+
 ## Building from source
 
 Needs JDK 21 and the Android SDK.

@@ -48,6 +48,10 @@ Yōkai 原有的線上來源擴充與追蹤服務仍在 App 中，但 Bookmania 
 - 需要 Android 8.0 以上。
 - 每個版本都附上 APK 的 SHA-256，可以用來核對檔案。
 
+### iOS 版（開發中）
+
+iPhone 與 iPad 版在 [ios/](./ios) 開發中，需要 iOS／iPadOS 26 以上。目前的測試版要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
+
 ## 從原始碼建置
 
 需要 JDK 21 與 Android SDK。
