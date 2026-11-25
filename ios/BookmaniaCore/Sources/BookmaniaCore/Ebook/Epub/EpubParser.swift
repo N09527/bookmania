@@ -90,7 +90,8 @@ public enum EpubParser {
         let drmScheme: String?
     }
 
-    static func parse(_ zip: ZipReader) throws -> EpubPublication {
+    /// `detectWritingMode: false` skips reading the stylesheets and first documents (for metadata only).
+    static func parse(_ zip: ZipReader, detectWritingMode detect: Bool = true) throws -> EpubPublication {
         let encryption = try readEncryption(zip)
         if let scheme = encryption.drmScheme { throw BookError.drmProtected(scheme: scheme) }
 
@@ -176,7 +177,7 @@ public enum EpubParser {
             publisher: md?.descendantsNamed("publisher").first?.text.trimmed.nilIfEmpty,
             date: md?.descendantsNamed("date").first?.text.trimmed.nilIfEmpty
         )
-        let writingMode = detectWritingMode(zip, items, spine, metaName("primary-writing-mode"), direction, languages)
+        let writingMode = detect ? detectWritingMode(zip, items, spine, metaName("primary-writing-mode"), direction, languages) : .horizontal
 
         var mediaTypes = [String: String]()
         for item in items where mediaTypes[item.path] == nil { mediaTypes[item.path] = item.mediaType }

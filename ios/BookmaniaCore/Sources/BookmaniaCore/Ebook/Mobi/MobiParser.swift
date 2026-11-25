@@ -17,6 +17,28 @@ public enum MobiParser {
     }
 }
 
+extension MobiParser {
+    /// Metadata and cover without decompressing the book's text (for the library).
+    static func info(_ source: RandomAccessSource) throws -> BookInfo {
+        let file = try MobiFile(source)
+        let h = file.baseHeaders.exth.isEmpty ? file.headers : file.baseHeaders
+        let coverOffset = (h.exthUint(201) ?? h.exthUint(202)).flatMap { $0 < nullIndex ? $0 : nil }
+        let languages = h.exthStrings(524)
+        let metadata = BookMetadata(
+            title: h.exthString(503) ?? h.encoding.decode(h.title).trimmed.nilIfEmpty,
+            authors: h.exthStrings(100),
+            languages: languages.isEmpty ? [mobiLanguage(h.localeLanguage, h.localeRegion)].compactMap { $0 } : languages,
+            identifier: h.exthString(104) ?? h.exthString(113) ?? String(h.uid),
+            description: h.exthString(103),
+            coverHref: nil,
+            publisher: h.exthString(101),
+            date: h.exthString(106)
+        )
+        let cover = coverOffset.flatMap { try? file.resource(Int($0) + 1) }
+        return BookInfo(metadata: metadata, cover: cover ?? nil)
+    }
+}
+
 /// A small LRU cache for assembled documents (the reader may load a document in two frames).
 final class DocumentCache {
     private let capacity: Int

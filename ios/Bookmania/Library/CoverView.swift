@@ -20,10 +20,13 @@ struct CoverView: View {
         }
         .aspectRatio(2.0 / 3.0, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 8))
-        .task(id: work.coverFile) {
-            guard let url = work.coverFile else { return }
-            let loaded = await Task.detached(priority: .utility) { UIImage(contentsOfFile: url.path) }.value
-            image = loaded
+        .task(id: work.id) {
+            if let url = work.coverFile {
+                image = await Task.detached(priority: .utility) { UIImage(contentsOfFile: url.path) }.value
+            } else if let bytes = await BookInfoCache.shared.cover(for: work) {
+                // No cover.jpg: the cover of the first book, as Android does.
+                image = UIImage(data: Data(bytes))
+            }
         }
     }
 }
