@@ -86,6 +86,24 @@ jobs:
         if: failure()
         run: .github/scripts/ios-errors.sh ios/xcodebuild.log 31
 
+      - name: Check the app bundle
+        run: |
+          app=ios/build/Build/Products/Release-iphoneos/Bookmania.app
+          missing=""
+          for f in Bookmania Info.plist ebook/reader.html ebook/reader.js LICENSE NOTICE-foliate-js.txt Assets.car \
+                   zh-Hant.lproj/Localizable.strings en.lproj/Localizable.strings; do
+            [ -e "$app/$f" ] || missing="$missing $f"
+          done
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Info.plist")
+          build=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Info.plist")
+          minos=$(/usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$app/Info.plist")
+          archs=$(lipo -archs "$app/Bookmania")
+          echo "::notice title=App bundle::version ${version} (${build}), minimum iOS ${minos}, ${archs}; $(cd "$app" && find . -type f | wc -l | tr -d ' ') files"
+          if [ -n "$missing" ]; then
+            echo "::error title=App bundle::missing:${missing}"
+            exit 1
+          fi
+
       - name: Package the IPA
         run: |
           mkdir -p ios/dist/Payload
