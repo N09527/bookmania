@@ -11,7 +11,7 @@
 - **核心解析**：Android 的 `core/ebook`（約 2,500 行 Kotlin）逐檔移植成 Swift 套件 `ios/BookmaniaCore`，可在 Linux 與 iOS 編譯。Android 的 41 個單元測試全部移植，用同一批測試書、同樣的預期值；加上新的測試，共 55 個，在這裡（Linux）全部通過【已查證】。
 - **App**：四個分頁（書櫃、最新、探索、其他）、本機來源（「檔案」App 裡的 `Bookmania/local`，結構與 Android 相同）、作品頁（內容簡介、共 N 冊）、關於與開放原始碼授權、正體中文與英文。
 - **文字閱讀器**：直接使用 Android 的排版殼層（`reader.html`、`reader.js`），在 WKWebView 中排版；點擊左右三分之一、滑動或實體鍵盤翻頁、檔案之間接續、中間點擊顯示書名與頁碼；DRM、損毀、KFX 檔案顯示與 Android 相同的說明。
-- **建置**：GitHub Actions 的 `iOS` 工作流程在 Linux 跑核心測試、在 macOS 26（Xcode 26.6）建置未簽章的 IPA。這一階段推送的 5 次建置全部成功【已查證】；最後一次的 IPA 約 467 KB，App 內容檢查通過（第 5 節）。
+- **建置**：GitHub Actions 的 `iOS` 工作流程在 Linux 跑核心測試、在 macOS 26（Xcode 26.6）建置未簽章的 IPA。工作分支上改到 iOS 的 5 次推送，建置都成功【已查證】；最後一次的 IPA 479,832 bytes（約 469 KiB），App 內容檢查通過（第 5 節）。1.1.0 起，IPA 和 APK 一起在 Releases 發布（第 4 節）。
 - **沒有驗證的**：App 的介面與閱讀器都還沒有在實機或模擬器上執行過（第 5 節）。這一版要請你在 iPhone 與 iPad 上試。
 
 ## 1. 核心解析（BookmaniaCore）
@@ -64,10 +64,11 @@
 
 - **這裡（Linux，Swift 6.4.3）**：BookmaniaCore 的 55 個單元測試全部通過（16 組：路徑、格式判斷、ZIP、Deflate／SHA-1、內容清理、EPUB、字數、MOBI／AZW3、直排判定、字型檢查、本機書庫、閱讀器網址、排版設定、設定儲存、字型儲存、書目讀取）。
 - **GitHub（Ubuntu 24.04，Swift 6.4.2）**：同樣的核心測試，每次推送都通過。
-- **GitHub（macOS 26，Xcode 26.6，iOS 26.5 SDK）**：App 每次都編譯成功（介面與閱讀器的程式第一次推送就通過，沒有需要修正的編譯錯誤）。最後一次（提交 `476d90a`，[執行結果](https://github.com/N09527/bookmania/actions/runs/45658297049)）：
-  - IPA：`Bookmania-unsigned.ipa`，477,900 bytes，SHA-256 `d3d874899d328064f08c01e136149783152752f36308231e9d79b79021b46216`。
-  - App 內容檢查：版本 1.0.0（200）、最低 iOS 26.0、arm64；排版殼層兩個檔案、兩份授權聲明、資源目錄、英文與正體中文字串都在。
-  - 每次建置的 IPA 雜湊值都不同（壓縮檔內的時間不同），大小相同。
+- **GitHub（macOS 26，Xcode 26.6，iOS 26.5 SDK）**：工作分支上改到 iOS 的 5 次推送（`18ab227`、`b92b730`、`1bc8668`、`476d90a`、`2dd1f24`），App 都編譯成功，沒有需要修正的編譯錯誤；鍵盤翻頁也是第一次推送就通過。最後一次（提交 `2dd1f24`，[執行結果](https://github.com/N09527/bookmania/actions/runs/45699189121)）：
+  - IPA：`Bookmania-unsigned.ipa`，479,832 bytes，SHA-256 `314cc398f6ce45bd56724964475616015cff8c113bba929f07f8b3936b70f881`。
+  - App 內容檢查：版本 1.1.0（201），與 `app/build.gradle.kts` 相同；最低 iOS 26.0、arm64；排版殼層兩個檔案、兩份授權聲明、資源目錄、英文與正體中文字串都在。
+  - 程式沒有變的兩次建置（`1bc8668`、`476d90a`），IPA 大小相同、雜湊值不同（【推論】壓縮檔內記錄的時間不同）。Releases 上的 IPA 是另一次建置，雜湊值以 Releases 附的 `SHA256SUMS.txt` 為準。
+- **`main` 上的一次建置被 GitHub 取消**：提交 `8c9890d`（程式與 `476d90a` 相同，只多了這份報告）推到 `main` 時，核心測試通過，App 的工作卻在排隊 15 分鐘後被取消，標註是「The job was not acquired by Runner of type hosted even after multiple attempts」，並有 macOS arm64 執行器容量不足的通知。建置沒有開始，不是程式的問題。發布時的 iOS 建置也可能遇到；遇到時什麼都不會發布，在 Actions 頁面重新執行即可（docs/RELEASING.md）。
 
 沒有做的：在模擬器或實機上執行 App（你說不需要模擬器；實機由你進行）。
 
