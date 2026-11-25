@@ -1,8 +1,10 @@
-# Publishes the debug APKs on GitHub Releases when the version in app/build.gradle.kts changes on main, or when the
-# workflow is run by hand (Actions > Release > Run workflow). The workflow creates the tag v<version> itself, so no tag
-# has to be pushed. A version that is already published is skipped.
-# The debug build is signed with the debug key kept in the repository (app/debug.keystore), so every published APK
-# updates the previous one in place; no secrets are needed. See docs/RELEASING.md.
+# Publishes Bookmania on GitHub Releases when the version in app/build.gradle.kts changes on main, or when the
+# workflow is run by hand (Actions > Release > Run workflow): the Android debug APKs and the unsigned iOS IPA, in one
+# release. The workflow creates the tag v<version> itself, so no tag has to be pushed. A version that is already
+# published is skipped, and nothing is published unless both platforms build.
+# The debug APKs are signed with the debug key kept in the repository (app/debug.keystore), so every published APK
+# updates the previous one in place; no secrets are needed. The IPA is not signed: it is signed with your own Apple ID
+# when it is installed (docs/ios/INSTALL.md). See docs/RELEASING.md.
 name: Release
 
 on:
@@ -14,7 +16,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release
@@ -73,8 +75,8 @@ jobs:
           fi
           echo "publish=true" >> "$GITHUB_OUTPUT"
 
-  release:
-    name: Build and publish
+  android:
+    name: Android (debug APKs)
     needs: check
     if: needs.check.outputs.publish == 'true'
     runs-on: ubuntu-latest
@@ -124,7 +126,106 @@ jobs:
             fi
             cp "$apk" "dist/bookmania-$TAG-debug-$abi.apk"
           done
-          (cd dist && sha256sum -- *.apk > SHA256SUMS.txt)
+
+      - name: Keep the APKs for the release
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-android
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 7
+
+  ios-core:
+    name: iOS core unit tests (Linux)
+    needs: check
+    if: needs.check.outputs.publish == 'true'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Test BookmaniaCore
+        run: |
+          swift --version
+          swift test --package-path ios/BookmaniaCore
+
+  ios:
+    name: iOS (unsigned IPA)
+    needs: check
+    if: needs.check.outputs.publish == 'true'
+    runs-on: macos-26
+    env:
+      TAG: ${{ needs.check.outputs.tag }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Tools
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+        run: |
+          xcodebuild -version
+          brew install xcodegen
+          xcodegen --version
+
+      - name: Generate the Xcode project
+        working-directory: ios
+        run: xcodegen generate
+
+      - name: Build
+        run: .github/scripts/ios-build.sh
+
+      - name: Report compile errors
+        if: failure()
+        run: .github/scripts/ios-errors.sh ios/xcodebuild.log 1
+
+      - name: Check the app and package the IPA
+        run: .github/scripts/ios-package.sh "bookmania-$TAG-ios-unsigned.ipa"
+
+      - name: Keep the IPA for the release
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-ios
+          path: ios/dist/*.ipa
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish
+    needs: [check, android, ios-core, ios]
+    if: needs.check.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ needs.check.outputs.tag }}
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Collect the APKs and the IPA
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: release-*
+          path: dist
+          merge-multiple: true
+
+      - name: Check the files and write the checksums
+        run: |
+          missing=""
+          for f in arm64-v8a armeabi-v7a x86 x86_64 universal; do
+            [ -f "dist/bookmania-$TAG-debug-$f.apk" ] || missing="$missing bookmania-$TAG-debug-$f.apk"
+          done
+          [ -f "dist/bookmania-$TAG-ios-unsigned.ipa" ] || missing="$missing bookmania-$TAG-ios-unsigned.ipa"
+          if [ -n "$missing" ]; then
+            echo "::error::missing:$missing"
+            exit 1
+          fi
+          (cd dist && sha256sum -- *.apk *.ipa > SHA256SUMS.txt)
+          ls -l dist
 
       - name: Write the release notes
         run: |
@@ -138,16 +239,25 @@ jobs:
             echo "::warning::CHANGELOG.md has no section for $version"
           fi
           # Relative links of the changelog (./docs/...) do not work on the release page: point them at this commit.
-          sed -i "s#](\./#](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_SHA/#g" notes.md
+          blob="https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_SHA"
+          sed -i "s#](\./#]($blob/#g" notes.md
           {
             echo
             echo "### 下載 (Download)"
+            echo
+            echo "#### Android"
             echo
             echo "這是 debug 版：App 名稱「Bookmania Debug」，套件名稱 \`io.github.n09527.bookmania.debug\`。"
             echo "一般手機請下載 \`bookmania-$TAG-debug-arm64-v8a.apk\`；裝不了時改用 \`universal\`。需要 Android 8.0 以上。"
             echo
             echo "This is the debug build (\"Bookmania Debug\", package \`io.github.n09527.bookmania.debug\`)."
             echo "Most phones need \`bookmania-$TAG-debug-arm64-v8a.apk\`; if it does not install, use \`universal\`. Requires Android 8.0+."
+            echo
+            echo "#### iPhone／iPad（測試版 / test build）"
+            echo
+            echo "\`bookmania-$TAG-ios-unsigned.ipa\` 需要 iOS／iPadOS 26 以上。它沒有簽章：請用電腦上的側載工具（例如 Sideloadly）以自己的 Apple ID 簽章後安裝，步驟見 [docs/ios/INSTALL.md]($blob/docs/ios/INSTALL.md)。用免費 Apple ID 簽章的 App 7 天後到期，到期後要重新簽章安裝。"
+            echo
+            echo "\`bookmania-$TAG-ios-unsigned.ipa\` requires iOS/iPadOS 26 or later. It is not signed: sign and install it with your own Apple ID using a sideloading tool on a computer, such as Sideloadly; see [docs/ios/INSTALL.md]($blob/docs/ios/INSTALL.md) (Chinese). Apps signed with a free Apple ID expire after 7 days and have to be signed and installed again."
             echo
             echo "### SHA-256"
             echo

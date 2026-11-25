@@ -1,6 +1,12 @@
 # 發布新版本
 
-Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布的是 **debug 版**（自用）。`main` 上 `app/build.gradle.kts` 的版本號改變並推送後，GitHub Actions 的 [release 工作流程](../.github/workflows/release.yml) 會自動跑單元測試、建置 debug 版的五個 APK、檢查簽章，然後建立版本標籤 `v1.2.3`，發布 APK 與 SHA-256。不需要設定任何 secrets，也不需要自己推送標籤。已經發布過的版本會跳過。
+Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布 Android 的 **debug 版**（自用），1.1.0 起也附上 iOS 的**未簽章 IPA**。`main` 上 `app/build.gradle.kts` 的版本號改變並推送後，GitHub Actions 的 [release 工作流程](../.github/workflows/release.yml) 會自動：
+
+- Android：跑單元測試、建置 debug 版的五個 APK、檢查簽章。
+- iOS：在 Linux 跑核心程式的單元測試；在 macOS 建置 App、檢查內容與版本號，打包成 IPA（見下方「iOS 的 IPA」）。
+- 兩邊都成功後，建立版本標籤 `v1.2.3`，發布 APK、IPA 與 SHA-256。任何一邊失敗就什麼都不發布。
+
+不需要設定任何 secrets，也不需要自己推送標籤。已經發布過的版本會跳過。
 
 ## debug 版是什麼
 
@@ -14,17 +20,23 @@ Bookmania 在 [Releases](https://github.com/N09527/bookmania/releases) 發布的
 ## 每次發布
 
 1. 修改 `app/build.gradle.kts`：
-   - `_versionName` 改成新版本，例如 `"1.1.0"`。
-   - `versionCode` 加一以上，例如 `201`。**只能變大**，否則手機無法覆蓋安裝；沒有比上一個發布的版本大時，工作流程會停止。
-2. 在 [CHANGELOG.md](../CHANGELOG.md) 新增這一版的段落，標題寫成 `## [1.1.0] - 日期`，並在檔尾加上 `[1.1.0]: https://github.com/N09527/bookmania/releases/tag/v1.1.0`。發布的說明會取用這一段。
+   - `_versionName` 改成新版本，例如 `"1.2.0"`。iOS 版用同一個版本號。
+   - `versionCode` 加一以上，例如 `202`。**只能變大**，否則手機無法覆蓋安裝；沒有比上一個發布的版本大時，工作流程會停止。iOS 版的內部版本號（CFBundleVersion）也用它。
+2. 在 [CHANGELOG.md](../CHANGELOG.md) 新增這一版的段落，標題寫成 `## [1.2.0] - 日期`，並在檔尾加上 `[1.2.0]: https://github.com/N09527/bookmania/releases/tag/v1.2.0`。發布的說明會取用這一段。
 3. 提交並推送到 `main`。推送的變更包含 `app/build.gradle.kts` 時，工作流程會自動開始。
-4. 到存放庫的「Actions」看進度。完成後 Releases 會出現新版本，附上五個 APK 與 `SHA256SUMS.txt`。
+4. 到存放庫的「Actions」看進度。完成後 Releases 會出現新版本，附上五個 APK、iOS 的 IPA 與 `SHA256SUMS.txt`。macOS 的執行器有時要排隊，iOS 的部分可能比 Android 晚完成。
 
 也可以手動執行：「Actions」分頁 > 左側的「Release」>「Run workflow」，分支選 `main`。它會發布 `main` 目前的版本；這個版本已經發布過時，什麼都不做。適合用在第一次發布、或上一次執行失敗之後重試。
 
-工作流程會先檢查：只在 `main` 上執行；這個版本還沒發布；同名的標籤如果已經存在，必須指向同一個提交；`versionCode` 比上一個發布的版本大；每個 APK 都用 `app/debug.keystore` 簽章。任何一項不符就停止，不會發布。
+工作流程會先檢查：只在 `main` 上執行；這個版本還沒發布；同名的標籤如果已經存在，必須指向同一個提交；`versionCode` 比上一個發布的版本大；每個 APK 都用 `app/debug.keystore` 簽章；IPA 裡的 App 帶著同一個版本號，排版殼層、授權聲明與兩種語言的字串都在。任何一項不符就停止，不會發布。
 
 第一次使用前，請確認「Settings > Actions > General」的「Actions permissions」允許執行 Actions；「Actions」分頁如果出現啟用工作流程的按鈕，請按下去。
+
+## iOS 的 IPA
+
+- 檔名 `bookmania-v1.2.3-ios-unsigned.ipa`，需要 iOS／iPadOS 26 以上，iPhone 與 iPad 共用。
+- 在 GitHub 的 `macos-26` 執行器上，用 XcodeGen 從 `ios/project.yml` 產生 Xcode 專案，以 Release 設定建置（[.github/scripts/ios-build.sh](../.github/scripts/ios-build.sh)），再檢查並打包（[.github/scripts/ios-package.sh](../.github/scripts/ios-package.sh)）。平常推送改到 iOS 的程式時，[iOS 工作流程](../.github/workflows/ios.yml) 也用這兩個腳本。
+- **沒有簽章**。要用自己的 Apple ID 以側載工具簽章後安裝，步驟見 [docs/ios/INSTALL.md](./ios/INSTALL.md)。發布流程不需要 Apple 的帳號或憑證。
 
 ## release 版（選用）
 

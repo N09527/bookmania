@@ -13,9 +13,10 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    # The release workflow passes the version of app/build.gradle.kts; these are the defaults for local builds.
-    MARKETING_VERSION: "1.0.0"
-    CURRENT_PROJECT_VERSION: "200"
+    # The workflows pass the version of app/build.gradle.kts (.github/scripts/ios-build.sh); keep these defaults for
+    # local builds the same.
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "201"
 targets:
   Bookmania:
     type: application
