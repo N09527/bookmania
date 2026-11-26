@@ -7,3 +7,5 @@
 *.otf binary
 *.ttf binary
 *.woff2 binary
+*.tachibk binary
+*.cbz binary

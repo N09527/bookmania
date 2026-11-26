@@ -17,6 +17,20 @@ public struct LocalWork: Identifiable, Hashable, Sendable {
     /// `cover.jpg` (or another `cover.*` image) in the folder.
     public var coverFile: URL?
     public var chapters: [LocalChapter]
+
+    public init(id: String, folder: URL, title: String, author: String? = nil, artist: String? = nil, description: String? = nil,
+                genres: [String] = [], status: Int = 0, coverFile: URL? = nil, chapters: [LocalChapter]) {
+        self.id = id
+        self.folder = folder
+        self.title = title
+        self.author = author
+        self.artist = artist
+        self.description = description
+        self.genres = genres
+        self.status = status
+        self.coverFile = coverFile
+        self.chapters = chapters
+    }
 }
 
 /// A chapter of a local work: a book file, an archive of images or a folder of images.
@@ -35,6 +49,14 @@ public struct LocalChapter: Identifiable, Hashable, Sendable {
     /// File name without extension (folder name for folders); a book's own title may replace it for display.
     public let fileTitle: String
     public let modified: Date?
+
+    public init(id: String, file: URL, kind: Kind, fileTitle: String, modified: Date?) {
+        self.id = id
+        self.file = file
+        self.kind = kind
+        self.fileTitle = fileTitle
+        self.modified = modified
+    }
 }
 
 /// Lists the local source the way Android's LocalSource does: works are the folders of `local/`, chapters are the

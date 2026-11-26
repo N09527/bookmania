@@ -30,6 +30,11 @@
 "bookmania_page_curl_summary" = "In the paged modes, taps, keys and swipes turn the page with a curl (the page does not follow the finger). Long strip mode is unchanged.";
 "bookmania_gutter_shadow_summary" = "In double page mode, a shadow where the two pages meet, like the fold of a printed book.";
 "read_duration_info" = "Time in the readers, from the chapters' reading history";
-"backup_coming" = "Backups are added in this test build's next step.";
 "ebook_no_image_pages" = "This book has no pages the image reader can show, so it opens as text.";
 "image_book_unreadable" = "The file cannot be read: it is damaged, or not a ZIP / CBZ archive or a folder of images.";
+"backup_help" = "Backups use the Android version's format (.tachibk): the library and its categories, read chapters and bookmarks, the history, the positions in text books and the settings. Book files are not included. Only works of the local source are restored.";
+"backup_restored_works" = "Restored %lld works.";
+"backup_restored_positions" = "Positions in text books: %lld.";
+"backup_restored_settings" = "Settings: %lld.";
+"backup_skipped_sources" = "Skipped %lld works of other (online) sources.";
+"backup_invalid" = "This is not a backup file that can be read.";
