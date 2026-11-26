@@ -234,6 +234,25 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         addToolbarButton("books.vertical", label: "Chapters", action: #selector(chaptersTapped))
         addToolbarButton("list.number", label: "Contents", action: #selector(contentsTapped))
         addToolbarButton("textformat.size", label: "Typesetting", action: #selector(settingsTapped))
+        if chapter.kind == .epub {
+            // An EPUB can also be read in the image reader (Android's "open as images"); the choice is kept.
+            let more = UIButton(type: .system)
+            more.setImage(UIImage(systemName: "ellipsis.circle"), for: .normal)
+            more.accessibilityLabel = NSLocalizedString("More", comment: "")
+            more.showsMenuAsPrimaryAction = true
+            more.menu = UIMenu(children: [
+                UIAction(title: NSLocalizedString("Open as images", comment: ""), image: UIImage(systemName: "photo.on.rectangle")) { [weak self] _ in
+                    guard let self else { return }
+                    self.leaveSession()
+                    self.env.ebookInfo.setUserKind(self.chapter.id, EbookInfoCache.kindComic)
+                    self.onOpenChapter(self.chapter, false)
+                },
+            ])
+            more.translatesAutoresizingMaskIntoConstraints = false
+            more.widthAnchor.constraint(equalToConstant: 44).isActive = true
+            more.heightAnchor.constraint(equalToConstant: 44).isActive = true
+            toolbarButtons.addArrangedSubview(more)
+        }
         pageLabel.translatesAutoresizingMaskIntoConstraints = false
         pageLabel.font = .monospacedDigitSystemFont(ofSize: 15, weight: .regular)
         pageLabel.textAlignment = .center
@@ -334,23 +353,16 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         let ext = url.pathExtension.lowercased()
         Task.detached(priority: .userInitiated) { [weak self] in
             do {
+                // Which reader an EPUB needs was decided before (ReaderContainerViewController).
                 let publication = try BookOpener.open(try FileSource(url: url), extension: ext)
-                let comic = ext == "epub" && ContentClassifier.classify(publication) == .comic
-                await self?.bookOpened(publication, comic: comic)
+                await self?.bookOpened(publication)
             } catch {
                 await self?.bookFailed(error)
             }
         }
     }
 
-    private func bookOpened(_ publication: Publication, comic: Bool) {
-        if comic {
-            publication.close()
-            spinner.stopAnimating()
-            showMessage(title: NSLocalizedString("Picture book", comment: ""),
-                        message: NSLocalizedString("comic_reader_later", comment: ""))
-            return
-        }
+    private func bookOpened(_ publication: Publication) {
         if publication.spine.isEmpty {
             publication.close()
             spinner.stopAnimating()

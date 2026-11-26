@@ -23,8 +23,6 @@
 "kfx_message" = "不支援 KFX 格式。Bookmania 可讀取沒有 DRM 的 EPUB、MOBI 與 AZW3。";
 "End of the book" = "已到本書結尾";
 "Beginning of the book" = "已在本書開頭";
-"Picture book" = "圖片書";
-"comic_reader_later" = "這是以圖片為主的書。iOS 版的漫畫閱讀器會在後續的測試版加入。";
 "shell_failed" = "閱讀器的排版程式沒有啟動。請把這個情況回報給開發者。";
 "layout_timeout" = "排版超過 90 秒仍未完成。";
 "ebook_no_content" = "這本書沒有可閱讀的內容。";
@@ -226,3 +224,8 @@
 "Read duration" = "閱讀歷時";
 "read_duration_info" = "閱讀器中的時間，基於章節閱讀紀錄";
 "backup_coming" = "備份功能在這個測試版的下一步加入。";
+"ebook_no_image_pages" = "這本書沒有圖片閱讀器能顯示的頁面，因此以文字模式開啟。";
+"image_book_unreadable" = "無法讀取這個檔案：檔案已損毀，或不是 ZIP／CBZ 壓縮檔或圖片資料夾。";
+"No pages found" = "找不到頁面";
+"Open as text" = "以文字模式開啟";
+"Open as images" = "以圖片模式開啟";

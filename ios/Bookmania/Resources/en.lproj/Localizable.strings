@@ -4,7 +4,6 @@
 "drm_message" = "Protection: %@\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.";
 "corrupt_message" = "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.";
 "kfx_message" = "KFX books are not supported. Bookmania reads EPUB, MOBI and AZW3 books without DRM.";
-"comic_reader_later" = "This book is mostly pictures. The comic reader of the iOS version comes in a later test build.";
 "shell_failed" = "The reader's layout program did not start. Please report this.";
 "layout_timeout" = "The layout did not finish within 90 seconds.";
 "ebook_no_content" = "This book has no readable content.";
@@ -32,3 +31,5 @@
 "bookmania_gutter_shadow_summary" = "In double page mode, a shadow where the two pages meet, like the fold of a printed book.";
 "read_duration_info" = "Time in the readers, from the chapters' reading history";
 "backup_coming" = "Backups are added in this test build's next step.";
+"ebook_no_image_pages" = "This book has no pages the image reader can show, so it opens as text.";
+"image_book_unreadable" = "The file cannot be read: it is damaged, or not a ZIP / CBZ archive or a folder of images.";

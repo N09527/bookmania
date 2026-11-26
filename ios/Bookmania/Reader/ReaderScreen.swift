@@ -59,28 +59,32 @@ final class ReaderContainerViewController: UIViewController {
     private func reader(for chapter: LocalChapter, switchedFromImages: Bool) -> UIViewController {
         let open: (LocalChapter, Bool) -> Void = { [weak self] target, switched in self?.show(target, switchedFromImages: switched) }
         switch chapter.kind {
-        case .epub, .mobi, .azw3:
+        case .mobi, .azw3:
             return TextReaderViewController(chapter: chapter, switchedFromImages: switchedFromImages, onOpenChapter: open, onClose: onClose)
         case .archive, .folder:
-            return MessageViewController(
-                title: NSLocalizedString("Picture book", comment: ""),
-                message: NSLocalizedString("comic_reader_later", comment: ""),
-                onClose: onClose
-            )
+            return ComicReaderViewController(chapter: chapter, onOpenChapter: open, onClose: onClose)
+        case .epub:
+            switch AppEnvironment.shared.ebookInfo.kind(chapter.id) {
+            case EbookInfoCache.kindText?:
+                return TextReaderViewController(chapter: chapter, switchedFromImages: switchedFromImages, onOpenChapter: open, onClose: onClose)
+            case EbookInfoCache.kindComic?:
+                return ComicReaderViewController(chapter: chapter, onOpenChapter: open, onClose: onClose)
+            default:
+                return ClassifyingViewController(chapter: chapter) { [weak self] in self?.show(chapter, switchedFromImages: switchedFromImages) }
+            }
         }
     }
 }
 
-/// A full-screen message with a close button.
-final class MessageViewController: UIViewController {
-    private let titleText: String
-    private let message: String
-    private let onClose: () -> Void
+/// Decides once which reader an EPUB opens in (EbookRouter on Android): the classification of its content, kept for
+/// the file. A file that cannot be read goes to the text reader, which explains why (DRM, damaged).
+final class ClassifyingViewController: UIViewController {
+    private let chapter: LocalChapter
+    private let done: () -> Void
 
-    init(title: String, message: String, onClose: @escaping () -> Void) {
-        self.titleText = title
-        self.message = message
-        self.onClose = onClose
+    init(chapter: LocalChapter, done: @escaping () -> Void) {
+        self.chapter = chapter
+        self.done = done
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -90,32 +94,31 @@ final class MessageViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 12
-        stack.alignment = .center
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        let title = UILabel()
-        title.text = titleText
-        title.font = .preferredFont(forTextStyle: .title3)
-        title.numberOfLines = 0
-        title.textAlignment = .center
-        let body = UILabel()
-        body.text = message
-        body.numberOfLines = 0
-        body.textAlignment = .center
-        body.textColor = .secondaryLabel
-        let close = UIButton(configuration: .borderedProminent())
-        close.setTitle(NSLocalizedString("Close", comment: ""), for: .normal)
-        close.addTarget(self, action: #selector(closeTapped), for: .touchUpInside)
-        [title, body, close].forEach(stack.addArrangedSubview)
-        view.addSubview(stack)
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(spinner)
         NSLayoutConstraint.activate([
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            stack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 32),
-            stack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -32),
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
+        spinner.startAnimating()
+        let file = chapter.file
+        let id = chapter.id
+        let info = AppEnvironment.shared.ebookInfo
+        Task { [weak self] in
+            await Task.detached(priority: .userInitiated) {
+                do {
+                    let publication = try BookOpener.open(try FileSource(url: file), extension: "epub")
+                    defer { publication.close() }
+                    let comic = ContentClassifier.classify(publication) == .comic
+                    info.setAutoKind(id, comic ? EbookInfoCache.kindComic : EbookInfoCache.kindText)
+                } catch {
+                    // DRM, damaged or unreadable: the text reader explains it (not stored, so a replaced file is
+                    // classified again).
+                    info.setTransientKind(id, EbookInfoCache.kindText)
+                }
+            }.value
+            self?.done()
+        }
     }
-
-    @objc private func closeTapped() { onClose() }
 }

@@ -215,5 +215,11 @@ import Testing
         #expect(reloaded.counts("w/a.epub", size: 100, modified: 5) == [1, 2, 3])
         #expect(reloaded.counts("w/a.epub", size: 101, modified: 5) == nil)
         #expect(reloaded.counts("w/b.epub", size: 100, modified: 5) == nil)
+        // The reader of an EPUB: the classification, then the user's choice wins.
+        #expect(reloaded.kind("w/a.epub") == nil)
+        reloaded.setAutoKind("w/a.epub", EbookInfoCache.kindComic)
+        #expect(reloaded.kind("w/a.epub") == "COMIC")
+        reloaded.setUserKind("w/a.epub", EbookInfoCache.kindText)
+        #expect(EbookInfoCache(file: file).kind("w/a.epub") == "TEXT")
     }
 }

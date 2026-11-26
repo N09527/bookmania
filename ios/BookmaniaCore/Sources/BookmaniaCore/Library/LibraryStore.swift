@@ -275,8 +275,9 @@ public final class LibraryStore: @unchecked Sendable {
     }
 }
 
-/// Character counts of text books (for whole-book progress), cached per file version so a book is counted once
-/// (Android keeps them in ebook.db). Not part of backups.
+/// Character counts of text books (for whole-book progress), cached per file version so a book is counted once, and
+/// which reader an EPUB opens in: the user's choice ("open as text / as images") or the classification, kept so it
+/// runs once per file (Android keeps both in ebook.db). Not part of backups.
 public final class EbookInfoCache: @unchecked Sendable {
     private struct Entry: Codable {
         var size: Int64
@@ -284,16 +285,32 @@ public final class EbookInfoCache: @unchecked Sendable {
         var counts: [Int]
     }
 
+    private struct Kind: Codable {
+        var user: String?
+        var auto: String?
+    }
+
+    private struct Stored: Codable {
+        var counts: [String: Entry] = [:]
+        var kinds: [String: Kind] = [:]
+    }
+
+    /// The readers an EPUB can open in (ContentKind names on Android).
+    public static let kindText = "TEXT"
+    public static let kindComic = "COMIC"
+
     private let file: URL?
     private let lock = NSLock()
-    private var entries: [String: Entry]
+    private var stored: Stored
+    /// Decisions for this run of the app only (a file that could not be read is classified again next time).
+    private var transient: [String: String] = [:]
 
     public init(file: URL?) {
         self.file = file
-        if let file, let data = try? Data(contentsOf: file), let decoded = try? JSONDecoder().decode([String: Entry].self, from: data) {
-            entries = decoded
+        if let file, let data = try? Data(contentsOf: file), let decoded = try? JSONDecoder().decode(Stored.self, from: data) {
+            stored = decoded
         } else {
-            entries = [:]
+            stored = Stored()
         }
     }
 
@@ -301,14 +318,41 @@ public final class EbookInfoCache: @unchecked Sendable {
     public func counts(_ chapterId: String, size: Int64, modified: Double) -> [Int]? {
         lock.lock()
         defer { lock.unlock() }
-        guard let e = entries[chapterId], e.size == size, abs(e.modified - modified) < 0.001 else { return nil }
+        guard let e = stored.counts[chapterId], e.size == size, abs(e.modified - modified) < 0.001 else { return nil }
         return e.counts
     }
 
     public func store(_ chapterId: String, size: Int64, modified: Double, counts: [Int]) {
+        change { $0.counts[chapterId] = Entry(size: size, modified: modified, counts: counts) }
+    }
+
+    /// The reader for an EPUB: the user's choice, else the stored classification; nil when never classified.
+    public func kind(_ chapterId: String) -> String? {
         lock.lock()
-        entries[chapterId] = Entry(size: size, modified: modified, counts: counts)
-        let copy = entries
+        defer { lock.unlock() }
+        if let k = stored.kinds[chapterId], let kind = k.user ?? k.auto { return kind }
+        return transient[chapterId]
+    }
+
+    /// A decision kept only while the app runs.
+    public func setTransientKind(_ chapterId: String, _ kind: String) {
+        lock.lock()
+        transient[chapterId] = kind
+        lock.unlock()
+    }
+
+    public func setUserKind(_ chapterId: String, _ kind: String) {
+        change { $0.kinds[chapterId, default: Kind()].user = kind }
+    }
+
+    public func setAutoKind(_ chapterId: String, _ kind: String) {
+        change { $0.kinds[chapterId, default: Kind()].auto = kind }
+    }
+
+    private func change(_ update: (inout Stored) -> Void) {
+        lock.lock()
+        update(&stored)
+        let copy = stored
         lock.unlock()
         guard let file, let data = try? JSONEncoder().encode(copy) else { return }
         try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
