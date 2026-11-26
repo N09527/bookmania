@@ -6,10 +6,61 @@ struct ReaderScreen: UIViewControllerRepresentable {
     let chapter: LocalChapter
     let onClose: () -> Void
 
-    func makeUIViewController(context: Context) -> UIViewController {
+    func makeUIViewController(context: Context) -> ReaderContainerViewController {
+        ReaderContainerViewController(chapter: chapter, onClose: onClose)
+    }
+
+    func updateUIViewController(_ uiViewController: ReaderContainerViewController, context: Context) {}
+}
+
+/// Holds the reader a chapter needs, and puts another one in its place when the user opens another chapter of the
+/// work from the reader (the chapter panel), as Android starts the reader again for it.
+final class ReaderContainerViewController: UIViewController {
+    private let firstChapter: LocalChapter
+    private let onClose: () -> Void
+    private var current: UIViewController?
+
+    init(chapter: LocalChapter, onClose: @escaping () -> Void) {
+        firstChapter = chapter
+        self.onClose = onClose
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        show(firstChapter, switchedFromImages: false)
+    }
+
+    override var childForStatusBarHidden: UIViewController? { current }
+    override var childForHomeIndicatorAutoHidden: UIViewController? { current }
+
+    /// Opens `chapter` in the reader it needs, replacing the one shown.
+    func show(_ chapter: LocalChapter, switchedFromImages: Bool) {
+        let child = reader(for: chapter, switchedFromImages: switchedFromImages)
+        if let old = current {
+            old.willMove(toParent: nil)
+            old.view.removeFromSuperview()
+            old.removeFromParent()
+        }
+        addChild(child)
+        child.view.frame = view.bounds
+        child.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(child.view)
+        child.didMove(toParent: self)
+        current = child
+        setNeedsStatusBarAppearanceUpdate()
+        setNeedsUpdateOfHomeIndicatorAutoHidden()
+    }
+
+    private func reader(for chapter: LocalChapter, switchedFromImages: Bool) -> UIViewController {
+        let open: (LocalChapter, Bool) -> Void = { [weak self] target, switched in self?.show(target, switchedFromImages: switched) }
         switch chapter.kind {
         case .epub, .mobi, .azw3:
-            return TextReaderViewController(chapter: chapter, onClose: onClose)
+            return TextReaderViewController(chapter: chapter, switchedFromImages: switchedFromImages, onOpenChapter: open, onClose: onClose)
         case .archive, .folder:
             return MessageViewController(
                 title: NSLocalizedString("Picture book", comment: ""),
@@ -18,8 +69,6 @@ struct ReaderScreen: UIViewControllerRepresentable {
             )
         }
     }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
 
 /// A full-screen message with a close button.

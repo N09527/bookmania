@@ -110,33 +110,33 @@ func countNonWhitespaceUTF16(_ s: String) -> Int {
 
 extension String {
     /// Kotlin `substringBefore`.
-    func before(_ delimiter: Character) -> String {
+    public func before(_ delimiter: Character) -> String {
         if let i = firstIndex(of: delimiter) { return String(self[..<i]) }
         return self
     }
 
     /// Kotlin `substringAfter` (the whole string when the delimiter is missing).
-    func after(_ delimiter: Character) -> String {
+    public func after(_ delimiter: Character) -> String {
         if let i = firstIndex(of: delimiter) { return String(self[index(after: i)...]) }
         return self
     }
 
     /// Kotlin `substringAfterLast(delimiter, missing)`.
-    func afterLast(_ delimiter: Character, missing: String) -> String {
+    public func afterLast(_ delimiter: Character, missing: String) -> String {
         if let i = lastIndex(of: delimiter) { return String(self[index(after: i)...]) }
         return missing
     }
 
     /// Kotlin `substringBeforeLast(delimiter, missing)`.
-    func beforeLast(_ delimiter: Character, missing: String) -> String {
+    public func beforeLast(_ delimiter: Character, missing: String) -> String {
         if let i = lastIndex(of: delimiter) { return String(self[..<i]) }
         return missing
     }
 
-    var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
+    public var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
 
     /// nil for an empty string (Kotlin `ifEmpty { null }`).
-    var nilIfEmpty: String? { isEmpty ? nil : self }
+    public var nilIfEmpty: String? { isEmpty ? nil : self }
 }
 
 /// Zero-padded decimal, as `"%05d".format(n)`.

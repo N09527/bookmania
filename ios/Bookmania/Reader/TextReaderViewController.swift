@@ -9,6 +9,10 @@ import WebKit
 /// fold's shadow and the input are in the extensions of this class.
 final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     let chapter: LocalChapter
+    /// The user came from the image reader ("open as text"): its page numbers are not the text reader's.
+    let switchedFromImages: Bool
+    /// Opens another chapter of the work in its reader (the chapter panel).
+    let onOpenChapter: (LocalChapter, Bool) -> Void
     let onClose: () -> Void
     let env = AppEnvironment.shared
 
@@ -21,6 +25,9 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     let bottomBar = UIView()
     let titleLabel = UILabel()
     let pageLabel = UILabel()
+    /// The whole-book slider in the bottom bar, and what it shows while it is dragged.
+    let progressSlider = UISlider()
+    let seekLabel = PaddedLabel()
     let toolbarButtons = UIStackView()
     let spinner = UIActivityIndicatorView(style: .large)
     let messageView = UIStackView()
@@ -60,8 +67,31 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     var panelHost: UIHostingController<SettingsPanelContainer>?
     var panelConstraints: [NSLayoutConstraint] = []
 
-    init(chapter: LocalChapter, onClose: @escaping () -> Void) {
+    // Reading progress (TextReaderViewController+Progress).
+    /// Saves the position, the read state and the reading time.
+    var session: ReadingSession?
+    /// Where to open the book (a saved position), used once when the shell is ready.
+    var restoreTarget: EbookLocator?
+    /// The position shown now, saved shortly after it changes and when the reader is left.
+    var currentLocator: EbookLocator?
+    var currentPage = 0
+    var currentDocPages = 1
+    var saveTask: Task<Void, Never>?
+    var lifecycleObservers: [NSObjectProtocol] = []
+    /// Whether the first document is waiting for the character counts (an estimated start position).
+    var waitingForCounts = false
+
+    // Page turns (TextReaderViewController+Input).
+    var pageTurner: PageTurner!
+    /// A turn into the next or previous document, played once its layout is ready.
+    var pendingTurn: PageTurner.Turn?
+    var pendingTurnTask: Task<Void, Never>?
+
+    init(chapter: LocalChapter, switchedFromImages: Bool = false, onOpenChapter: @escaping (LocalChapter, Bool) -> Void,
+         onClose: @escaping () -> Void) {
         self.chapter = chapter
+        self.switchedFromImages = switchedFromImages
+        self.onOpenChapter = onOpenChapter
         self.onClose = onClose
         super.init(nibName: nil, bundle: nil)
     }
@@ -70,6 +100,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     required init?(coder: NSCoder) { fatalError("init(coder:) is not supported") }
 
     deinit {
+        lifecycleObservers.forEach(NotificationCenter.default.removeObserver)
         publication?.close()
     }
 
@@ -88,6 +119,9 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
+        pageTurner?.end()
+        // Write what is shown now and the reading time, also when the reader is being closed.
+        leaveSession()
     }
 
     // MARK: Setup
@@ -116,6 +150,12 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         view.addSubview(webView)
         gutterView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(gutterView)
+        pageTurner = PageTurner(
+            capture: { [weak self] in await self?.pagePicture() },
+            awaitDrawn: { [weak self] in await self?.awaitPageDrawn() }
+        )
+        pageTurner.overlay.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(pageTurner.overlay)
         let fontStore = env.fontStore
         schemeHandler.fontFile = { fontStore.file($0) }
 
@@ -142,6 +182,10 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             gutterView.bottomAnchor.constraint(equalTo: webView.bottomAnchor),
             gutterView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
             gutterView.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
+            pageTurner.overlay.topAnchor.constraint(equalTo: webView.topAnchor),
+            pageTurner.overlay.bottomAnchor.constraint(equalTo: webView.bottomAnchor),
+            pageTurner.overlay.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
+            pageTurner.overlay.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
             touchLayer.topAnchor.constraint(equalTo: view.topAnchor),
             touchLayer.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             touchLayer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -187,14 +231,33 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         toolbarButtons.spacing = 4
         toolbarButtons.translatesAutoresizingMaskIntoConstraints = false
         toolbarButtons.isHidden = true // until a book is open
+        addToolbarButton("books.vertical", label: "Chapters", action: #selector(chaptersTapped))
+        addToolbarButton("list.number", label: "Contents", action: #selector(contentsTapped))
         addToolbarButton("textformat.size", label: "Typesetting", action: #selector(settingsTapped))
         pageLabel.translatesAutoresizingMaskIntoConstraints = false
         pageLabel.font = .monospacedDigitSystemFont(ofSize: 15, weight: .regular)
         pageLabel.textAlignment = .center
+        progressSlider.translatesAutoresizingMaskIntoConstraints = false
+        progressSlider.minimumValue = 0
+        progressSlider.maximumValue = 1
+        progressSlider.isEnabled = false // until the character counts are known
+        progressSlider.accessibilityLabel = NSLocalizedString("Book progress", comment: "")
+        progressSlider.addTarget(self, action: #selector(sliderMoved), for: .valueChanged)
+        progressSlider.addTarget(self, action: #selector(sliderReleased), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+        seekLabel.translatesAutoresizingMaskIntoConstraints = false
+        seekLabel.textColor = .white
+        seekLabel.backgroundColor = UIColor.black.withAlphaComponent(0.75)
+        seekLabel.layer.cornerRadius = 10
+        seekLabel.clipsToBounds = true
+        seekLabel.numberOfLines = 2
+        seekLabel.textAlignment = .center
+        seekLabel.isHidden = true
         topBar.addSubview(close)
         topBar.addSubview(titleLabel)
         topBar.addSubview(toolbarButtons)
         bottomBar.addSubview(pageLabel)
+        bottomBar.addSubview(progressSlider)
+        view.addSubview(seekLabel)
         let guide = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
             topBar.topAnchor.constraint(equalTo: view.topAnchor),
@@ -213,9 +276,15 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             bottomBar.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             bottomBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bottomBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            bottomBar.topAnchor.constraint(equalTo: guide.bottomAnchor, constant: -48),
+            bottomBar.topAnchor.constraint(equalTo: guide.bottomAnchor, constant: -84),
             pageLabel.centerXAnchor.constraint(equalTo: bottomBar.centerXAnchor),
-            pageLabel.topAnchor.constraint(equalTo: bottomBar.topAnchor, constant: 12),
+            pageLabel.topAnchor.constraint(equalTo: bottomBar.topAnchor, constant: 10),
+            progressSlider.topAnchor.constraint(equalTo: pageLabel.bottomAnchor, constant: 8),
+            progressSlider.leadingAnchor.constraint(equalTo: guide.leadingAnchor, constant: 20),
+            progressSlider.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -20),
+            seekLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            seekLabel.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, constant: -48),
+            seekLabel.bottomAnchor.constraint(equalTo: bottomBar.topAnchor, constant: -12),
         ])
     }
 
@@ -297,7 +366,8 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         resolveMode()
         if let title = publication.metadata.title { titleLabel.text = title }
         toolbarButtons.isHidden = false
-        if shellLoaded { openInitial() }
+        startSession()
+        if shellLoaded && !waitingForCounts { openInitial() }
     }
 
     private func bookFailed(_ error: Error) {
@@ -345,7 +415,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         shellLoaded = true
-        if publication != nil { openInitial() }
+        if publication != nil && !waitingForCounts { openInitial() }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -388,8 +458,18 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         return all.isEmpty ? Array(spine.indices) : all
     }
 
-    /// Opens the first document (a saved position comes with the reading progress, iOS stage 3).
+    /// Opens the saved position, or the first document.
     func openInitial() {
+        let saved = restoreTarget
+        restoreTarget = nil
+        if let saved {
+            // The path wins over the index, in case the book's spine changed.
+            let index = spine.firstIndex { $0.href == saved.href } ?? (spine.indices.contains(saved.spine) ? saved.spine : nil)
+            if let index {
+                openSpine(index, target: saved.shellTarget)
+                return
+            }
+        }
         openSpine(linearIndices().first ?? 0, target: "'start'")
     }
 
@@ -501,8 +581,16 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         }
     }
 
-    /// A layout of the open document is shown (an open, a relayout, a page turn to another document).
-    func layoutFinished() {}
+    /// A layout of the open document is shown (an open, a relayout, a page turn): the position is taken, and a turn
+    /// into this document that was waiting for it is played.
+    func layoutFinished() {
+        Task { [weak self] in await self?.capturePosition() }
+        if let turn = pendingTurn {
+            pendingTurn = nil
+            pendingTurnTask?.cancel()
+            Task { [weak self] in await self?.pageTurner.play(turn) }
+        }
+    }
 
     /// Waits for the relayout the shell starts by itself after the viewport changed (its layout counter `seq` moves
     /// on), then takes the new page numbers. If no new layout shows up within 15 seconds, the current one is taken.
@@ -532,12 +620,15 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         // Two columns: both pages of the spread, e.g. "3–4/35" (the last spread can hold one page).
         let shown = columns > 1 && page + 2 <= pages ? "\(page + 1)–\(page + 2)" : "\(page + 1)"
         pageLabel.text = "\(spineIndex + 1)/\(spine.count) · \(shown)/\(pages)"
+        progressSlider.semanticContentAttribute = rtl ? .forceRightToLeft : .forceLeftToRight
     }
 
     // MARK: Chrome
 
     func setChrome(visible: Bool) {
+        if visible { endTurn() } // the turn is drawn above the page, it would cover the bars
         chromeVisible = visible
+        seekLabel.isHidden = true
         UIView.animate(withDuration: 0.2) {
             self.topBar.alpha = visible ? 1 : 0
             self.bottomBar.alpha = visible ? 1 : 0
@@ -575,6 +666,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     @objc func closeTapped() {
         layoutTask?.cancel()
         resizeTask?.cancel()
+        leaveSession()
         onClose()
     }
 
@@ -584,6 +676,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         super.viewWillTransition(to: size, with: coordinator)
         // The shell lays the document out again by itself when the viewport changes; page, page count and columns
         // change with it, so they are read again once it is done.
+        endTurn() // the pictures of the page no longer fit
         refreshAfterResize()
         coordinator.animate(alongsideTransition: { [weak self] _ in
             self?.layoutPanel(for: size)

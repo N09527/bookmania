@@ -90,3 +90,11 @@
 "Slide" = "滑動";
 "Curl" = "捲曲";
 "ebook_page_turn_hint" = "所有書共用，不受上方選擇的範圍影響。";
+"Chapters" = "章節";
+"Contents" = "目錄";
+"Book progress" = "全書進度";
+"This book has no table of contents" = "這本書沒有目錄";
+"The link target was not found in this book" = "書中找不到這個連結的位置";
+"Open this link in the browser?" = "要用瀏覽器開啟這個連結嗎？";
+"Open in browser" = "在瀏覽器中開啟";
+"Reading now" = "正在閱讀";

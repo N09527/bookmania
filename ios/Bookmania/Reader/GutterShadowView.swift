@@ -7,6 +7,20 @@ final class GutterShadowView: UIView {
     /// between them and only the faint ends reach the text.
     static let halfWidth: CGFloat = 32
 
+    /// Black with these alphas: 0, 2 %, 7 %, 15 %, 25 %, 30 % on the centre line, and back (symmetric).
+    private static let alphas: [CGFloat] = [0x00, 0x05, 0x12, 0x26, 0x40, 0x4D, 0x40, 0x26, 0x12, 0x05, 0x00]
+    private static let stops: [CGFloat] = [0, 0.15, 0.3, 0.4, 0.47, 0.5, 0.53, 0.6, 0.7, 0.85, 1]
+    private static var colors: [CGColor] { alphas.map { UIColor.black.withAlphaComponent($0 / 255).cgColor } }
+
+    /// Draws the band centred on `centerX` into a picture of the page (the page turn's pictures carry it too).
+    static func draw(in context: CGContext, centerX: CGFloat, height: CGFloat) {
+        guard let gradient = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: colors as CFArray, locations: stops) else { return }
+        context.saveGState()
+        context.clip(to: CGRect(x: centerX - halfWidth, y: 0, width: 2 * halfWidth, height: height))
+        context.drawLinearGradient(gradient, start: CGPoint(x: centerX - halfWidth, y: 0), end: CGPoint(x: centerX + halfWidth, y: 0), options: [])
+        context.restoreGState()
+    }
+
     private let gradient = CAGradientLayer()
     /// The centre line shown now (points in this view), or nil when there is no shadow.
     private(set) var centerX: CGFloat?
@@ -18,10 +32,8 @@ final class GutterShadowView: UIView {
         backgroundColor = .clear
         gradient.startPoint = CGPoint(x: 0, y: 0.5)
         gradient.endPoint = CGPoint(x: 1, y: 0.5)
-        // Black with these alphas: 0, 2 %, 7 %, 15 %, 25 %, 30 % on the centre line, and back (symmetric).
-        let alphas: [CGFloat] = [0x00, 0x05, 0x12, 0x26, 0x40, 0x4D, 0x40, 0x26, 0x12, 0x05, 0x00]
-        gradient.colors = alphas.map { UIColor.black.withAlphaComponent($0 / 255).cgColor }
-        gradient.locations = [0, 0.15, 0.3, 0.4, 0.47, 0.5, 0.53, 0.6, 0.7, 0.85, 1].map { NSNumber(value: $0) }
+        gradient.colors = GutterShadowView.colors
+        gradient.locations = GutterShadowView.stops.map { NSNumber(value: Double($0)) }
         gradient.isHidden = true
         layer.addSublayer(gradient)
     }
