@@ -107,6 +107,31 @@ public final class ReaderPreferences: @unchecked Sendable {
         set { setBool(Keys.incognitoMode, newValue) }
     }
 
+    /// Reading modes of the image reader (ReadingModeType on Android; the flag values equal the preference values).
+    public enum ReadingMode {
+        public static let leftToRight = 1
+        public static let rightToLeft = 2
+        public static let vertical = 3
+        public static let webtoon = 4
+        public static let continuousVertical = 5
+    }
+
+    /// The image reader's reading mode for works without their own: right to left unless chosen otherwise.
+    public var defaultReadingMode: Int {
+        get { min(max(int(Keys.defaultReadingMode, ReadingMode.rightToLeft), 1), 5) }
+        set { store.set(Keys.defaultReadingMode, String(newValue)) }
+    }
+
+    /// Double pages in the image reader's paged modes (PageLayout): 0 single, 1 double, 2 automatic (two in
+    /// landscape, the default). Split pages (3) are not offered on iOS and count as automatic.
+    public var pageLayout: Int {
+        get {
+            let v = int(Keys.pageLayout, 2)
+            return (0 ... 2).contains(v) ? v : 2
+        }
+        set { store.set(Keys.pageLayout, String(newValue)) }
+    }
+
     /// The tap zones for the current settings.
     public var navigation: TapNavigation {
         TapNavigation(mode: navigationModePager, invert: pagerNavInverted)

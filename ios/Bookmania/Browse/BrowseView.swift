@@ -19,22 +19,39 @@ struct BrowseView: View {
                 }
             }
             .navigationTitle("Browse")
+            .navigationDestination(for: LocalWork.self) { work in
+                WorkView(work: work)
+            }
         }
     }
 }
 
+/// Every work of the local source; the ones in the library are marked. A work is added to the library from its page.
 struct LocalSourceView: View {
     @EnvironmentObject private var library: LibraryModel
+    @State private var search = ""
 
     var body: some View {
-        List(library.works) { work in
+        let works = library.works.filter {
+            search.trimmed.isEmpty || $0.title.range(of: search.trimmed, options: [.caseInsensitive, .widthInsensitive]) != nil
+        }
+        List(works) { work in
             NavigationLink(value: work) {
-                Text(work.title)
+                HStack(spacing: 12) {
+                    CoverView(work: work).frame(width: 44)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(verbatim: work.title).lineLimit(2)
+                        Text("\(work.chapters.count) books").font(.caption).foregroundStyle(.secondary)
+                    }
+                    Spacer(minLength: 8)
+                    if library.workState(work.id).favorite {
+                        Image(systemName: "heart.fill").foregroundStyle(Color.accentColor)
+                            .accessibilityLabel(Text("In library"))
+                    }
+                }
             }
         }
-        .navigationDestination(for: LocalWork.self) { work in
-            WorkView(work: work)
-        }
+        .searchable(text: $search)
         .overlay {
             if library.works.isEmpty && !library.isScanning {
                 ContentUnavailableView {

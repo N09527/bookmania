@@ -7,7 +7,13 @@ public struct LocalWork: Identifiable, Hashable, Sendable {
     public let folder: URL
     public var title: String
     public var author: String?
+    public var artist: String?
     public var description: String?
+    /// Genres, as ComicInfo.xml or details.json list them.
+    public var genres: [String] = []
+    /// Publishing status with Android's numbers (SManga): 0 unknown, 1 ongoing, 2 completed, 3 licensed,
+    /// 4 publishing finished, 5 cancelled, 6 on hiatus.
+    public var status: Int = 0
     /// `cover.jpg` (or another `cover.*` image) in the folder.
     public var coverFile: URL?
     public var chapters: [LocalChapter]
@@ -101,7 +107,10 @@ public enum LocalLibrary {
             folder: folder,
             title: details["title"]?.nilIfEmpty ?? folder.lastPathComponent,
             author: details["author"]?.nilIfEmpty,
+            artist: details["artist"]?.nilIfEmpty,
             description: details["description"]?.nilIfEmpty,
+            genres: (details["genre"] ?? "").split(separator: ",").map { String($0).trimmed }.filter { !$0.isEmpty },
+            status: details["status"].flatMap { Int($0) }.flatMap { (0 ... 6).contains($0) ? $0 : nil } ?? 0,
             coverFile: cover,
             chapters: chapters
         )
@@ -124,7 +133,14 @@ public enum LocalLibrary {
         if let series = doc.descendantsNamed("series").first?.text.trimmed.nilIfEmpty { out["title"] = series }
         else if let title = doc.descendantsNamed("title").first?.text.trimmed.nilIfEmpty { out["title"] = title }
         if let writer = doc.descendantsNamed("writer").first?.text.trimmed.nilIfEmpty { out["author"] = writer }
+        if let penciller = doc.descendantsNamed("penciller").first?.text.trimmed.nilIfEmpty { out["artist"] = penciller }
         if let summary = doc.descendantsNamed("summary").first?.text.trimmed.nilIfEmpty { out["description"] = summary }
+        if let genre = doc.descendantsNamed("genre").first?.text.trimmed.nilIfEmpty { out["genre"] = genre }
+        // Android writes the status as <ty:PublishingStatusTachiyomi> (ComicInfoPublishingStatus).
+        if let status = doc.descendantsNamed("publishingstatustachiyomi").first?.text.trimmed {
+            let values = ["ongoing": 1, "completed": 2, "licensed": 3, "publishing finished": 4, "cancelled": 5, "on hiatus": 6]
+            if let n = values[status.lowercased()] { out["status"] = String(n) }
+        }
         return out
     }
 
@@ -133,9 +149,14 @@ public enum LocalLibrary {
         guard let data = try? Data(contentsOf: url),
               let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
         var out = [String: String]()
-        for key in ["title", "author", "description"] {
+        for key in ["title", "author", "artist", "description"] {
             if let v = object[key] as? String { out[key] = v }
         }
+        if let genres = object["genre"] as? [String] { out["genre"] = genres.joined(separator: ", ") }
+        else if let genre = object["genre"] as? String { out["genre"] = genre }
+        // A number, or a number as text.
+        if let n = object["status"] as? Int { out["status"] = String(n) }
+        else if let t = object["status"] as? String, Int(t) != nil { out["status"] = t }
         return out
     }
 }
