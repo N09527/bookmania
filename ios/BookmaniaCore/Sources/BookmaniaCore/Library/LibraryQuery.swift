@@ -1,7 +1,7 @@
 import Foundation
 
 /// A work as the library and the work page show it: the local folder and what the store knows about it.
-public struct LibraryItem: Identifiable, Sendable {
+public struct LibraryEntry: Identifiable, Sendable {
     public let work: LocalWork
     public let state: WorkState
     public let unread: Int
@@ -19,7 +19,7 @@ public struct LibraryItem: Identifiable, Sendable {
 }
 
 /// The library's sort, filters and display, under Android's preference keys and with its values (LibrarySort,
-/// FilterBottomSheet, LibraryItem.LAYOUT_*).
+/// FilterBottomSheet, LibraryEntry.LAYOUT_*).
 public final class LibraryPreferences: @unchecked Sendable {
     private let store: PreferenceStore
 
@@ -124,14 +124,14 @@ public struct LibraryOptions: Equatable, Sendable {
 /// A section of the library: a category with its works (nil category: the default one, for works without a category).
 public struct LibrarySection: Identifiable, Sendable {
     public let category: LibraryCategory?
-    public let items: [LibraryItem]
+    public let items: [LibraryEntry]
     public var id: Int64 { category?.id ?? 0 }
 }
 
 /// Builds, filters and sorts the library (LibraryPresenter on Android).
 public enum LibraryQuery {
 
-    public static func item(_ work: LocalWork, _ state: LibraryState) -> LibraryItem {
+    public static func item(_ work: LocalWork, _ state: LibraryState) -> LibraryEntry {
         var unread = 0, read = 0, bookmarks = 0
         var lastRead: Int64 = 0, latest: Int64 = 0, fetched: Int64 = 0
         for chapter in work.chapters {
@@ -142,12 +142,12 @@ public enum LibraryQuery {
             latest = max(latest, chapter.modified.map { Int64($0.timeIntervalSince1970 * 1000) } ?? 0)
             fetched = max(fetched, c.dateFetch)
         }
-        return LibraryItem(work: work, state: state.works[work.id] ?? WorkState(), unread: unread, readCount: read,
+        return LibraryEntry(work: work, state: state.works[work.id] ?? WorkState(), unread: unread, readCount: read,
                            bookmarks: bookmarks, lastRead: lastRead, latestChapter: latest, dateFetched: fetched)
     }
 
     /// Whether `item` passes the filters and the search (title, author, artist or a genre containing the text).
-    public static func matches(_ item: LibraryItem, _ o: LibraryOptions) -> Bool {
+    public static func matches(_ item: LibraryEntry, _ o: LibraryOptions) -> Bool {
         switch o.filterUnread {
         case 1 where item.unread == 0: return false
         case 2 where item.unread > 0: return false
@@ -172,9 +172,9 @@ public enum LibraryQuery {
 
     /// Sorts like Android's LibrarySort: "ascending" is A to Z, the most recently read / updated / added first, the
     /// fewest unread (works without unread chapters last) and the fewest chapters first; descending reverses it.
-    public static func sorted(_ items: [LibraryItem], _ o: LibraryOptions) -> [LibraryItem] {
-        let byTitle: (LibraryItem, LibraryItem) -> Bool = { LocalLibrary.naturalCompare($0.work.title, $1.work.title) == .orderedAscending }
-        let ordered: (LibraryItem, LibraryItem) -> Bool
+    public static func sorted(_ items: [LibraryEntry], _ o: LibraryOptions) -> [LibraryEntry] {
+        let byTitle: (LibraryEntry, LibraryEntry) -> Bool = { LocalLibrary.naturalCompare($0.work.title, $1.work.title) == .orderedAscending }
+        let ordered: (LibraryEntry, LibraryEntry) -> Bool
         switch o.sort {
         case 1: ordered = { $0.lastRead != $1.lastRead ? $0.lastRead > $1.lastRead : byTitle($0, $1) }
         case 2: ordered = { $0.latestChapter != $1.latestChapter ? $0.latestChapter > $1.latestChapter : byTitle($0, $1) }

@@ -53,7 +53,7 @@ final class LibraryModel: ObservableObject {
 
     func work(_ id: String) -> LocalWork? { works.first { $0.id == id } }
 
-    func item(_ work: LocalWork) -> LibraryItem { LibraryQuery.item(work, state) }
+    func item(_ work: LocalWork) -> LibraryEntry { LibraryQuery.item(work, state) }
 
     func chapterState(_ id: String) -> ChapterState { state.chapters[id] ?? ChapterState() }
 

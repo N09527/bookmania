@@ -145,13 +145,15 @@ struct SettingsView: View {
                 }
                 Toggle("Keep screen on", isOn: $prefs.keepScreenOn)
             }
-            Section("Text reader") {
+            Section {
                 Picker("Page turn animation", selection: $prefs.textPageTurn) {
                     Text("None").tag(ReaderPreferences.pageTurnNone)
                     Text("Slide").tag(ReaderPreferences.pageTurnSlide)
                     Text("Curl").tag(ReaderPreferences.pageTurnCurl)
                 }
                 Toggle("Gutter shadow", isOn: $prefs.textGutter)
+            } header: {
+                Text("Text reader")
             } footer: {
                 Text("text_reader_settings_help")
             }

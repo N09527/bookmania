@@ -27,7 +27,7 @@ struct UnreadBadge: View {
 
 /// A work in a grid: the cover with the badge, and the title under it (comfortable), on it (compact) or none.
 struct WorkGridCell: View {
-    let item: LibraryItem
+    let item: LibraryEntry
     let layout: Int
     let badge: Int
 
@@ -63,7 +63,7 @@ struct WorkGridCell: View {
 
 /// A work in a list: a small cover, the title, the author, the badge.
 struct WorkListCell: View {
-    let item: LibraryItem
+    let item: LibraryEntry
     let badge: Int
 
     var body: some View {
