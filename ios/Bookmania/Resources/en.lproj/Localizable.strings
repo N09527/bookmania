@@ -1,5 +1,5 @@
 /* Text keys that are not English sentences; English sentences are their own keys. */
-"local_source_help" = "In the Files app, open On My iPhone (or On My iPad) › Bookmania › local, and put each work in a folder of its own with its books (EPUB, MOBI, AZW3) inside.";
+"local_source_help" = "In the Files app, open On My iPhone (or On My iPad) › Bookmania › local, and put each work in a folder of its own with its books (EPUB, MOBI, AZW3, or comics as ZIP/CBZ files or folders of images) inside.";
 "recents_help" = "Your reading history and new books will appear here.";
 "drm_message" = "Protection: %@\n\nBookmania only opens books without DRM and does not remove DRM. Please use a DRM-free copy of this book.";
 "corrupt_message" = "The file is damaged, or it is not a valid EPUB, MOBI or AZW3 book.";

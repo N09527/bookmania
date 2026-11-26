@@ -85,6 +85,13 @@ public enum BackupMapper {
         public var skipped = 0
         public var positions = 0
         public var preferences = 0
+
+        public init(works: Int = 0, skipped: Int = 0, positions: Int = 0, preferences: Int = 0) {
+            self.works = works
+            self.skipped = skipped
+            self.positions = positions
+            self.preferences = preferences
+        }
     }
 
     /// Merges `backup` into `state` (and the preferences into `store`), as Android's restorers do:

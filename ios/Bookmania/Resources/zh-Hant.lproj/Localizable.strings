@@ -4,7 +4,7 @@
 "More" = "其他";
 "Local source" = "本機來源";
 "No books yet" = "還沒有書";
-"local_source_help" = "在「檔案」App 打開「我的 iPhone（或我的 iPad）› Bookmania › local」，每部作品建一個資料夾，把書檔（EPUB、MOBI、AZW3）放進去。";
+"local_source_help" = "在「檔案」App 打開「我的 iPhone（或我的 iPad）› Bookmania › local」，每部作品建一個資料夾，把書檔（EPUB、MOBI、AZW3，或漫畫的 ZIP／CBZ 檔、圖片資料夾）放進去。";
 "Nothing read yet" = "還沒有閱讀紀錄";
 "recents_help" = "閱讀紀錄與新加入的書會出現在這裡。";
 "Refresh" = "重新整理";

@@ -13,7 +13,7 @@ struct BackupDocument: FileDocument {
         data = configuration.file.regularFileContents ?? Data()
     }
 
-    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper { FileWrapper(regularFileContents: data) }
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper { FileWrapper(regularFileWithContents: data) }
 }
 
 /// Backup and restore with Android's backup files (.tachibk): the library and its categories, the chapters' read
