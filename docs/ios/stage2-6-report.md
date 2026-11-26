@@ -16,7 +16,7 @@
 
 - **完成的範圍**：iOS-2～iOS-6 的程式都已寫完，一起放在 1.2.0（第 1～5 節）。設計說明裡有、但這一版沒有做的項目列在第 9 節。
 - **核心程式**：BookmaniaCore 的單元測試從 55 個增加到 101 個（24 組），在這裡（Linux）全部通過【已查證】。
-- **App 的編譯**：每次推送後在 GitHub 的 macOS 26（Xcode 26.6）建置。有 2 次推送出現編譯錯誤，下一次推送修正後通過（第 7.2 節）【已查證】。
+- **App 的編譯**：每次推送後在 GitHub 的 macOS 26（Xcode 26.6）建置。工作分支上改到 iOS 的 8 次推送中，有 2 次出現編譯錯誤，下一次推送修正後通過（第 7.2 節）【已查證】。
 - **與 Android 互通的備份**：兩個方向都用對方的程式實際讀過。iOS 寫的備份檔交給 Android 版的程式讀，Android 版寫的備份檔交給 iOS 的程式讀，兩邊的測試都通過（第 7.3 節）【已查證】。
 - **沒有驗證的**：App 還沒有在實機或模擬器上執行過，所有畫面與操作都要等你在裝置上測試（第 8、10 節）。
 
@@ -174,7 +174,7 @@
 | `df5e47a` | iOS-5 | 成功 | 1,076,393 bytes |
 | `812b8e0` | iOS-6 | **失敗** | — |
 | `59bfbf1` | iOS-6 的修正 | 成功 | 1,136,594 bytes |
-| 這份報告所在的提交 | 備份範圍對齊 Android、文件、版本 1.2.0 | 發布後補上 | |
+| `e4cceed` | 備份範圍對齊 Android、文件、版本 1.2.0 | 成功 | 1,137,128 bytes |
 
 - `e03376c` 的錯誤有兩個：
   - 我取的型別名稱 `LibraryItem` 和 SwiftUI 內建的同名型別衝突，改名為 `LibraryEntry`。
@@ -182,7 +182,7 @@
 - `812b8e0` 的錯誤也有兩個：
   - 核心程式的還原結果沒有公開的初始化方法，App 無法建立它。
   - `FileWrapper` 的參數名稱寫錯（應為 `regularFileWithContents:`）。
-- 這些建置的 App 版本號都是 1.1.0（201），因為版本號取自 `app/build.gradle.kts`，那時還沒有改成 1.2.0。
+- `e4cceed` 以前的建置，App 版本號都是 1.1.0（201）：版本號取自 `app/build.gradle.kts`，那時還沒有改成 1.2.0。`e4cceed` 的建置是 1.2.0（202）。
 - Releases 上的 1.2.0 IPA 是發布流程另外建置的（第 7.4 節）。
 
 ### 7.3 與 Android 互通的備份【已查證】
@@ -198,8 +198,9 @@
   - 同一個 Android 測試會確認這個檔案就是 Android 程式的輸出。
   - iOS 的核心測試讀它，並確認線上來源的作品被略過。
 - **執行結果**（這裡的 Linux）：
-  - Android：`./gradlew --offline :app:testBookmaniaDebugUnitTest`，指定 `IosBackupInteropTest`（2 個）與既有的 `EbookBackupTest`（3 個），全部通過（看過 JUnit 的結果檔）。
+  - Android：`./gradlew --offline :app:testBookmaniaDebugUnitTest`，指定 `IosBackupInteropTest`（2 個）與既有的 `EbookBackupTest`（3 個），全部通過（看過 JUnit 的結果檔）。最後一次在 2026-11-26 10:51（UTC）用最終的程式重跑，結果相同。
   - iOS：核心測試裡的 `aBackupWrittenByAndroid`、`theIOSFixtureReadsBack` 通過。
+  - 備份範圍對齊 Android 之後（`e4cceed`），用最終的程式重新產生 `ios-backup.tachibk`，與提交的檔案逐位元組相同，所以上面的 Android 測試結果仍然適用。
 - **測試檔的保存**：Git 的全域設定 `* text eol=lf` 會把備份檔當成文字檔轉換換行字元。所以在 `core/ebook/.gitattributes` 把 `*.tachibk` 與 `*.cbz` 設為二進位檔，並確認提交進去的位元組與原檔相同。
 - 這是程式層級的互通測試。在兩台裝置之間實際搬移備份檔還沒有做過（第 10 節）。
 
