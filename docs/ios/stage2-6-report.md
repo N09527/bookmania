@@ -183,7 +183,7 @@
   - 核心程式的還原結果沒有公開的初始化方法，App 無法建立它。
   - `FileWrapper` 的參數名稱寫錯（應為 `regularFileWithContents:`）。
 - `e4cceed` 以前的建置，App 版本號都是 1.1.0（201）：版本號取自 `app/build.gradle.kts`，那時還沒有改成 1.2.0。`e4cceed` 的建置是 1.2.0（202）。
-- Releases 上的 1.2.0 IPA 是發布流程另外建置的（第 7.4 節）。
+- Releases 上的 1.2.0 IPA 是發布流程另外建置的（第 7.4 節）。大小與 `e4cceed` 在工作分支上的建置相同（1,137,128 bytes），雜湊值不同（【推論】壓縮檔內記錄的時間不同）。
 
 ### 7.3 與 Android 互通的備份【已查證】
 
@@ -204,9 +204,23 @@
 - **測試檔的保存**：Git 的全域設定 `* text eol=lf` 會把備份檔當成文字檔轉換換行字元。所以在 `core/ebook/.gitattributes` 把 `*.tachibk` 與 `*.cbz` 設為二進位檔，並確認提交進去的位元組與原檔相同。
 - 這是程式層級的互通測試。在兩台裝置之間實際搬移備份檔還沒有做過（第 10 節）。
 
-### 7.4 發布 v1.2.0
+### 7.4 發布 v1.2.0【已查證】
 
-`main` 快轉後由發布流程建置與發布；結果在發布後的下一個提交補上。
+- `main` 快轉到 `e4cceed` 後，發布流程的工作全部成功：版本檢查、Android、iOS 核心測試、iOS、發布。
+  - 2026-11-26 10:55（UTC）發布 [v1.2.0](https://github.com/N09527/bookmania/releases/tag/v1.2.0)，標籤指向 `e4cceed`，是 Releases 的最新版本。
+  - `main` 上同一個提交的 iOS 工作流程（核心測試、App）也都成功。
+- 附件 7 個：五個 APK、`bookmania-v1.2.0-ios-unsigned.ipa`（1,137,128 bytes）、`SHA256SUMS.txt`。
+- 我從 Releases 下載了 IPA、arm64-v8a 的 APK 與 `SHA256SUMS.txt`：
+  - 兩個檔案的雜湊值都與 `SHA256SUMS.txt` 一致。
+  - IPA 的 SHA-256 是 `c8c9afa1d953dd6d233ead1e731884a25d896fbfbac13a45a4c141b986b5a140`。
+  - 其他四個 APK 沒有下載核對。
+- IPA 內只有 `Payload/Bookmania.app`。`Info.plist` 的內容：
+  - `io.github.n09527.bookmania`、顯示名稱 Bookmania、1.2.0（202）。
+  - 最低 iOS 26.0、iPhone 與 iPad（裝置類型 1、2）、開放「檔案」App 存取。
+  - 以 iOS 26.5 SDK、Xcode 26.6 建置。
+  - App 內共 12 個檔案，排版殼層兩個檔案、兩份授權聲明、資源目錄、英文與正體中文字串都在。
+- APK（arm64-v8a）：套件 `io.github.n09527.bookmania.debug`、versionCode 202、versionName `1.2.0-d6589`、minSdk 26。
+- 發布說明有這一版的變更紀錄，以及 Android 與 iPhone／iPad 的下載說明。
 
 ## 8. 請你在裝置上檢查
 
