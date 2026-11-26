@@ -2,6 +2,7 @@
 
 - 日期：2026-11-25
 - 標示：【已查證】＝實際查過或實測；【推論】＝由事實推導、未實測；【決定】＝我在你同意的範圍內自行決定的細節，可以改。
+- 進度（2026-11-26）：iOS-1～iOS-6 的程式都已完成。iOS-1 在 1.1.0 發布（[報告](./stage1-report.md)），iOS-2～iOS-6 在 1.2.0 一起發布（[報告](./stage2-6-report.md)）。實際做法與這份設計不同的地方，列在階段 2～6 報告的第 6 節（自行決定的細節）與第 9 節（沒有做的）。
 
 ## 範圍
 
@@ -47,7 +48,7 @@
 
 | 功能 | iOS 的做法 |
 |---|---|
-| 本機來源 | App 的「文件」資料夾開放給「檔案」App（我的 iPhone > Bookmania），裡面的 `local/作品資料夾/章節檔案` 結構與 Android 相同；支援 `cover.jpg`、`ComicInfo.xml`、`details.json`。也可以從「檔案」App 匯入。 |
+| 本機來源 | App 的「文件」資料夾開放給「檔案」App（我的 iPhone > Bookmania），裡面的 `local/作品資料夾/章節檔案` 結構與 Android 相同；支援 `cover.jpg`、`ComicInfo.xml`、`details.json`。也可以從「檔案」App 匯入（1.2.0 沒有另外做 App 內的匯入按鈕，見階段 2～6 報告第 9 節）。 |
 | 書櫃 | 分類、排序、篩選、搜尋、格狀／清單、未讀數量。 |
 | 作品頁 | 封面、「內容簡介」、「共 N 冊」、章節清單、已讀／未讀、書籤、排序。 |
 | 文字閱讀器 | Android 第 2～8 階段的全部：EPUB、MOBI、AZW3；直排與橫排；翻頁方向；雙欄與中縫陰影；排版設定（三層、字型匯入、數值輸入、粗體）；注音；翻頁動畫（捲曲、滑動、無）；目錄、全書進度滑桿、章節面板；閱讀位置；點擊區；DRM 與損毀檔案的說明。 |
@@ -81,14 +82,14 @@ ios/
 - **共用排版殼層**：文字閱讀器直接使用 Android 版的 `app/src/main/assets/ebook/`（`reader.html`、`reader.js`），不複製一份。殼層只透過 `window.__reader` 接受原生端的呼叫，並由原生端輪詢 `status()`，WKWebView 用同樣的方式呼叫它【已查證：讀過 reader.js】。
 - **書籍內容的隔離**：書與殼層由 App 自訂的網址協定提供（WKURLSchemeHandler），不讀取一般檔案路徑；書的文件放在沒有腳本權限的 iframe（沿用殼層的 sandbox 與 CSP），另外用 WKContentRuleList 擋掉所有對外連線。解析時沿用 Android 的清理規則（移除 script 等元素與 on* 屬性）。
 - **電子書解析**：把 `core/ebook`（Kotlin，約 2,500 行）逐檔移植成 Swift，MOBI／AZW3 部分同樣源自 foliate-js（MIT）。不用第三方套件：ZIP 與 deflate 解壓、寬鬆的 XML／HTML 解析、SHA-1 都自己寫，因為 Linux 與 iOS 要用同一份程式。
-- **資料庫**：SQLite（iOS 內建；Linux 測試用系統的 libsqlite3），自己的資料表結構，不必與 Android 相同；兩邊靠備份檔互通。
-- **第三方元件與授權**：App 不含第三方程式庫。建置工具 XcodeGen（MIT）只在 GitHub 上使用，不會包進 App。SQLite 為公有領域。foliate-js 的 MIT 聲明沿用。
+- **資料儲存**：原本計畫用 SQLite。實作時改為 App 的「Application Support」裡的 JSON 檔（書櫃與閱讀狀態、書檔的判定與字數），設定照 Android 的偏好設定鍵存在 UserDefaults（【決定】，見階段 2～6 報告第 6 節）。資料結構不必與 Android 相同，兩邊靠備份檔互通。
+- **第三方元件與授權**：App 不含第三方程式庫。建置工具 XcodeGen（MIT）只在 GitHub 上使用，不會包進 App。foliate-js 的 MIT 聲明沿用。
 - **版本**：iOS 與 Android 用同一個版本號（`app/build.gradle.kts` 的 `_versionName` 與 `versionCode`），發布流程把它帶入 iOS 的版本設定。
 - **套件名稱**：`io.github.n09527.bookmania`（側載工具有時會改掉它，不影響使用）。
 
 ## 4. 階段
 
-每個階段結束時會有一份報告，並在 Releases 發布一個新版本，和 APK 一起附上可以安裝的未簽章 IPA（你在 11/25 的決定，見第 7 節）。
+每個階段結束時會有一份報告，並在 Releases 發布一個新版本，和 APK 一起附上可以安裝的未簽章 IPA（你在 11/25 的決定，見第 7 節）。iOS-2～iOS-6 依你在 11/26 的要求（「全部做完，我再一次進上機測試」）合併成一份報告、一次發布（1.2.0）。
 
 | 階段 | 內容 | 你在裝置上驗證 |
 |---|---|---|

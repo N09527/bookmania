@@ -109,6 +109,9 @@ import Testing
         var other = ChapterState()
         other.lastPageRead = 4
         state.chapters["乙/1.epub"] = other // read, not in the library: backed up too
+        var opened = ChapterState()
+        opened.lastRead = 50
+        state.chapters["丙/1.epub"] = opened // only opened (no page, not read), not in the library: left out, as on Android
         let b = BackupMapper.backup(works: works, state: state, preferences: [
             "pref_ebook_fontSize": "22", "pref_ebook_gutter_shadow": "false", "pref_reader_theme_key": "4", "unrelated_key": "x",
             "pref_ebook_override_0123": "{}",

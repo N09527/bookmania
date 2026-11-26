@@ -18,9 +18,9 @@ public enum BackupMapper {
 
     // MARK: Creating
 
-    /// A backup of the works in the library, and of the other works with read chapters or history (Android's
-    /// "read manga not in the library"): their chapters, categories, history and text positions, the categories, and
-    /// the preferences listed in `preferenceType`.
+    /// A backup of the works in the library, and of the other works with a chapter read or begun (Android's
+    /// findReadNotFavorites: read = 1 OR last_page_read != 0): their chapters, categories, history and text positions,
+    /// the categories, and the preferences listed in `preferenceType`.
     public static func backup(works: [LocalWork], state: LibraryState, preferences: [String: String]) -> AndroidBackup {
         var backup = AndroidBackup()
         let categories = state.categories.sorted { ($0.order, $0.id) < ($1.order, $1.id) }
@@ -29,7 +29,7 @@ public enum BackupMapper {
         for work in works {
             let w = state.works[work.id] ?? WorkState()
             let chapterStates = work.chapters.map { state.chapters[$0.id] ?? ChapterState() }
-            let read = chapterStates.contains { $0.read || $0.lastRead != nil || $0.lastPageRead > 0 }
+            let read = chapterStates.contains { $0.read || $0.lastPageRead != 0 }
             guard w.favorite || read else { continue }
             var m = BackupMangaRecord(source: localSourceId, url: work.id)
             m.title = work.title

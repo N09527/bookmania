@@ -48,9 +48,9 @@ Yōkai's online source extensions and trackers are still in the App, but Bookman
 - Requires Android 8.0 or later.
 - Each release lists the SHA-256 of its files, so a download can be checked.
 
-### iOS version (in development)
+### iOS version (test builds)
 
-The iPhone and iPad version is being developed in [ios/](./ios) and needs iOS/iPadOS 26 or later. From 1.1.0 on, every release on [Releases](https://github.com/N09527/bookmania/releases) also carries an iOS test build, `bookmania-v<version>-ios-unsigned.ipa`. It is not signed: sideload it with your own Apple ID, see [docs/ios/INSTALL.md](./docs/ios/INSTALL.md) (Chinese); design and progress are in [docs/ios/](./docs/ios).
+The iPhone and iPad version is in [ios/](./ios) and needs iOS/iPadOS 26 or later. From 1.2.0 on it has everything its design lists: the text reader and its typesetting settings, reading positions, the library and categories, the image reader, and backups that move between it and the Android version; it has not been tested on a device yet. From 1.1.0 on, every release on [Releases](https://github.com/N09527/bookmania/releases) also carries an iOS test build, `bookmania-v<version>-ios-unsigned.ipa`. It is not signed: sideload it with your own Apple ID, see [docs/ios/INSTALL.md](./docs/ios/INSTALL.md) (Chinese); design and progress are in [docs/ios/](./docs/ios).
 
 ## Building from source
 

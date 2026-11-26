@@ -4,6 +4,23 @@ Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在�
 
 格式參考 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本號依 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.2.0] - 2026-11-26
+
+iPhone／iPad 版完成設計說明列的全部階段（iOS-2～iOS-6），仍是測試版，**還沒有在實機上測試過**；報告見 [docs/ios/stage2-6-report.md](./docs/ios/stage2-6-report.md)。Android 版沒有變更，APK 只有版本號不同。
+
+### 新增（iPhone／iPad）
+
+- 排版設定面板：三層（全部書籍／這部作品／這個檔案）、字體與匯入字型、字級、行距、字距、首行縮排、段落間距、邊距、字體加粗，每個數值可以直接輸入；書寫方向、翻頁方向、雙欄與中縫陰影。
+- 閱讀位置的保存與還原、已讀與頁數、閱讀記錄與閱讀時間、無痕模式；目錄、全書進度滑桿、章節面板、書中的連結。
+- 翻頁動畫：捲曲、滑動、無（文字閱讀器）。
+- 書櫃：加入書櫃、分類、排序、篩選、搜尋、顯示方式、未讀標籤；作品頁的已讀、書籤、章節排序與篩選、繼續閱讀；「最新」的記錄與更新；設定與統計資料。
+- 圖片閱讀器：ZIP／CBZ、圖片資料夾、圖片型 EPUB；單頁式（由左至右、由右至左、由上至下）與長圖；雙頁與中縫陰影；捲曲翻頁。EPUB 可以在文字與圖片模式之間切換。
+- 備份與還原：與 Android 版互通的 .tachibk 檔（書櫃、分類、已讀與書籤、閱讀記錄、文字書的閱讀位置、設定）。
+
+### 變更
+
+- 版本 1.2.0（內部編號 202）。
+
 ## [1.1.0] - 2026-11-25
 
 第一個附上 iPhone／iPad 版的版本。iOS 版還在開發中，這一版是它的測試版（iOS 階段 1），**還沒有在實機上測試過**；設計與報告見 [docs/ios](./docs/ios)。Android 版沒有變更，APK 只有版本號不同。
@@ -52,5 +69,6 @@ Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在�
 - Yōkai 的建置版本（standard、dev）、發布管道（beta、nightly）與更新來源。「關於」頁每次打開時向 Yōkai 查詢新版本的檢查不再執行（App 沒有內建更新功能）。
 - 「關於」頁的 Mihon 網站、Discord 與翻譯平台連結。
 
+[1.2.0]: https://github.com/N09527/bookmania/releases/tag/v1.2.0
 [1.1.0]: https://github.com/N09527/bookmania/releases/tag/v1.1.0
 [1.0.0]: https://github.com/N09527/bookmania/releases/tag/v1.0.0

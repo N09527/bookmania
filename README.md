@@ -48,9 +48,9 @@ Yōkai 原有的線上來源擴充與追蹤服務仍在 App 中，但 Bookmania 
 - 需要 Android 8.0 以上。
 - 每個版本都附上各檔案的 SHA-256，可以用來核對檔案。
 
-### iOS 版（開發中）
+### iOS 版（測試版）
 
-iPhone 與 iPad 版在 [ios/](./ios) 開發中，需要 iOS／iPadOS 26 以上。1.1.0 起，[Releases](https://github.com/N09527/bookmania/releases) 的每個版本也附上 iOS 的測試版 `bookmania-v版本-ios-unsigned.ipa`。它沒有簽章，要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
+iPhone 與 iPad 版在 [ios/](./ios)，需要 iOS／iPadOS 26 以上。1.2.0 起包含設計說明列出的全部功能：文字閱讀器與排版設定、閱讀位置、書櫃與分類、圖片閱讀器、與 Android 版互通的備份；但還沒有在實機上測試過。1.1.0 起，[Releases](https://github.com/N09527/bookmania/releases) 的每個版本也附上 iOS 的測試版 `bookmania-v版本-ios-unsigned.ipa`。它沒有簽章，要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
 
 ## 從原始碼建置
 
