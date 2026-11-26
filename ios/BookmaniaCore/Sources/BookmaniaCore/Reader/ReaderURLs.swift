@@ -157,3 +157,43 @@ public struct ShellSettings: Equatable, Sendable {
         return String(json[start ..< end])
     }
 }
+
+extension ShellSettings {
+    /// What the shell lays out with for `settings` (settingsJson on Android): the page's resolved writing mode and
+    /// page direction, the reader's colours, and the font: the book's own (null), a system family, or an imported
+    /// font by its URL. `importedFontURL` is nil when the chosen font no longer exists (deleted, or not restored
+    /// with a backup); the book's font is used then, as on Android.
+    public init(settings s: EbookSettings, vertical: Bool, rtl: Bool, theme: ReaderTheme, importedFontURL: String?) {
+        self.init(vertical: vertical, rtl: rtl)
+        columns = s.columns
+        switch s.font {
+        case EbookSettings.fontSans, EbookSettings.fontSerif: font = ["kind": s.font]
+        case EbookSettings.fontBook: font = nil
+        default: font = importedFontURL.map { ["kind": "imported", "url": $0] }
+        }
+        bold = s.bold
+        fontSize = s.fontSize
+        lineHeight = s.lineHeight
+        letterSpacing = s.letterSpacing
+        indent = s.indent
+        paragraphSpacing = s.paragraphSpacing
+        marginTop = s.marginTop
+        marginBottom = s.marginBottom
+        marginLeft = s.marginLeft
+        marginRight = s.marginRight
+        background = theme.backgroundHex
+        textColor = theme.textHex
+        dark = theme.dark
+    }
+}
+
+extension EbookSettings {
+    /// The writing mode of the page: the setting, or the book's own when it says "book" (resolveMode on Android).
+    public func vertical(bookVertical: Bool) -> Bool {
+        switch writingMode {
+        case EbookSettings.modeVertical: return true
+        case EbookSettings.modeHorizontal: return false
+        default: return bookVertical
+        }
+    }
+}

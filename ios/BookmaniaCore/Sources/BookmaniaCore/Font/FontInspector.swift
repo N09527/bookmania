@@ -19,7 +19,7 @@ public enum FontFormat: String, Sendable {
     public var fileExtension: String { rawValue }
 }
 
-public struct InvalidFontError: Error, Equatable {
+public struct InvalidFontError: Error, Equatable, Sendable {
     public let message: String
 }
 

@@ -15,7 +15,7 @@ public struct ImportedFont: Codable, Equatable, Identifiable, Sendable {
 
 /// Imported fonts live in the app's private files (`<directory>/<id>.<ttf|otf>`); the list is app state, stored
 /// as on Android under `__APP_STATE_ebook_fonts` (not in backups, like the files themselves).
-public final class FontStore {
+public final class FontStore: @unchecked Sendable {
     private let directory: URL
     private let store: PreferenceStore
     private static let listKey = "__APP_STATE_ebook_fonts"
@@ -26,7 +26,7 @@ public final class FontStore {
         self.store = store
     }
 
-    public struct Pending {
+    public struct Pending: Sendable {
         public let bytes: [UInt8]
         public let info: FontInfo
         public let name: String

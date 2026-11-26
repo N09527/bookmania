@@ -39,7 +39,7 @@ public struct BookKey: Equatable, Sendable {
 /// The three settings levels, stored with the preference keys of Android's EbookSettingsStore so they can travel in
 /// backups: global values as `pref_ebook_<key>`, per-work / per-file overrides as one JSON object each under
 /// `pref_ebook_override_<sha1 of the identity>`.
-public final class EbookSettingsStore {
+public final class EbookSettingsStore: @unchecked Sendable {
     private let store: PreferenceStore
 
     public init(_ store: PreferenceStore) { self.store = store }

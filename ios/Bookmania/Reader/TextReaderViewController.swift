@@ -1,38 +1,64 @@
 import BookmaniaCore
+import SwiftUI
 import UIKit
 import WebKit
 
-/// The text reader (EbookReaderActivity on Android, stage 2 scope): the shared shell lays out one book document in a
-/// WKWebView; this controller opens documents, turns pages with taps, swipes and a hardware keyboard, moves to the
-/// next or previous document at the ends, and shows the page number. Typesetting settings, two columns, page turn
-/// animations, positions and the table of contents come in later stages.
+/// The text reader (EbookReaderActivity on Android): the shared shell lays out one book document in a WKWebView; this
+/// controller opens documents, applies the typesetting settings, turns pages with taps, swipes and a hardware
+/// keyboard, moves to the next or previous document at the ends, and shows the page number. The settings panel, the
+/// fold's shadow and the input are in the extensions of this class.
 final class TextReaderViewController: UIViewController, WKNavigationDelegate {
-    private let chapter: LocalChapter
-    private let onClose: () -> Void
+    let chapter: LocalChapter
+    let onClose: () -> Void
+    let env = AppEnvironment.shared
 
-    private var webView: WKWebView!
-    private let schemeHandler = ReaderSchemeHandler()
-    private let touchLayer = UIView()
-    private let topBar = UIView()
-    private let bottomBar = UIView()
-    private let titleLabel = UILabel()
-    private let pageLabel = UILabel()
-    private let spinner = UIActivityIndicatorView(style: .large)
-    private let messageView = UIStackView()
+    var webView: WKWebView!
+    let schemeHandler = ReaderSchemeHandler()
+    /// The fold's shadow between two columns, over the page.
+    let gutterView = GutterShadowView()
+    let touchLayer = UIView()
+    let topBar = UIView()
+    let bottomBar = UIView()
+    let titleLabel = UILabel()
+    let pageLabel = UILabel()
+    let toolbarButtons = UIStackView()
+    let spinner = UIActivityIndicatorView(style: .large)
+    let messageView = UIStackView()
 
-    private var publication: Publication?
-    private var spine: [SpineItem] = []
-    private var spineIndex = 0
-    private var vertical = false
-    private var rtl = false
-    private var shellLoaded = false
-    private var busy = true
-    private var page = 0
-    private var pages = 1
-    private var columns = 1
-    private var chromeVisible = false
-    private var layoutTask: Task<Void, Never>?
-    private var turnTask: Task<Void, Never>?
+    var publication: Publication?
+    /// The whole spine, as on Android: saved positions use its indices; page turns only go through linear items.
+    var spine: [SpineItem] = []
+    var spineIndex = 0
+    lazy var bookKey = BookKey(chapter)
+    var settings = EbookSettings()
+    /// The book's own writing mode, used while the setting is "book".
+    var bookVertical = false
+    /// Resolved writing mode of the page.
+    var vertical = false
+    /// Whether the next page is on the left (taps, swipes and arrow keys follow it).
+    var rtl = false
+    var shellLoaded = false
+    var busy = true
+    var page = 0
+    var pages = 1
+    /// Pages shown side by side (2 with two columns).
+    var columns = 1
+    var chromeVisible = false
+    var layoutTask: Task<Void, Never>?
+    var turnTask: Task<Void, Never>?
+    var resizeTask: Task<Void, Never>?
+    /// Settings the shell lays out with now; a change lays the open document out again.
+    var appliedJSON: String?
+    var pendingRelayout = false
+    /// Where the shell puts the gap between two columns (CSS px = points of the web view), or nil with one column.
+    var gutterCSS: Double?
+    /// The largest left + right margins that keep two columns, when the settings ask for two here.
+    var marginMost: Int?
+
+    // The typesetting panel (TextReaderViewController+Settings).
+    var panelModel: EbookSettingsPanelModel?
+    var panelHost: UIHostingController<SettingsPanelContainer>?
+    var panelConstraints: [NSLayoutConstraint] = []
 
     init(chapter: LocalChapter, onClose: @escaping () -> Void) {
         self.chapter = chapter
@@ -50,19 +76,25 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
     override var prefersStatusBarHidden: Bool { !chromeVisible }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
 
-    // The reader takes the keyboard (the page keys below), not the web view.
+    // The reader takes the keyboard (the page keys), not the web view.
     override var canBecomeFirstResponder: Bool { true }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         becomeFirstResponder()
+        if env.readerPreferences.keepScreenOn { UIApplication.shared.isIdleTimerDisabled = true }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     // MARK: Setup
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = Theme.current(traitCollection).background
+        view.backgroundColor = backgroundColor()
 
         let config = WKWebViewConfiguration()
         config.setURLSchemeHandler(schemeHandler, forURLScheme: ReaderURLs.scheme)
@@ -82,6 +114,10 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         webView.allowsBackForwardNavigationGestures = false
         webView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(webView)
+        gutterView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(gutterView)
+        let fontStore = env.fontStore
+        schemeHandler.fontFile = { fontStore.file($0) }
 
         // All input goes to the native layer (the book frames are passive, as on Android).
         touchLayer.translatesAutoresizingMaskIntoConstraints = false
@@ -102,6 +138,10 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             webView.bottomAnchor.constraint(equalTo: guide.bottomAnchor),
             webView.leadingAnchor.constraint(equalTo: guide.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: guide.trailingAnchor),
+            gutterView.topAnchor.constraint(equalTo: webView.topAnchor),
+            gutterView.bottomAnchor.constraint(equalTo: webView.bottomAnchor),
+            gutterView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
+            gutterView.trailingAnchor.constraint(equalTo: webView.trailingAnchor),
             touchLayer.topAnchor.constraint(equalTo: view.topAnchor),
             touchLayer.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             touchLayer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -118,6 +158,10 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
         spinner.startAnimating()
+
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _: UITraitCollection) in
+            self.appearanceChanged()
+        }
 
         loadShell()
         openBook()
@@ -138,11 +182,18 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.font = .preferredFont(forTextStyle: .headline)
         titleLabel.text = chapter.fileTitle
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        toolbarButtons.axis = .horizontal
+        toolbarButtons.spacing = 4
+        toolbarButtons.translatesAutoresizingMaskIntoConstraints = false
+        toolbarButtons.isHidden = true // until a book is open
+        addToolbarButton("textformat.size", label: "Typesetting", action: #selector(settingsTapped))
         pageLabel.translatesAutoresizingMaskIntoConstraints = false
         pageLabel.font = .monospacedDigitSystemFont(ofSize: 15, weight: .regular)
         pageLabel.textAlignment = .center
         topBar.addSubview(close)
         topBar.addSubview(titleLabel)
+        topBar.addSubview(toolbarButtons)
         bottomBar.addSubview(pageLabel)
         let guide = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
@@ -155,8 +206,10 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             close.widthAnchor.constraint(equalToConstant: 44),
             close.heightAnchor.constraint(equalToConstant: 44),
             titleLabel.leadingAnchor.constraint(equalTo: close.trailingAnchor, constant: 4),
-            titleLabel.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -16),
+            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: toolbarButtons.leadingAnchor, constant: -8),
             titleLabel.centerYAnchor.constraint(equalTo: close.centerYAnchor),
+            toolbarButtons.trailingAnchor.constraint(equalTo: guide.trailingAnchor, constant: -8),
+            toolbarButtons.centerYAnchor.constraint(equalTo: close.centerYAnchor),
             bottomBar.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             bottomBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             bottomBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -164,6 +217,17 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             pageLabel.centerXAnchor.constraint(equalTo: bottomBar.centerXAnchor),
             pageLabel.topAnchor.constraint(equalTo: bottomBar.topAnchor, constant: 12),
         ])
+    }
+
+    func addToolbarButton(_ symbol: String, label: String, action: Selector) {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: symbol), for: .normal)
+        button.accessibilityLabel = NSLocalizedString(label, comment: "")
+        button.addTarget(self, action: action, for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.widthAnchor.constraint(equalToConstant: 44).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        toolbarButtons.addArrangedSubview(button)
     }
 
     private func setUpMessageView() {
@@ -218,18 +282,22 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
                         message: NSLocalizedString("comic_reader_later", comment: ""))
             return
         }
+        if publication.spine.isEmpty {
+            publication.close()
+            spinner.stopAnimating()
+            showMessage(title: NSLocalizedString("Cannot open this book", comment: ""),
+                        message: NSLocalizedString("ebook_no_content", comment: ""))
+            return
+        }
         self.publication = publication
         schemeHandler.publication = publication
-        spine = publication.spine.filter { $0.linear }
-        if spine.isEmpty { spine = publication.spine }
-        vertical = publication.writingModeHint == .vertical
-        switch publication.readingDirection {
-        case .rtl: rtl = true
-        case .ltr: rtl = false
-        case .default: rtl = vertical
-        }
+        spine = publication.spine
+        bookVertical = publication.writingModeHint == .vertical
+        settings = env.settingsStore.effective(bookKey)
+        resolveMode()
         if let title = publication.metadata.title { titleLabel.text = title }
-        if shellLoaded { openSpine(0, target: "'start'") }
+        toolbarButtons.isHidden = false
+        if shellLoaded { openInitial() }
     }
 
     private func bookFailed(_ error: Error) {
@@ -248,9 +316,12 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         }
     }
 
-    private func showMessage(title: String, message: String) {
+    func showMessage(title: String, message: String) {
         busy = true
+        closePanel()
         webView.isHidden = true
+        gutterView.show(nil)
+        toolbarButtons.isHidden = true
         messageView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         let titleView = UILabel()
         titleView.text = title
@@ -274,7 +345,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         shellLoaded = true
-        if publication != nil { openSpine(spineIndex, target: "'start'") }
+        if publication != nil { openInitial() }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -283,6 +354,12 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         shellFailed(error)
+    }
+
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        // The web content process crashed or was ended by the system; this web view shows nothing any more.
+        spinner.stopAnimating()
+        showMessage(title: NSLocalizedString("Cannot open this book", comment: ""), message: "WebKit content process ended")
     }
 
     private func shellFailed(_ error: Error) {
@@ -303,34 +380,45 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         return navigationAction.targetFrame == nil ? .cancel : .allow
     }
 
-    private func settingsJSON() -> String {
-        let theme = Theme.current(traitCollection)
-        var s = ShellSettings(vertical: vertical, rtl: rtl)
-        s.background = theme.backgroundHex
-        s.textColor = theme.textHex
-        s.dark = theme.dark
-        return s.json()
+    // MARK: Navigation
+
+    /// Indices of the linear spine items (page turns go through these); all items when none is linear.
+    func linearIndices() -> [Int] {
+        let all = spine.indices.filter { spine[$0].linear }
+        return all.isEmpty ? Array(spine.indices) : all
     }
 
-    private func openSpine(_ index: Int, target: String) {
+    /// Opens the first document (a saved position comes with the reading progress, iOS stage 3).
+    func openInitial() {
+        openSpine(linearIndices().first ?? 0, target: "'start'")
+    }
+
+    func openSpine(_ index: Int, target: String) {
         guard index >= 0, index < spine.count else { return }
         spineIndex = index
         busy = true
+        pendingRelayout = false
         let url = ReaderURLs.bookURL(spine[index].href)
-        let script = "String(window.__reader.open(\(ShellSettings.jsString(url)), \(settingsJSON()), \(target)))"
+        let json = settingsJSON()
+        appliedJSON = json
+        let script = "String(window.__reader.open(\(ShellSettings.jsString(url)), \(json), \(target)))"
         webView.evaluateJavaScript(script, completionHandler: nil)
         awaitLayout()
     }
 
-    private struct Status {
+    struct Status {
         var ready: Bool
         var error: String?
         var page: Int
         var pages: Int
         var cols: Int
+        var seq: Int
+        var gutter: Double?
+        var twoWanted: Bool
+        var marginMost: Int?
     }
 
-    private func eval(_ script: String) async -> String? {
+    func eval(_ script: String) async -> String? {
         await withCheckedContinuation { continuation in
             webView.evaluateJavaScript(script) { result, _ in
                 continuation.resume(returning: result as? String)
@@ -338,7 +426,7 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         }
     }
 
-    private func status() async -> Status? {
+    func status() async -> Status? {
         guard let text = await eval("JSON.stringify(window.__reader ? window.__reader.status() : null)"),
               let object = try? JSONSerialization.jsonObject(with: Data(text.utf8)) as? [String: Any] else { return nil }
         return Status(
@@ -346,12 +434,29 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
             error: object["error"] as? String,
             page: object["page"] as? Int ?? 0,
             pages: object["pages"] as? Int ?? 1,
-            cols: object["cols"] as? Int ?? 1
+            cols: object["cols"] as? Int ?? 1,
+            seq: object["seq"] as? Int ?? -1,
+            gutter: (object["gutter"] as? NSNumber)?.doubleValue,
+            twoWanted: object["twoWanted"] as? Bool ?? false,
+            marginMost: (object["marginMost"] as? NSNumber)?.intValue
         )
     }
 
+    /// Takes the page, the page count, the columns and the gap between them from a finished layout.
+    func apply(_ s: Status) {
+        page = s.page
+        pages = max(1, s.pages)
+        columns = max(1, s.cols)
+        gutterCSS = s.gutter.flatMap { $0.isFinite ? $0 : nil }
+        // The panel limits the side margins to what keeps two columns on this screen.
+        marginMost = s.twoWanted ? s.marginMost.flatMap { $0 >= 0 ? $0 : nil } : nil
+        showGutter()
+        updatePageLabel()
+        if let model = panelModel, model.marginMost != marginMost { model.marginMost = marginMost }
+    }
+
     /// Polls the shell until the current layout is finished, then shows the page.
-    private func awaitLayout() {
+    func awaitLayout() {
         layoutTask?.cancel()
         layoutTask = Task { [weak self] in
             let started = Date()
@@ -373,16 +478,20 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
                                      message: NSLocalizedString("layout_timeout", comment: ""))
                     return
                 }
+                if elapsed > 0.3 { self.spinner.startAnimating() }
                 if let s = current, s.ready {
                     self.spinner.stopAnimating()
                     self.busy = false
                     if let error = s.error {
                         self.showMessage(title: NSLocalizedString("Cannot open this book", comment: ""), message: error)
+                        return
+                    }
+                    self.apply(s)
+                    if self.pendingRelayout {
+                        self.pendingRelayout = false
+                        self.applySettings()
                     } else {
-                        self.page = s.page
-                        self.pages = max(1, s.pages)
-                        self.columns = max(1, s.cols)
-                        self.updatePageLabel()
+                        self.layoutFinished()
                     }
                     if !self.isFirstResponder { self.becomeFirstResponder() }
                     return
@@ -392,97 +501,42 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         }
     }
 
-    private func updatePageLabel() {
-        let shown = min(pages, page + 1)
-        pageLabel.text = "\(shown) / \(pages)    \(spineIndex + 1) / \(spine.count)"
-    }
+    /// A layout of the open document is shown (an open, a relayout, a page turn to another document).
+    func layoutFinished() {}
 
-    // MARK: Input
-
-    @objc private func tapped(_ gesture: UITapGestureRecognizer) {
-        let x = gesture.location(in: touchLayer).x
-        let width = touchLayer.bounds.width
-        if chromeVisible {
-            setChrome(visible: false)
-        } else if x < width / 3 {
-            turn(forward: rtl)
-        } else if x > width * 2 / 3 {
-            turn(forward: !rtl)
-        } else {
-            setChrome(visible: true)
-        }
-    }
-
-    @objc private func swiped(_ gesture: UISwipeGestureRecognizer) {
-        // Pages move with the finger: a swipe towards the side where reading continues turns forward.
-        let towardsLeft = gesture.direction == .left
-        turn(forward: rtl ? !towardsLeft : towardsLeft)
-    }
-
-    /// The page keys of Android's reader (dispatchKeyEvent): left and right follow the page direction (with
-    /// right-to-left pages the left key turns forward), space and Page Down turn forward, Page Up back.
-    private lazy var pageKeyCommands: [UIKeyCommand] = [
-        UIKeyCommand.inputLeftArrow, UIKeyCommand.inputRightArrow, " ", UIKeyCommand.inputPageDown, UIKeyCommand.inputPageUp,
-    ].map { input in
-        let command = UIKeyCommand(input: input, modifierFlags: [], action: #selector(pageKey(_:)))
-        command.wantsPriorityOverSystemBehavior = true
-        command.allowsAutomaticMirroring = false // the book's direction decides, not the interface's
-        return command
-    }
-
-    override var keyCommands: [UIKeyCommand]? { pageKeyCommands }
-
-    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        // As on Android, the page keys are left to the system while the bars or a message are shown.
-        if action == #selector(pageKey(_:)) { return !chromeVisible && messageView.isHidden }
-        return super.canPerformAction(action, withSender: sender)
-    }
-
-    @objc private func pageKey(_ command: UIKeyCommand) {
-        guard !chromeVisible, messageView.isHidden else { return }
-        switch command.input ?? "" {
-        case UIKeyCommand.inputLeftArrow: turn(forward: rtl)
-        case UIKeyCommand.inputRightArrow: turn(forward: !rtl)
-        case UIKeyCommand.inputPageUp: turn(forward: false)
-        default: turn(forward: true) // space, Page Down
-        }
-    }
-
-    private func turn(forward: Bool) {
-        guard !busy, publication != nil else { return }
-        // Turns run one after another and check `busy` again before they start (Android: turnLock), so quick taps
-        // or a held key cannot open the next document twice and skip one.
-        let previous = turnTask
-        turnTask = Task { [weak self] in
-            await previous?.value
-            guard let self, !self.busy else { return }
-            let result = await self.eval(forward ? "String(window.__reader.next())" : "String(window.__reader.prev())")
-            switch result {
-            case "ok":
-                if let s = await self.status() {
-                    self.page = s.page
-                    self.pages = max(1, s.pages)
-                    self.updatePageLabel()
+    /// Waits for the relayout the shell starts by itself after the viewport changed (its layout counter `seq` moves
+    /// on), then takes the new page numbers. If no new layout shows up within 15 seconds, the current one is taken.
+    func refreshAfterResize() {
+        guard publication != nil, shellLoaded, messageView.isHidden else { return }
+        resizeTask?.cancel()
+        gutterView.show(nil) // until the new layout tells where the columns are
+        resizeTask = Task { [weak self] in
+            guard let self else { return }
+            let before = await self.status()?.seq ?? -1
+            let start = Date()
+            while !Task.isCancelled, Date().timeIntervalSince(start) < 60 {
+                try? await Task.sleep(nanoseconds: 200_000_000)
+                if Task.isCancelled || self.busy { continue }
+                guard let s = await self.status() else { continue }
+                if s.error != nil { return }
+                if s.ready && (s.seq != before || Date().timeIntervalSince(start) > 15) {
+                    self.apply(s)
+                    self.layoutFinished()
+                    return
                 }
-            case "end" where forward:
-                if self.spineIndex + 1 < self.spine.count {
-                    self.openSpine(self.spineIndex + 1, target: "'start'")
-                } else {
-                    self.toast(NSLocalizedString("End of the book", comment: ""))
-                }
-            case "start" where !forward:
-                if self.spineIndex > 0 {
-                    self.openSpine(self.spineIndex - 1, target: "'end'")
-                } else {
-                    self.toast(NSLocalizedString("Beginning of the book", comment: ""))
-                }
-            default:
-                break
             }
         }
     }
 
-    private func setChrome(visible: Bool) {
+    func updatePageLabel() {
+        // Two columns: both pages of the spread, e.g. "3–4/35" (the last spread can hold one page).
+        let shown = columns > 1 && page + 2 <= pages ? "\(page + 1)–\(page + 2)" : "\(page + 1)"
+        pageLabel.text = "\(spineIndex + 1)/\(spine.count) · \(shown)/\(pages)"
+    }
+
+    // MARK: Chrome
+
+    func setChrome(visible: Bool) {
         chromeVisible = visible
         UIView.animate(withDuration: 0.2) {
             self.topBar.alpha = visible ? 1 : 0
@@ -495,9 +549,11 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         }
     }
 
-    private func toast(_ text: String) {
+    func toast(_ text: String) {
         let label = PaddedLabel()
         label.text = text
+        label.numberOfLines = 0
+        label.textAlignment = .center
         label.textColor = .white
         label.backgroundColor = UIColor.black.withAlphaComponent(0.75)
         label.layer.cornerRadius = 10
@@ -506,17 +562,19 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
         view.addSubview(label)
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.widthAnchor.constraint(lessThanOrEqualTo: view.widthAnchor, constant: -48),
             label.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60),
         ])
-        UIView.animate(withDuration: 0.3, delay: 1.6, options: []) {
+        UIView.animate(withDuration: 0.3, delay: 1.8, options: []) {
             label.alpha = 0
         } completion: { _ in
             label.removeFromSuperview()
         }
     }
 
-    @objc private func closeTapped() {
+    @objc func closeTapped() {
         layoutTask?.cancel()
+        resizeTask?.cancel()
         onClose()
     }
 
@@ -524,41 +582,27 @@ final class TextReaderViewController: UIViewController, WKNavigationDelegate {
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        coordinator.animate(alongsideTransition: nil) { [weak self] _ in
-            // The shell relayouts itself on resize; wait for it, then show the new page numbers.
-            guard let self, self.publication != nil, self.shellLoaded else { return }
-            self.busy = true
-            Task { [weak self] in
-                try? await Task.sleep(nanoseconds: 300_000_000)
-                self?.awaitLayout()
-            }
-        }
+        // The shell lays the document out again by itself when the viewport changes; page, page count and columns
+        // change with it, so they are read again once it is done.
+        refreshAfterResize()
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            self?.layoutPanel(for: size)
+        })
     }
 
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-        guard previousTraitCollection?.userInterfaceStyle != traitCollection.userInterfaceStyle else { return }
-        view.backgroundColor = Theme.current(traitCollection).background
-        guard publication != nil, shellLoaded, !busy else { return }
-        busy = true
-        webView.evaluateJavaScript("String(window.__reader.relayout(\(settingsJSON())))", completionHandler: nil)
-        awaitLayout()
+    private func appearanceChanged() {
+        view.backgroundColor = backgroundColor()
+        applySettings()
     }
-}
 
-/// Reader colours: the light theme, or the dark one of the Android reader (rgb 32,33,37 with #E0E0E0 text).
-struct Theme {
-    let background: UIColor
-    let backgroundHex: String
-    let textHex: String
-    let dark: Bool
+    /// The reader's colours for the setting and the system appearance.
+    func readerTheme() -> ReaderTheme {
+        ReaderTheme.resolve(setting: env.readerPreferences.readerTheme, systemDark: traitCollection.userInterfaceStyle == .dark)
+    }
 
-    static func current(_ traits: UITraitCollection) -> Theme {
-        if traits.userInterfaceStyle == .dark {
-            return Theme(background: UIColor(red: 32 / 255, green: 33 / 255, blue: 37 / 255, alpha: 1),
-                         backgroundHex: "#202125", textHex: "#E0E0E0", dark: true)
-        }
-        return Theme(background: .white, backgroundHex: "#FFFFFF", textHex: "#000000", dark: false)
+    func backgroundColor() -> UIColor {
+        let (r, g, b) = ReaderTheme.components(readerTheme().backgroundHex)
+        return UIColor(red: r, green: g, blue: b, alpha: 1)
     }
 }
 
@@ -571,5 +615,10 @@ final class PaddedLabel: UILabel {
     override var intrinsicContentSize: CGSize {
         let size = super.intrinsicContentSize
         return CGSize(width: size.width + 32, height: size.height + 16)
+    }
+
+    override func textRect(forBounds bounds: CGRect, limitedToNumberOfLines numberOfLines: Int) -> CGRect {
+        let inner = super.textRect(forBounds: bounds.inset(by: UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)), limitedToNumberOfLines: numberOfLines)
+        return inner.inset(by: UIEdgeInsets(top: -8, left: -16, bottom: -8, right: -16))
     }
 }
