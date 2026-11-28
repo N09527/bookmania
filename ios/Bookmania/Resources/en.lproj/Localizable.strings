@@ -52,3 +52,12 @@
 "sync_conflicts" = "Different from the file on the server (left as they are): %@";
 "sync_file_problems" = "Book files not moved: %1$lld (%2$@)";
 "sync_keychain_failed" = "The password could not be saved in the keychain.";
+
+/* The extension runtime's test (More › Extension runtime). */
+"extension_runtime_help" = "Tests the Java VM that is to run extension sources (Tachiyomi and Mihon extensions): it starts, with the extension host, which answers. Starting takes a while, and the VM stays in memory until the app is closed. No extension is installed or run here.";
+"extension_runtime_not_included" = "This build of the app does not contain the extension runtime.";
+"extension_runtime_not_running" = "The extension runtime is not running.";
+"extension_runtime_bad_reply" = "The extension host gave an answer that cannot be read.";
+"extension_runtime_started" = "Started in %.1f s.";
+"extension_runtime_hello" = "The host answered in %.1f s:";
+"extension_runtime_memory" = "Memory: %.0f MB before starting, %.0f MB now.";

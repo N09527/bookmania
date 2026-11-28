@@ -1,0 +1,7 @@
+// The embedded Java VM of the extension sources (docs/extensions-and-sync/design.md, E-1). When the app is built with
+// the package of .github/workflows/ios-jvm.yml (restored into Vendor/oneechan-runtime/build/embedded), these add its
+// link flags and turn the app's VM code on (BM_HAS_JVM). Without the package they add nothing.
+#include? "../Vendor/oneechan-runtime/build/embedded/jvm.xcconfig"
+#include? "../Vendor/oneechan-runtime/build/embedded/bookmania-jvm.xcconfig"
+OTHER_LDFLAGS = $(inherited) $(JVM_LDFLAGS)
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) $(BM_JVM_DEFINITIONS)

@@ -262,3 +262,18 @@
 "sync_conflicts" = "與伺服器上的檔案不同、沒有覆蓋：%@";
 "sync_file_problems" = "沒有傳送的書檔：%1$lld 個（%2$@）";
 "sync_keychain_failed" = "無法把密碼存進鑰匙圈。";
+
+/* 擴充執行環境的測試（更多 › 擴充執行環境）。 */
+"Extension runtime" = "擴充執行環境";
+"Included in this build" = "這個版本包含";
+"Yes" = "是";
+"No" = "否";
+"Start and say hello" = "啟動並測試";
+"Result" = "結果";
+"extension_runtime_help" = "測試將來執行擴充來源（Tachiyomi 與 Mihon 的擴充）的 Java 虛擬機：啟動虛擬機與擴充主機，並由主機回應。啟動需要一段時間，啟動後虛擬機會留在記憶體中，直到 App 關閉。這裡不會安裝或執行任何擴充。";
+"extension_runtime_not_included" = "這個版本的 App 不包含擴充執行環境。";
+"extension_runtime_not_running" = "擴充執行環境沒有在執行。";
+"extension_runtime_bad_reply" = "擴充主機的回應無法讀取。";
+"extension_runtime_started" = "啟動用了 %.1f 秒。";
+"extension_runtime_hello" = "主機在 %.1f 秒內回應：";
+"extension_runtime_memory" = "記憶體：啟動前 %.0f MB，現在 %.0f MB。";

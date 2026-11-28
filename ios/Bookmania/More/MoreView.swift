@@ -1,7 +1,8 @@
 import BookmaniaCore
 import SwiftUI
 
-/// More (Android's "more" tab): incognito mode, settings, statistics, backup, the WebDAV sync, about.
+/// More (Android's "more" tab): incognito mode, settings, statistics, backup, the WebDAV sync, the extension
+/// runtime's test, about.
 struct MoreView: View {
     @EnvironmentObject private var library: LibraryModel
     @State private var incognito = AppEnvironment.shared.readerPreferences.incognitoMode
@@ -51,6 +52,11 @@ struct MoreView: View {
                         SyncSettingsView()
                     } label: {
                         Label("WebDAV sync", systemImage: "arrow.triangle.2.circlepath.icloud")
+                    }
+                    NavigationLink {
+                        ExtensionRuntimeView()
+                    } label: {
+                        Label("Extension runtime", systemImage: "puzzlepiece.extension")
                     }
                 }
                 Section("About") {

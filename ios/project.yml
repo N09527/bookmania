@@ -36,6 +36,23 @@ targets:
         buildPhase: resources
     dependencies:
       - package: BookmaniaCore
+    # The embedded Java VM, when the build has its package (Config/JVM.xcconfig).
+    configFiles:
+      Debug: Config/JVM.xcconfig
+      Release: Config/JVM.xcconfig
+    postBuildScripts:
+      - name: Bundle the extension runtime
+        basedOnDependencyAnalysis: false
+        script: |
+          # The embedded Java VM's java.home, the extension host and their licence files (E-1), when this build has
+          # the runtime's package (.github/workflows/ios-jvm.yml); else nothing.
+          src="${SRCROOT}/Vendor/oneechan-runtime/build/embedded"
+          dst="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ExtensionRuntime"
+          rm -rf "$dst"
+          if [ -f "$src/bookmania-jvm.xcconfig" ] && [ -d "$src/jre" ] && [ -f "$src/host/oneechan-host.jar" ]; then
+            mkdir -p "$dst"
+            cp -R "$src/jre" "$src/host" "$src/licenses" "$dst/"
+          fi
     info:
       path: Bookmania/Info.plist
       properties:
@@ -65,6 +82,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.n09527.bookmania
         TARGETED_DEVICE_FAMILY: "1,2"
+        SWIFT_OBJC_BRIDGING_HEADER: Bookmania/Extensions/Runtime/Bookmania-Bridging-Header.h
+        # The script that bundles the extension runtime reads the runtime's package outside the target's files.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
 schemes:

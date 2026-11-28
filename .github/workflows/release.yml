@@ -170,6 +170,24 @@ jobs:
           brew install xcodegen
           xcodegen --version
 
+      - name: Cache key of the embedded JVM
+        id: jvm
+        run: echo "key=$(.github/scripts/ios-embedded-jvm-key.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore the embedded JVM (built by the iOS JVM workflow)
+        uses: actions/cache/restore@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ios/Vendor/oneechan-runtime/build/embedded
+          key: ${{ steps.jvm.outputs.key }}
+
+      - name: Report whether the app gets the embedded JVM
+        run: |
+          if [ -f ios/Vendor/oneechan-runtime/build/embedded/bookmania-jvm.xcconfig ]; then
+            echo "::notice title=Embedded JVM::included ($(du -sh ios/Vendor/oneechan-runtime/build/embedded | cut -f1))"
+          else
+            echo "::warning title=Embedded JVM::not included: no package for ${{ steps.jvm.outputs.key }} yet (the iOS JVM workflow builds it)"
+          fi
+
       - name: Generate the Xcode project
         working-directory: ios
         run: xcodegen generate
