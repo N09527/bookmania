@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "device": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b",
+  "written": 1764300000000,
+  "works": {
+    "0:直排測試書 EPUB": {"favorite": true, "added": 1700000000000, "categories": ["小說"], "chapterFlags": 4097, "viewerFlags": null, "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+    "2499283573021220255:/manga/1": {"favorite": false, "t": 1764200000000, "d": "0a9b8c7d-6e5f-4a3b-2c1d-0e9f8a7b6c5d"}
+  },
+  "categories": {
+    "小說": {"order": 0, "flags": 0, "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+    "舊分類": {"deleted": true, "t": 1764300000500, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"}
+  },
+  "settings": {
+    "pref_ebook_fontSize": {"type": "string", "value": "24", "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+    "pref_reader_theme_key": {"type": "int", "value": 4, "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+    "pref_ebook_gutter_shadow": {"type": "bool", "value": false, "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+    "pref_ebook_override_0123": {"type": "string", "value": null, "t": 1764300000900, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"}
+  },
+  "progress": {"0:直排測試書 EPUB": 1764300000000},
+  "a field from a newer version": {"ignored": true}
+}

@@ -1,0 +1,1141 @@
+[
+    {
+        "name": "first sync: the libraries are joined, the server's settings win",
+        "device": "b",
+        "now": 5000,
+        "library": {
+            "snapshot": {
+                "works": {
+                    "0:A": {
+                        "favorite": true,
+                        "added": 100,
+                        "categories": [
+                            "x"
+                        ],
+                        "chapterFlags": 0
+                    },
+                    "0:B": {
+                        "favorite": false,
+                        "added": 0,
+                        "categories": [],
+                        "chapterFlags": 0
+                    }
+                },
+                "categories": {
+                    "x": {
+                        "order": 0,
+                        "flags": 0
+                    }
+                },
+                "settings": {
+                    "k1": {
+                        "type": "int",
+                        "value": 1
+                    }
+                }
+            },
+            "baseline": {
+                "library": {
+                    "works": {},
+                    "categories": {},
+                    "settings": {}
+                },
+                "applied": [],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 300,
+                    "works": {
+                        "0:B": {
+                            "favorite": true,
+                            "added": 200,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 300,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {
+                        "y": {
+                            "order": 1,
+                            "flags": 0,
+                            "deleted": false,
+                            "t": 300,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {
+                        "k1": {
+                            "type": "int",
+                            "value": 2,
+                            "t": 300,
+                            "d": "a"
+                        },
+                        "k2": {
+                            "type": "bool",
+                            "value": true,
+                            "t": 300,
+                            "d": "a"
+                        }
+                    },
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {
+                        "0:A": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [
+                                "x"
+                            ],
+                            "chapterFlags": 0,
+                            "t": 100,
+                            "d": "b"
+                        },
+                        "0:B": {
+                            "favorite": true,
+                            "added": 200,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 300,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": false,
+                            "t": 5000,
+                            "d": "b"
+                        },
+                        "y": {
+                            "order": 1,
+                            "flags": 0,
+                            "deleted": false,
+                            "t": 300,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {
+                        "k1": {
+                            "type": "int",
+                            "value": 2,
+                            "t": 300,
+                            "d": "a"
+                        },
+                        "k2": {
+                            "type": "bool",
+                            "value": true,
+                            "t": 300,
+                            "d": "a"
+                        }
+                    }
+                },
+                "changes": {
+                    "works": {
+                        "0:B": {
+                            "favorite": true,
+                            "added": 200,
+                            "categories": [],
+                            "chapterFlags": 0
+                        }
+                    },
+                    "categories": {
+                        "y": {
+                            "order": 1,
+                            "flags": 0
+                        }
+                    },
+                    "deletedCategories": [],
+                    "settings": {
+                        "k1": {
+                            "type": "int",
+                            "value": 2
+                        },
+                        "k2": {
+                            "type": "bool",
+                            "value": true
+                        }
+                    }
+                },
+                "equal": [
+                    "c:x",
+                    "w:0:A"
+                ]
+            }
+        }
+    },
+    {
+        "name": "a change made here after the last sync wins",
+        "device": "b",
+        "now": 9000,
+        "library": {
+            "snapshot": {
+                "works": {
+                    "0:A": {
+                        "favorite": false,
+                        "added": 0,
+                        "categories": [],
+                        "chapterFlags": 0
+                    }
+                },
+                "categories": {},
+                "settings": {}
+            },
+            "baseline": {
+                "library": {
+                    "works": {
+                        "0:A": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 1000,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {}
+                },
+                "applied": [
+                    "w:0:A"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 1000,
+                    "works": {
+                        "0:A": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 1000,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {},
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {
+                        "0:A": {
+                            "favorite": false,
+                            "added": 0,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 9000,
+                            "d": "b"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {}
+                },
+                "changes": {
+                    "works": {},
+                    "categories": {},
+                    "deletedCategories": [],
+                    "settings": {}
+                },
+                "equal": [
+                    "w:0:A"
+                ]
+            }
+        }
+    },
+    {
+        "name": "a work added again here takes its added time, so a later removal elsewhere still wins",
+        "device": "b",
+        "now": 9000,
+        "library": {
+            "snapshot": {
+                "works": {
+                    "0:A": {
+                        "favorite": true,
+                        "added": 7000,
+                        "categories": [],
+                        "chapterFlags": 0
+                    }
+                },
+                "categories": {},
+                "settings": {}
+            },
+            "baseline": {
+                "library": {
+                    "works": {
+                        "0:A": {
+                            "favorite": false,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 5000,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {}
+                },
+                "applied": [
+                    "w:0:A"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 8000,
+                    "works": {
+                        "0:A": {
+                            "favorite": false,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 8000,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {},
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {
+                        "0:A": {
+                            "favorite": false,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 8000,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {}
+                },
+                "changes": {
+                    "works": {
+                        "0:A": {
+                            "favorite": false,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0
+                        }
+                    },
+                    "categories": {},
+                    "deletedCategories": [],
+                    "settings": {}
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "a category deleted here becomes a deletion mark",
+        "device": "a",
+        "now": 8000,
+        "library": {
+            "snapshot": {
+                "works": {},
+                "categories": {},
+                "settings": {}
+            },
+            "baseline": {
+                "library": {
+                    "works": {},
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": false,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {}
+                },
+                "applied": [
+                    "c:x"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "b",
+                    "written": 100,
+                    "works": {},
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": false,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {},
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {},
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": true,
+                            "t": 8000,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {}
+                },
+                "changes": {
+                    "works": {},
+                    "categories": {},
+                    "deletedCategories": [],
+                    "settings": {}
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "a category deleted elsewhere is deleted here",
+        "device": "b",
+        "now": 9000,
+        "library": {
+            "snapshot": {
+                "works": {},
+                "categories": {
+                    "x": {
+                        "order": 0,
+                        "flags": 0
+                    }
+                },
+                "settings": {}
+            },
+            "baseline": {
+                "library": {
+                    "works": {},
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": false,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {}
+                },
+                "applied": [
+                    "c:x"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 8000,
+                    "works": {},
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": true,
+                            "t": 8000,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {},
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {},
+                    "categories": {
+                        "x": {
+                            "order": 0,
+                            "flags": 0,
+                            "deleted": true,
+                            "t": 8000,
+                            "d": "a"
+                        }
+                    },
+                    "settings": {}
+                },
+                "changes": {
+                    "works": {},
+                    "categories": {},
+                    "deletedCategories": [
+                        "x"
+                    ],
+                    "settings": {}
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "a setting cleared here is cleared everywhere",
+        "device": "a",
+        "now": 6000,
+        "library": {
+            "snapshot": {
+                "works": {},
+                "categories": {},
+                "settings": {}
+            },
+            "baseline": {
+                "library": {
+                    "works": {},
+                    "categories": {},
+                    "settings": {
+                        "k": {
+                            "type": "int",
+                            "value": 3,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    }
+                },
+                "applied": [
+                    "s:k"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "b",
+                    "written": 100,
+                    "works": {},
+                    "categories": {},
+                    "settings": {
+                        "k": {
+                            "type": "int",
+                            "value": 3,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {},
+                    "categories": {},
+                    "settings": {
+                        "k": {
+                            "type": "int",
+                            "t": 6000,
+                            "d": "a"
+                        }
+                    }
+                },
+                "changes": {
+                    "works": {},
+                    "categories": {},
+                    "deletedCategories": [],
+                    "settings": {}
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "works this device cannot have are kept",
+        "device": "b",
+        "now": 5000,
+        "library": {
+            "snapshot": {
+                "works": {
+                    "0:A": {
+                        "favorite": true,
+                        "added": 50,
+                        "categories": [],
+                        "chapterFlags": 0
+                    }
+                },
+                "categories": {},
+                "settings": {}
+            },
+            "baseline": {
+                "library": {
+                    "works": {
+                        "123:/m/1": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {}
+                },
+                "applied": [
+                    "w:0:A"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 100,
+                    "works": {
+                        "123:/m/1": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {},
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {
+                        "0:A": {
+                            "favorite": true,
+                            "added": 50,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 50,
+                            "d": "b"
+                        },
+                        "123:/m/1": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0,
+                            "t": 100,
+                            "d": "a"
+                        }
+                    },
+                    "categories": {},
+                    "settings": {}
+                },
+                "changes": {
+                    "works": {
+                        "123:/m/1": {
+                            "favorite": true,
+                            "added": 100,
+                            "categories": [],
+                            "chapterFlags": 0
+                        }
+                    },
+                    "categories": {},
+                    "deletedCategories": [],
+                    "settings": {}
+                },
+                "equal": [
+                    "w:0:A"
+                ]
+            }
+        }
+    },
+    {
+        "name": "equal times: the larger device id wins",
+        "device": "a",
+        "now": 5000,
+        "library": {
+            "snapshot": {
+                "works": {},
+                "categories": {},
+                "settings": {
+                    "k": {
+                        "type": "string",
+                        "value": "mine"
+                    }
+                }
+            },
+            "baseline": {
+                "library": {
+                    "works": {},
+                    "categories": {},
+                    "settings": {
+                        "k": {
+                            "type": "string",
+                            "value": "old",
+                            "t": 10,
+                            "d": "a"
+                        }
+                    }
+                },
+                "applied": [
+                    "s:k"
+                ],
+                "seen": {},
+                "ownProgress": {},
+                "uploadedFiles": [],
+                "pending": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "b",
+                    "written": 5000,
+                    "works": {},
+                    "categories": {},
+                    "settings": {
+                        "k": {
+                            "type": "string",
+                            "value": "theirs",
+                            "t": 5000,
+                            "d": "b"
+                        }
+                    },
+                    "progress": {}
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "works": {},
+                    "categories": {},
+                    "settings": {
+                        "k": {
+                            "type": "string",
+                            "value": "theirs",
+                            "t": 5000,
+                            "d": "b"
+                        }
+                    }
+                },
+                "changes": {
+                    "works": {},
+                    "categories": {},
+                    "deletedCategories": [],
+                    "settings": {
+                        "k": {
+                            "type": "string",
+                            "value": "theirs"
+                        }
+                    }
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "an offline read here does not override a later read elsewhere",
+        "device": "b",
+        "now": 100000,
+        "progress": {
+            "snapshot": {
+                "chapters": {
+                    "W/c1": {
+                        "read": false,
+                        "page": 10,
+                        "left": 5,
+                        "bookmark": false,
+                        "lastRead": 2000,
+                        "duration": 60000
+                    }
+                }
+            },
+            "baseline": {
+                "chapters": {
+                    "W/c1": {
+                        "progress": {
+                            "read": false,
+                            "page": 5,
+                            "left": 10,
+                            "t": 1000,
+                            "d": "a"
+                        }
+                    }
+                },
+                "applied": [
+                    "W/c1|progress"
+                ]
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 3000,
+                    "work": "0:W",
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 40,
+                                "left": 0,
+                                "t": 3000,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 3000,
+                                "duration": 120000
+                            }
+                        }
+                    }
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 40,
+                                "left": 0,
+                                "t": 3000,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 3000,
+                                "duration": 120000
+                            }
+                        }
+                    }
+                },
+                "changes": {
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 40,
+                                "left": 0
+                            },
+                            "history": {
+                                "lastRead": 3000,
+                                "duration": 120000
+                            }
+                        }
+                    }
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "a later read here wins",
+        "device": "b",
+        "now": 100000,
+        "progress": {
+            "snapshot": {
+                "chapters": {
+                    "W/c1": {
+                        "read": false,
+                        "page": 50,
+                        "left": 1,
+                        "bookmark": false,
+                        "lastRead": 90000,
+                        "duration": 70000
+                    }
+                }
+            },
+            "baseline": {
+                "chapters": {
+                    "W/c1": {
+                        "progress": {
+                            "read": false,
+                            "page": 40,
+                            "left": 0,
+                            "t": 3000,
+                            "d": "a"
+                        },
+                        "history": {
+                            "lastRead": 3000,
+                            "duration": 60000
+                        }
+                    }
+                },
+                "applied": [
+                    "W/c1|progress"
+                ]
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 3000,
+                    "work": "0:W",
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 40,
+                                "left": 0,
+                                "t": 3000,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 3000,
+                                "duration": 60000
+                            }
+                        }
+                    }
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 50,
+                                "left": 1,
+                                "t": 90000,
+                                "d": "b"
+                            },
+                            "history": {
+                                "lastRead": 90000,
+                                "duration": 70000
+                            }
+                        }
+                    }
+                },
+                "changes": {
+                    "chapters": {}
+                },
+                "equal": [
+                    "W/c1|progress"
+                ]
+            }
+        }
+    },
+    {
+        "name": "first sync of a text book: the newest position",
+        "device": "b",
+        "now": 100000,
+        "progress": {
+            "snapshot": {
+                "chapters": {
+                    "W/c1": {
+                        "read": false,
+                        "page": 3,
+                        "left": 0,
+                        "bookmark": false,
+                        "locator": "{\"spine\":0,\"href\":\"a.xhtml\",\"updatedAt\":5000}",
+                        "lastRead": 5000,
+                        "duration": 0
+                    }
+                }
+            },
+            "baseline": {
+                "chapters": {},
+                "applied": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 7000,
+                    "work": "0:W",
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 9,
+                                "left": 2,
+                                "t": 7000,
+                                "d": "a"
+                            },
+                            "position": {
+                                "locator": "{\"spine\":1,\"href\":\"b.xhtml\",\"updatedAt\":7000}",
+                                "t": 7000,
+                                "d": "a"
+                            }
+                        }
+                    }
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 9,
+                                "left": 2,
+                                "t": 7000,
+                                "d": "a"
+                            },
+                            "position": {
+                                "locator": "{\"spine\":1,\"href\":\"b.xhtml\",\"updatedAt\":7000}",
+                                "t": 7000,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 5000,
+                                "duration": 0
+                            }
+                        }
+                    }
+                },
+                "changes": {
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 9,
+                                "left": 2
+                            },
+                            "position": {
+                                "locator": "{\"spine\":1,\"href\":\"b.xhtml\",\"updatedAt\":7000}"
+                            }
+                        }
+                    }
+                },
+                "equal": []
+            }
+        }
+    },
+    {
+        "name": "history takes the largest values; a bookmark of the first sync loses to a real change",
+        "device": "b",
+        "now": 100000,
+        "progress": {
+            "snapshot": {
+                "chapters": {
+                    "W/c1": {
+                        "read": false,
+                        "page": 0,
+                        "left": 0,
+                        "bookmark": true,
+                        "lastRead": 100,
+                        "duration": 50
+                    },
+                    "W/c2": {
+                        "read": false,
+                        "page": 0,
+                        "left": 0,
+                        "bookmark": false,
+                        "lastRead": 0,
+                        "duration": 0
+                    }
+                }
+            },
+            "baseline": {
+                "chapters": {},
+                "applied": []
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 500,
+                    "work": "0:W",
+                    "chapters": {
+                        "W/c1": {
+                            "bookmark": {
+                                "value": false,
+                                "t": 500,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 90,
+                                "duration": 80
+                            }
+                        },
+                        "W/c3": {
+                            "progress": {
+                                "read": true,
+                                "page": 0,
+                                "left": 0,
+                                "t": 400,
+                                "d": "a"
+                            }
+                        }
+                    }
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "chapters": {
+                        "W/c1": {
+                            "bookmark": {
+                                "value": false,
+                                "t": 500,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 100,
+                                "duration": 80
+                            }
+                        },
+                        "W/c3": {
+                            "progress": {
+                                "read": true,
+                                "page": 0,
+                                "left": 0,
+                                "t": 400,
+                                "d": "a"
+                            }
+                        }
+                    }
+                },
+                "changes": {
+                    "chapters": {
+                        "W/c1": {
+                            "bookmark": false,
+                            "history": {
+                                "lastRead": 100,
+                                "duration": 80
+                            }
+                        },
+                        "W/c3": {
+                            "progress": {
+                                "read": true,
+                                "page": 0,
+                                "left": 0
+                            }
+                        }
+                    }
+                },
+                "equal": []
+            }
+        }
+    }
+]

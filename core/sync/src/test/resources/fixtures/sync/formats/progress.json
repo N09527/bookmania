@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "device": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b",
+  "written": 1764300000000,
+  "work": "0:直排測試書 EPUB",
+  "chapters": {
+    "直排測試書 EPUB/zh-vertical.epub": {
+      "progress": {"read": false, "page": 12, "left": 30, "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+      "bookmark": {"value": true, "t": 1764200000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+      "position": {"locator": "{\"spine\":1,\"href\":\"OEBPS/text/ch02.xhtml\",\"location\":[55,0],\"text\":\"【第１３段】長一點的段落\",\"progression\":0.29,\"total\":0.43,\"chapterPage\":12,\"updatedAt\":1700000000000}", "t": 1764300000000, "d": "6f1c2b9e-3d4a-4e5f-8a7b-1c2d3e4f5a6b"},
+      "history": {"lastRead": 1764300000000, "duration": 120000}
+    },
+    "直排測試書 EPUB/zh-horizontal.epub": {
+      "progress": {"read": true, "t": 1764100000000, "d": "0a9b8c7d-6e5f-4a3b-2c1d-0e9f8a7b6c5d"},
+      "position": {"t": 1764100000000, "d": "0a9b8c7d-6e5f-4a3b-2c1d-0e9f8a7b6c5d"}
+    }
+  }
+}

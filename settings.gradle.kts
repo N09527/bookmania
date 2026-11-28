@@ -34,6 +34,7 @@ rootProject.name = "Yokai"
 include(":app")
 include(":core:archive")
 include(":core:ebook")
+include(":core:sync")
 include(":core:main")
 include(":data")
 include(":domain")
