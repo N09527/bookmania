@@ -111,7 +111,10 @@ public final class SyncEngine {
 
     // MARK: Library
 
-    public func syncLibrary() async throws -> LibraryResult {
+    /// Syncs the library and the settings, then the progress of works another device changed, of works this device
+    /// could not send, and of `libraryWorks` whose progress changed here (in the reader or not); finding that needs
+    /// no network.
+    public func syncLibrary(libraryWorks: Set<String> = []) async throws -> LibraryResult {
         try await ensureFolders()
         var newer: [String] = []
         var remotes: [Sync.LibraryFile] = []
@@ -142,9 +145,13 @@ public final class SyncEngine {
             for (work, written) in r.progress where written > (baseline.seen[r.device]?[work] ?? 0) { pull.insert(work) }
         }
         var works: [WorkResult] = []
-        for work in pull.union(baseline.pending).sorted() {
-            works.append(try await syncWork(work, push: baseline.pending.contains(work), refreshDevices: false))
+        for work in pull.union(baseline.pending).union(libraryWorks).sorted() {
+            let changedHere = hasLocalChanges(work)
+            if !pull.contains(work) && !baseline.pending.contains(work) && !changedHere { continue }
+            works.append(try await syncWork(work, push: baseline.pending.contains(work) || changedHere, refreshDevices: false, sendLibrary: false))
         }
+        // library.json once for all the works sent above, not once per work.
+        if !works.isEmpty { adapter.saveBaseline(try await upload(adapter.loadBaseline(), now: clock())) }
         // A progress file listed but missing must not be asked for again and again.
         if !pull.isEmpty {
             var b = adapter.loadBaseline()
@@ -179,9 +186,17 @@ public final class SyncEngine {
 
     // MARK: One work
 
+    /// Whether this device's chapters of `work` changed since the work's last sync (no network).
+    public func hasLocalChanges(_ work: String) -> Bool {
+        let base = adapter.loadWorkBaseline(work)
+        let local = SyncMerge.annotate(adapter.progressSnapshot(work), base, now: clock(), device: device.id)
+        return local.chapters != base.chapters
+    }
+
     /// Merges a work's progress with the other devices' and writes the result here. With `push` (leaving the reader),
-    /// this device's progress file and library.json are sent too; if that fails, the work is kept as pending.
-    public func syncWork(_ work: String, push: Bool, refreshDevices: Bool = true) async throws -> WorkResult {
+    /// this device's progress file and library.json are sent too; if that fails, the work is kept as pending. Without
+    /// `sendLibrary`, library.json is left to the caller (a library sync sends it once for many works).
+    public func syncWork(_ work: String, push: Bool, refreshDevices: Bool = true, sendLibrary: Bool = true) async throws -> WorkResult {
         do {
             try await ensureFolders()
             let name = SyncIds.progressFileName(work)
@@ -218,7 +233,7 @@ public final class SyncEngine {
                     uploaded = true
                 }
                 lib.pending.remove(work)
-                lib = try await upload(lib, now: now)
+                if sendLibrary { lib = try await upload(lib, now: now) }
             }
             adapter.saveWorkBaseline(work, nextBase)
             adapter.saveBaseline(lib)

@@ -104,7 +104,12 @@ class SyncEngine(
 
     // region Library
 
-    fun syncLibrary(): LibraryResult {
+    /**
+     * Syncs the library and the settings, then the progress of works another device changed, of works this device
+     * could not send, and of [libraryWorks] whose progress changed here (in the reader or not, e.g. marked as read in
+     * the library); finding that needs no network.
+     */
+    fun syncLibrary(libraryWorks: Collection<String> = emptyList()): LibraryResult {
         ensureFolders()
         val newer = mutableListOf<String>()
         val remotes = mutableListOf<LibraryFile>()
@@ -134,9 +139,13 @@ class SyncEngine(
             }
         }
         val works = mutableListOf<WorkResult>()
-        for (work in (pull + baseline.pending).toSortedSet()) {
-            works += syncWork(work, push = work in baseline.pending, refreshDevices = false)
+        for (work in (pull + baseline.pending + libraryWorks).toSortedSet()) {
+            val changedHere = hasLocalChanges(work)
+            if (work !in pull && work !in baseline.pending && !changedHere) continue
+            works += syncWork(work, push = work in baseline.pending || changedHere, refreshDevices = false, sendLibrary = false)
         }
+        // library.json once for all the works sent above, not once per work.
+        if (works.isNotEmpty()) adapter.saveBaseline(upload(adapter.loadBaseline(), clock()))
         // A progress file listed but missing must not be asked for again and again.
         if (pull.isNotEmpty()) {
             var b = adapter.loadBaseline()
@@ -175,11 +184,19 @@ class SyncEngine(
 
     // region One work
 
+    /** Whether this device's chapters of [work] changed since the work's last sync (no network). */
+    fun hasLocalChanges(work: String): Boolean {
+        val base = adapter.loadWorkBaseline(work)
+        val local = SyncMerge.annotate(adapter.progressSnapshot(work), base, clock(), device.id)
+        return local.chapters != base.chapters
+    }
+
     /**
      * Merges a work's progress with the other devices' and writes the result here. With [push] (leaving the reader),
-     * this device's progress file and library.json are sent too; if that fails, the work is kept as pending.
+     * this device's progress file and library.json are sent too; if that fails, the work is kept as pending. Without
+     * [sendLibrary], library.json is left to the caller (a library sync sends it once for many works).
      */
-    fun syncWork(work: String, push: Boolean, refreshDevices: Boolean = true): WorkResult {
+    fun syncWork(work: String, push: Boolean, refreshDevices: Boolean = true, sendLibrary: Boolean = true): WorkResult {
         try {
             ensureFolders()
             val name = SyncIds.progressFileName(work)
@@ -216,7 +233,8 @@ class SyncEngine(
                     lib = lib.copy(ownProgress = (lib.ownProgress + (work to now)).toSortedMap())
                     uploaded = true
                 }
-                lib = upload(lib.copy(pending = lib.pending - work), now)
+                lib = lib.copy(pending = lib.pending - work)
+                if (sendLibrary) lib = upload(lib, now)
             }
             adapter.saveWorkBaseline(work, nextBase)
             adapter.saveBaseline(lib)

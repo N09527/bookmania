@@ -190,6 +190,41 @@ import Testing
         #expect(try await padSync.syncLibrary().works.isEmpty)
     }
 
+    @Test func progressChangedOutsideTheReaderGoesWithTheLibrarySync() async throws {
+        phone.works[book] = Sync.WorkValue(favorite: true, added: 1)
+        phone.setChapter(book, ch1, Sync.ChapterValue(page: 12, lastRead: clock.now))
+        phone.setChapter(book, ch2, Sync.ChapterValue())
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        let name = SyncIds.progressFileName(book)
+        let path = "Bookmania/sync-v1/devices/\(phone.id)/progress/\(name)"
+        #expect(Sync.decode(Sync.ProgressFile.self, server.files[path])?.chapters[ch1]?.progress?.page == 12)
+        tick()
+        phone.setChapter(book, ch2, Sync.ChapterValue(read: true))
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        #expect(Sync.decode(Sync.ProgressFile.self, server.files[path])?.chapters[ch2]?.progress?.read == true)
+        tick()
+        let before = server.requests.count
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        #expect(!server.requests.dropFirst(before).contains { $0.contains("/progress/") })
+        pad.setChapter(book, ch2, Sync.ChapterValue())
+        _ = try await padSync.syncLibrary()
+        #expect(pad.chapter(book, ch2)?.read == true)
+    }
+
+    @Test func theFirstSyncOfALibraryReadBeforeSendsLibraryJSONTwiceNotOncePerWork() async throws {
+        let books = (1...3).map { SyncIds.localWorkKey("書\($0)") }
+        for b in books {
+            phone.works[b] = Sync.WorkValue(favorite: true, added: 1)
+            phone.setChapter(b, String(b.split(separator: ":", maxSplits: 1)[1]) + "/1.epub", Sync.ChapterValue(page: 5, lastRead: clock.now))
+        }
+        _ = try await phoneSync.syncLibrary(libraryWorks: Set(books))
+        let own = "Bookmania/sync-v1/devices/\(phone.id)/"
+        #expect(server.requests.filter { $0 == "PUT \(own)library.json" }.count == 2)
+        #expect(server.requests.filter { $0.hasPrefix("PUT \(own)progress/") }.count == 3)
+        let library = Sync.decode(Sync.LibraryFile.self, server.files[own + "library.json"])
+        #expect(Set(library?.progress.keys.map { $0 } ?? []) == Set(books))
+    }
+
     @Test func progressThatCouldNotBeSentIsSentLater() async throws {
         phone.works[book] = Sync.WorkValue(favorite: true, added: 1)
         phone.setChapter(book, ch1, Sync.ChapterValue())

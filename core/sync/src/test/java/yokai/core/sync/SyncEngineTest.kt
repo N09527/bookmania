@@ -123,6 +123,47 @@ class SyncEngineTest {
     }
 
     @Test
+    fun `progress changed outside the reader goes with the library sync`() {
+        // The phone had read before it turned the sync on; then a chapter is marked read in the library.
+        phone.works[book] = WorkValue(favorite = true, added = 1)
+        phone.setChapter(book, ch1, ChapterValue(page = 12, lastRead = now))
+        phone.setChapter(book, ch2, ChapterValue())
+        phoneSync.syncLibrary(listOf(book))
+        val name = SyncIds.progressFileName(book)
+        val first = SyncJson.decodeFromString<ProgressFile>(server.text("Bookmania/sync-v1/devices/${phone.id}/progress/$name")!!)
+        assertEquals(12, first.chapters.getValue(ch1).progress!!.page)
+        tick()
+        phone.setChapter(book, ch2, ChapterValue(read = true))
+        phoneSync.syncLibrary(listOf(book))
+        val second = SyncJson.decodeFromString<ProgressFile>(server.text("Bookmania/sync-v1/devices/${phone.id}/progress/$name")!!)
+        assertTrue(second.chapters.getValue(ch2).progress!!.read)
+        // Nothing changed: no request for the work at all.
+        tick()
+        val before = server.requests.size
+        phoneSync.syncLibrary(listOf(book))
+        assertTrue(server.requests.drop(before).none { it.contains("/progress/") })
+        // The iPad gets it from the library sync.
+        pad.setChapter(book, ch2, ChapterValue())
+        padSync.syncLibrary()
+        assertTrue(pad.chapter(book, ch2)!!.read)
+    }
+
+    @Test
+    fun `the first sync of a library read before sends library json twice, not once per work`() {
+        val books = (1..3).map { SyncIds.localWorkKey("書$it") }
+        for (b in books) {
+            phone.works[b] = WorkValue(favorite = true, added = 1)
+            phone.setChapter(b, b.substringAfter(':') + "/1.epub", ChapterValue(page = 5, lastRead = now))
+        }
+        phoneSync.syncLibrary(books)
+        val own = "Bookmania/sync-v1/devices/${phone.id}/"
+        assertEquals(2, server.requests.count { it == "PUT ${own}library.json" })
+        assertEquals(3, server.requests.count { it.startsWith("PUT ${own}progress/") })
+        val library = SyncJson.decodeFromString<LibraryFile>(server.text(own + "library.json")!!)
+        assertEquals(books.toSet(), library.progress.keys)
+    }
+
+    @Test
     fun `progress that could not be sent is sent later`() {
         phone.works[book] = WorkValue(favorite = true, added = 1)
         phone.setChapter(book, ch1, ChapterValue())
