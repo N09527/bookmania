@@ -146,6 +146,12 @@ class LocalSource(private val context: Context) : CatalogueSource, UnmeteredSour
             return storageManager.getLocalSourceDirectory()
         }
 
+        /**
+         * The folders works are read from, in order: the storage folder's, then (when enabled) other storages'.
+         * Bookmania: also the WebDAV sync's book files (yokai.sync.AndroidSyncAdapter).
+         */
+        fun directories(context: Context): List<UniFile> = getBaseDirectories(context).filterNotNull()
+
         private fun getBaseDirectories(context: Context): List<UniFile?> {
             val sourcePreferences: SourcePreferences = Injekt.get()
             val base = listOf(getBaseDirectory())

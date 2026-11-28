@@ -41,7 +41,6 @@ import yokai.domain.chapter.models.ChapterUpdate
 import yokai.domain.history.HistoryRepository
 import yokai.domain.manga.MangaRepository
 import yokai.domain.manga.models.MangaUpdate
-import yokai.domain.storage.StorageManager
 import yokai.ebook.data.EbookDatabase
 import yokai.ebook.data.EbookLocator
 import yokai.ebook.data.PositionStore
@@ -53,12 +52,11 @@ import yokai.ebook.settings.BookKey
  * baselines (files in the app's own storage), and the local source's files.
  */
 class AndroidSyncAdapter(
-    context: Context,
+    private val context: Context,
     private val mangaRepository: MangaRepository = Injekt.get(),
     private val chapterRepository: ChapterRepository = Injekt.get(),
     private val categoryRepository: CategoryRepository = Injekt.get(),
     private val historyRepository: HistoryRepository = Injekt.get(),
-    private val storageManager: StorageManager = Injekt.get(),
     private val positions: PositionStore = EbookDatabase.get(context),
 ) : SyncAdapter, SyncFileAccess {
 
@@ -275,41 +273,53 @@ class AndroidSyncAdapter(
 
     // region Book files of the local source
 
-    private fun root(): UniFile? = storageManager.getLocalSourceDirectory()
+    /**
+     * The local source's folders, as the local source reads them (LocalSource.directories): a work is the folders of
+     * that name in all of them, so its files are looked for in each.
+     */
+    private fun roots(): List<UniFile> = LocalSource.directories(context)
 
     override fun list(works: Collection<String>): List<FileItem> {
-        val root = root() ?: return emptyList()
-        val out = mutableListOf<FileItem>()
+        val out = linkedMapOf<Pair<String, String>, FileItem>()
+        val roots = roots()
         for (work in works) {
-            val folder = root.findFile(work)?.takeIf { it.isDirectory } ?: continue
-            for (f in folder.listFiles().orEmpty()) {
-                val name = f.name ?: continue
-                if (name.startsWith(".")) continue
-                if (f.isDirectory) {
-                    for (g in f.listFiles().orEmpty()) {
-                        val n = g.name ?: continue
-                        if (n.startsWith(".") || g.isDirectory) continue
-                        out += FileItem(work, "$name/$n", g.length())
+            for (root in roots) {
+                val folder = root.findFile(work)?.takeIf { it.isDirectory } ?: continue
+                for (f in folder.listFiles().orEmpty()) {
+                    val name = f.name ?: continue
+                    if (name.startsWith(".")) continue
+                    if (f.isDirectory) {
+                        for (g in f.listFiles().orEmpty()) {
+                            val n = g.name ?: continue
+                            if (n.startsWith(".") || g.isDirectory) continue
+                            out.putIfAbsent(work to "$name/$n", FileItem(work, "$name/$n", g.length()))
+                        }
+                    } else {
+                        out.putIfAbsent(work to name, FileItem(work, name, f.length()))
                     }
-                } else {
-                    out += FileItem(work, name, f.length())
                 }
             }
         }
-        return out
+        return out.values.toList()
     }
 
     private fun resolve(work: String, path: String): UniFile? {
-        var f = root()?.findFile(work) ?: return null
-        for (part in path.split('/')) f = f.findFile(part) ?: return null
-        return f
+        for (root in roots()) {
+            var f: UniFile? = root.findFile(work)
+            for (part in path.split('/')) f = f?.findFile(part)
+            if (f != null && f.isFile) return f
+        }
+        return null
     }
 
     override fun open(work: String, path: String): InputStream =
-        resolve(work, path)?.openInputStream() ?: throw IOException("$work/$path is not in the local source folder")
+        resolve(work, path)?.openInputStream() ?: throw IOException("$work/$path is not in the local source folders")
 
     override fun save(work: String, path: String, input: InputStream) {
-        val root = root() ?: throw IOException("no local source folder")
+        // Next to the work's other files when it has a folder already, else in the first folder the source reads.
+        val roots = roots()
+        val root = roots.firstOrNull { it.findFile(work)?.isDirectory == true } ?: roots.firstOrNull()
+            ?: throw IOException("no local source folder")
         val parts = path.split('/')
         var folder = root.findFile(work) ?: root.createDirectory(work) ?: throw IOException("cannot create $work")
         if (parts.size == 2) {

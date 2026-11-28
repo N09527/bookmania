@@ -32,4 +32,7 @@ class SyncPreferences(private val store: PreferenceStore) {
 
     /** Book files with the same name but another size here and on the server (the last file sync). */
     fun lastConflicts() = store.getStringSet(Preference.privateKey("bookmania_sync_conflicts"), emptySet())
+
+    /** Book files the last file sync could not move or would not take (bad names), with the reasons. */
+    fun lastFileProblems() = store.getStringSet(Preference.privateKey("bookmania_sync_file_problems"), emptySet())
 }

@@ -23,5 +23,6 @@
     <string name="sync_last">Last sync: %s</string>
     <string name="sync_last_error">The last sync failed: %s</string>
     <string name="sync_conflicts">Different from the file on the server (left as they are): %s</string>
+    <string name="sync_file_problems">Book files not moved: %1$d (%2$s)</string>
     <string name="sync_info">Synced: the library and its categories, read state, bookmarks, reading positions, history, and the reading and library settings. A book takes the newest progress when it opens and sends its progress when it is left.</string>
 </resources>

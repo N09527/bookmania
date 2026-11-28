@@ -23,5 +23,6 @@
     <string name="sync_last">上次同步：%s</string>
     <string name="sync_last_error">上次同步失敗：%s</string>
     <string name="sync_conflicts">與伺服器上的檔案不同、沒有覆蓋：%s</string>
+    <string name="sync_file_problems">沒有傳送的書檔：%1$d 個（%2$s）</string>
     <string name="sync_info">同步的內容：書櫃與分類、已讀、書籤、閱讀位置、閱讀記錄，以及閱讀與書櫃的設定。開始閱讀時取得最新進度，離開閱讀時送出進度。</string>
 </resources>

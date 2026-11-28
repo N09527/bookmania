@@ -158,6 +158,10 @@ class SyncManager(private val app: Application) {
             record { engine.syncFiles(adapter, works) }
         } ?: return@withContext null
         prefs.lastConflicts().set(result.conflicts.map { "${it.work}/${it.path}" }.toSet())
+        val problems = result.failed.map { (item, why) -> "${item.work}/${item.path}: $why" } +
+            result.rejected.map { "${it.work}/${it.path}: name not allowed" }
+        if (problems.isNotEmpty()) Logger.w { "Book files not moved: " + problems.joinToString("; ") }
+        prefs.lastFileProblems().set(problems.toSet())
         val changed = result.downloaded.map { it.work }.toSet()
         if (changed.isNotEmpty()) {
             val mangaRepository = Injekt.get<MangaRepository>()
@@ -193,6 +197,7 @@ class SyncManager(private val app: Application) {
         prefs.lastSync().set(0)
         prefs.lastError().set("")
         prefs.lastConflicts().set(emptySet())
+        prefs.lastFileProblems().set(emptySet())
     }
 
     /** Schedules a library sync after the library or a synced setting changes (not after the sync's own writes). */

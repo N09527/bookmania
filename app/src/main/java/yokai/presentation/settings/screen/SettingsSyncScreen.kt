@@ -62,6 +62,7 @@ object SettingsSyncScreen : ComposableSettings() {
         val last by prefs.lastSync().collectAsState()
         val error by prefs.lastError().collectAsState()
         val conflicts by prefs.lastConflicts().collectAsState()
+        val fileProblems by prefs.lastFileProblems().collectAsState()
 
         val status = buildList {
             if (error.isNotBlank()) {
@@ -70,6 +71,9 @@ object SettingsSyncScreen : ComposableSettings() {
                 add(stringResource(MR.strings.sync_last, relativeTimeSpanString(last)))
             }
             if (conflicts.isNotEmpty()) add(stringResource(MR.strings.sync_conflicts, conflicts.sorted().joinToString("、")))
+            if (fileProblems.isNotEmpty()) {
+                add(stringResource(MR.strings.sync_file_problems, fileProblems.size, fileProblems.sorted().first()))
+            }
         }.joinToString("\n")
 
         return persistentListOf(
