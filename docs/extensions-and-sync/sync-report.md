@@ -120,6 +120,22 @@ S-1 已完成，這次的修改：
   - GitHub 上的 iOS 工作流程兩項都成功：Linux 的核心測試、macOS 建置未簽章的 IPA。
 - iOS App 沒有在模擬器或實機上執行過（第 5 節）。
 
+### 3.4 發布 v1.3.0
+
+- `main` 快轉到 `b1f19c7` 後，發布流程的工作全部成功：版本檢查、Android、iOS 核心測試、iOS、發布。
+- 2026-11-28 21:14（UTC）發布 [v1.3.0](https://github.com/N09527/bookmania/releases/tag/v1.3.0)，標籤指向 `b1f19c7`，是 Releases 的最新版本。
+- 附件 7 個：五個 APK、`bookmania-v1.3.0-ios-unsigned.ipa`（1,477,516 bytes）、`SHA256SUMS.txt`。
+- 我下載核對了 IPA、arm64-v8a 的 APK 與 `SHA256SUMS.txt`：
+  - 兩個檔案的雜湊值都與 `SHA256SUMS.txt` 一致。
+  - IPA 的 SHA-256 是 `c2abc24f646d7e137972c39ab691a177aca67515e6de18b09c97b12772478526`。
+  - 其他四個 APK 沒有下載核對。
+- IPA 的內容：
+  - `Info.plist`：`io.github.n09527.bookmania`、1.3.0（203）、最低 iOS 26.0。
+  - 有區域網路權限的說明文字（英文與正體中文）。
+  - 以 iOS 26.5 SDK、Xcode 26.6 建置。
+  - 正體中文字串有同步畫面用的 12 個鍵與「WebDAV 同步」。
+- APK（arm64-v8a）：套件 `io.github.n09527.bookmania.debug`、versionCode 203、versionName `1.3.0-d6605`、minSdk 26。
+
 ## 4. 找到並修正的問題
 
 1. **既有的進度不會送出**：書櫃同步原本只處理其他裝置改過的作品與待同步的作品。修正後也送出本機改過的進度（`1e43c71`）。
