@@ -267,7 +267,7 @@ object SyncMerge {
             }
             e.position?.let { p ->
                 when {
-                    local?.locator == p.locator -> equal += "$key|position"
+                    local != null && local.locator == p.locator -> equal += "$key|position"
                     local == null && p.locator == null -> Unit
                     else -> position = PositionChange(p.locator)
                 }

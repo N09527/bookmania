@@ -1,0 +1,19 @@
+# A local WebDAV server for the cross-platform sync test (run.sh). Test only: plain HTTP on the loopback address.
+host: 127.0.0.1
+port: 8765
+provider_mapping:
+  "/dav": "./root"
+http_authenticator:
+  domain_controller: null
+  accept_basic: true
+  accept_digest: false
+  default_to_digest: false
+  trusted_auth_header: null
+simple_dc:
+  user_mapping:
+    "*":
+      "reader":
+        password: "secret"
+verbose: 1
+logging:
+  enable_loggers: []

@@ -214,19 +214,18 @@ class WebDavClient(
             return out.toString()
         }
 
+        private fun isHex(c: Char) = c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F'
+
         /** Percent-decoding (UTF-8); a malformed escape is kept as it is. */
         fun decodePath(text: String): String {
             if ('%' !in text) return text
             val bytes = ByteArrayOutputStream()
             var i = 0
             while (i < text.length) {
-                if (text[i] == '%' && i + 2 < text.length) {
-                    val hex = text.substring(i + 1, i + 3).toIntOrNull(16)
-                    if (hex != null) {
-                        bytes.write(hex)
-                        i += 3
-                        continue
-                    }
+                if (text[i] == '%' && i + 2 < text.length && isHex(text[i + 1]) && isHex(text[i + 2])) {
+                    bytes.write(text.substring(i + 1, i + 3).toInt(16))
+                    i += 3
+                    continue
                 }
                 val cp = Character.codePointAt(text, i)
                 bytes.write(String(Character.toChars(cp)).toByteArray(Charsets.UTF_8))

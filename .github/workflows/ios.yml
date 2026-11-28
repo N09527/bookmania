@@ -9,6 +9,7 @@ on:
       - 'ios/**'
       - 'app/src/main/assets/ebook/**'
       - 'core/ebook/src/test/resources/fixtures/**'
+      - 'core/sync/src/test/resources/fixtures/**'
       - '.github/workflows/ios.yml'
       - '.github/scripts/ios-*.sh'
   workflow_dispatch:

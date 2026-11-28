@@ -13,6 +13,17 @@ enum Fixtures {
 
     static func url(_ name: String) -> URL { directory.appendingPathComponent(name) }
 
+    /// The sync format's examples and merge scenarios, shared with Android's core/sync tests.
+    static let sync: URL = directory // core/ebook/src/test/resources/fixtures
+        .deletingLastPathComponent() // core/ebook/src/test/resources
+        .deletingLastPathComponent() // core/ebook/src/test
+        .deletingLastPathComponent() // core/ebook/src
+        .deletingLastPathComponent() // core/ebook
+        .deletingLastPathComponent() // core
+        .appendingPathComponent("sync/src/test/resources/fixtures/sync")
+
+    static func syncData(_ name: String) throws -> Data { try Data(contentsOf: sync.appendingPathComponent(name)) }
+
     static func source(_ name: String) throws -> RandomAccessSource { try FileSource(url: url(name)) }
 
     static func bytes(_ name: String) throws -> [UInt8] { [UInt8](try Data(contentsOf: url(name))) }
