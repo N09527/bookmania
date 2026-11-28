@@ -30,6 +30,8 @@ jobs:
     env:
       RUNTIME: ios/Vendor/oneechan-runtime
       JOBS: '4'
+      # Part of the cache key: raise it to build again with the same runtime and Xcode, when what is built changes.
+      BUILD_VERSION: '1'
 
     steps:
       - name: Check out
@@ -51,9 +53,10 @@ jobs:
       - name: Cache key
         id: key
         run: |
-          runtime=$(git -C "$RUNTIME" rev-parse HEAD)
+          # The app's workflows compute the same key to restore the package (the runtime's commit is the submodule's).
+          runtime=$(git ls-tree HEAD "$RUNTIME" | awk '{print $3}')
           xcode=$(xcodebuild -version | head -1 | tr -d ' ')
-          echo "key=ios-jvm-${runtime}-${xcode}-${{ hashFiles('.github/workflows/ios-jvm.yml', '.github/scripts/ios-jvm-*.sh') }}" >> "$GITHUB_OUTPUT"
+          echo "key=ios-jvm-${BUILD_VERSION}-${runtime}-${xcode}" >> "$GITHUB_OUTPUT"
 
       - name: Restore the package
         id: cache
@@ -92,6 +95,10 @@ jobs:
       - name: Package
         if: steps.cache.outputs.cache-hit != 'true'
         run: .github/scripts/ios-jvm-step.sh package ./package.sh
+
+      - name: Prepare the package for the app
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: .github/scripts/ios-jvm-step.sh prepare "$GITHUB_WORKSPACE/.github/scripts/ios-jvm-prepare.sh"
 
       - name: Save the package
         if: steps.cache.outputs.cache-hit != 'true'
