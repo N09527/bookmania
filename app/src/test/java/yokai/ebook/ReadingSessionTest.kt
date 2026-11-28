@@ -35,6 +35,9 @@ class ReadingSessionTest {
         override fun putPosition(key: BookKey, locator: EbookLocator) {
             map[key] = locator
         }
+        override fun removePosition(key: BookKey) {
+            map.remove(key)
+        }
     }
 
     private fun <T> pref(value: T): Preference<T> = mockk { every { get() } returns value }

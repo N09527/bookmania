@@ -96,6 +96,12 @@ class SettingsMainController : SettingsLegacyController(), FloatingSearchInterfa
             }
         }
         preference {
+            iconRes = R.drawable.ic_cloud_24dp
+            iconTint = tintColor
+            titleRes = MR.strings.sync_title
+            onClick { navigateTo(SettingsSyncController()) }
+        }
+        preference {
             iconRes = R.drawable.ic_security_24dp
             iconTint = tintColor
             titleRes = MR.strings.security

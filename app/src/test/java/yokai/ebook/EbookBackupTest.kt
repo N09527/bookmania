@@ -27,6 +27,9 @@ class EbookBackupTest {
         override fun putPosition(key: BookKey, locator: EbookLocator) {
             map[key] = locator
         }
+        override fun removePosition(key: BookKey) {
+            map.remove(key)
+        }
     }
 
     private fun manga(sourceId: Long) = mockk<Manga> {

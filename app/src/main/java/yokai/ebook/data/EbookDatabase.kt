@@ -61,6 +61,10 @@ class EbookDatabase private constructor(context: Context) :
         writableDatabase.insertWithOnConflict("position", null, values, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
+    override fun removePosition(key: BookKey) {
+        writableDatabase.delete("position", WHERE, args(key))
+    }
+
     // endregion
 
     // region book info
@@ -131,6 +135,9 @@ interface PositionStore {
     fun positions(sourceId: Long, mangaUrl: String): Map<String, EbookLocator>
 
     fun putPosition(key: BookKey, locator: EbookLocator)
+
+    /** Forgets the position (the WebDAV sync, when another device cleared it). */
+    fun removePosition(key: BookKey)
 
     /** Keeps the newer of the stored position and [locator] (a restored backup must not undo newer reading). */
     fun putPositionIfNewer(key: BookKey, locator: EbookLocator): Boolean {

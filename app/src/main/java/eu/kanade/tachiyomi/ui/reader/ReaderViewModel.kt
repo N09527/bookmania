@@ -237,6 +237,8 @@ class ReaderViewModel(
                     val context = Injekt.get<Application>()
                     loader = ChapterLoader(context, downloadManager, downloadProvider, manga, source)
 
+                    // The WebDAV sync: the other devices' progress first (at most a few seconds).
+                    Injekt.get<yokai.sync.SyncManager>().pullBeforeReading(manga)
                     chapterList = getChapterList()
                     loadChapter(loader!!, chapterList!!.first { chapterId == it.chapter.id })
                     Result.success(true)
@@ -691,6 +693,8 @@ class ReaderViewModel(
         getCurrentChapter()?.let {
             viewModelScope.launchNonCancellableIO {
                 saveChapterHistory(it)
+                // Leaving the reader (or the app): the progress goes to the WebDAV sync.
+                manga?.let { m -> Injekt.get<yokai.sync.SyncManager>().requestPush(m) }
             }
         }
     }

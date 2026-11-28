@@ -202,6 +202,11 @@ open class App : Application(), DefaultLifecycleObserver, SingletonImageLoader.F
         )
     }
 
+    override fun onStart(owner: LifecycleOwner) {
+        // Back in the foreground: what other devices changed (the WebDAV sync, when it is set up).
+        Injekt.get<yokai.sync.SyncManager>().requestLibrarySync()
+    }
+
     override fun onPause(owner: LifecycleOwner) {
         if (!AuthenticatorUtil.isAuthenticating && preferences.lockAfter().get() >= 0) {
             SecureActivityDelegate.locked = true

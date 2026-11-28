@@ -148,6 +148,7 @@ android {
 dependencies {
     implementation(projects.core.archive)
     implementation(projects.core.ebook)
+    implementation(projects.core.sync)
     implementation(projects.core.main)
     implementation(projects.data)
     implementation(projects.domain)

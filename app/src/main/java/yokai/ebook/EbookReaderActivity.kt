@@ -89,6 +89,8 @@ import kotlinx.coroutines.sync.withLock
 import org.json.JSONArray
 import org.json.JSONObject
 import org.json.JSONTokener
+import uy.kohesive.injekt.Injekt
+import uy.kohesive.injekt.api.get
 import uy.kohesive.injekt.injectLazy
 import yokai.core.ebook.BookStats
 import yokai.core.ebook.CorruptBookException
@@ -393,11 +395,14 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
         persistPosition()
         val readingSession = session
         val span = readingSession?.stopTimer()
-        if (readingSession != null && span != null) {
-            launchIO {
+        val readManga = manga
+        launchIO {
+            if (readingSession != null && span != null) {
                 runCatching { readingSession.saveReadingTime(span.first, span.second) }
                     .onFailure { Logger.e(it) { "Saving the reading time failed" } }
             }
+            // Leaving the reader (or the app): the progress goes to the WebDAV sync.
+            readManga?.let { Injekt.get<yokai.sync.SyncManager>().requestPush(it) }
         }
         super.onPause()
     }
@@ -464,6 +469,8 @@ class EbookReaderActivity : BaseActivity<EbookReaderActivityBinding>() {
             manga, chapter, key, ebookDb, preferences, libraryPreferences, getChapter, updateChapter, upsertHistory, getTrack,
         )
         restoreTarget = withIOContext {
+            // The WebDAV sync: the other devices' progress first (at most a few seconds).
+            Injekt.get<yokai.sync.SyncManager>().pullBeforeReading(manga)
             readingSession.init()
             readingSession.positionToRestore(intent.getBooleanExtra(EXTRA_SWITCHED_FROM_IMAGES, false))
                 ?: estimatedPosition(chapter, file, key, pub.spine.size, readingSession)

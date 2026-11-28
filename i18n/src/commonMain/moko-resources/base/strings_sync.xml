@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_title">WebDAV sync</string>
+    <string name="sync_server">Server</string>
+    <string name="sync_server_not_set">Not set</string>
+    <string name="sync_account_title">WebDAV server</string>
+    <string name="sync_url">Address (https://…)</string>
+    <string name="sync_user">Account</string>
+    <string name="sync_password">Password</string>
+    <string name="sync_test">Test</string>
+    <string name="sync_testing">Testing…</string>
+    <string name="sync_test_ok">The server works.</string>
+    <string name="sync_test_failed">The server cannot be used: %s</string>
+    <string name="sync_https_only">The address must start with https://</string>
+    <string name="sync_save">Save</string>
+    <string name="sync_account_changed">Changing the server or account starts the sync over on this device.</string>
+    <string name="sync_enable">Sync with this server</string>
+    <string name="sync_files">Sync book files</string>
+    <string name="sync_files_summary">Files of the local source works in the library. Files on the server are never deleted or overwritten.</string>
+    <string name="sync_files_unmetered">Book files only on Wi-Fi</string>
+    <string name="sync_now">Sync now</string>
+    <string name="sync_started">Syncing…</string>
+    <string name="sync_last">Last sync: %s</string>
+    <string name="sync_last_error">The last sync failed: %s</string>
+    <string name="sync_conflicts">Different from the file on the server (left as they are): %s</string>
+    <string name="sync_info">Synced: the library and its categories, read state, bookmarks, reading positions, history, and the reading and library settings. A book takes the newest progress when it opens and sends its progress when it is left.</string>
+</resources>

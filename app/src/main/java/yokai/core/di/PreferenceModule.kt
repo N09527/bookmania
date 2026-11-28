@@ -23,6 +23,8 @@ import yokai.domain.ui.settings.ReaderPreferences
 fun preferenceModule(application: Application) = module {
     single<PreferenceStore> { AndroidPreferenceStore(application) }
 
+    single { yokai.sync.SyncPreferences(get()) }
+
     single { BasePreferences(get()) }
 
     single { SourcePreferences(get()) }
