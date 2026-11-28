@@ -29,6 +29,12 @@ Android 上的電子書閱讀器，為中文的直排與橫排排版而做。
 - 目錄、全書進度滑桿、同一部作品的章節面板；點擊區域與音量鍵翻頁。
 - 記住每本書的閱讀位置，並更新書櫃裡的進度、已讀狀態與閱讀紀錄。備份會包含閱讀位置。
 
+### WebDAV 同步
+
+- 透過你自己的 WebDAV 伺服器（只限 HTTPS），在 Android 與 iPhone／iPad 之間同步書櫃、閱讀進度、設定與書檔。
+- 開始閱讀前取得最新進度，離開閱讀時送出進度。
+- 資料只會傳到你設定的伺服器。設定方式見 [使用說明](./docs/extensions-and-sync/sync-guide.md)。
+
 ### 安全與隱私
 
 - 只能閱讀沒有 DRM 的書。受 DRM 保護的書會顯示說明，不會嘗試解密。Bookmania 不提供、也不會加入移除 DRM 的功能。
@@ -50,7 +56,7 @@ Yōkai 原有的線上來源擴充與追蹤服務仍在 App 中，但 Bookmania 
 
 ### iOS 版（測試版）
 
-iPhone 與 iPad 版在 [ios/](./ios)，需要 iOS／iPadOS 26 以上。1.2.0 起包含設計說明列出的全部功能：文字閱讀器與排版設定、閱讀位置、書櫃與分類、圖片閱讀器、與 Android 版互通的備份；但還沒有在實機上測試過。1.1.0 起，[Releases](https://github.com/N09527/bookmania/releases) 的每個版本也附上 iOS 的測試版 `bookmania-v版本-ios-unsigned.ipa`。它沒有簽章，要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
+iPhone 與 iPad 版在 [ios/](./ios)，需要 iOS／iPadOS 26 以上。1.2.0 起包含設計說明列出的全部功能：文字閱讀器與排版設定、閱讀位置、書櫃與分類、圖片閱讀器、與 Android 版互通的備份；但還沒有在實機上測試過。1.3.0 加上 WebDAV 同步，這部分只確認了編譯，還沒有執行過。1.1.0 起，[Releases](https://github.com/N09527/bookmania/releases) 的每個版本也附上 iOS 的測試版 `bookmania-v版本-ios-unsigned.ipa`。它沒有簽章，要用自己的 Apple ID 側載安裝，步驟見 [docs/ios/INSTALL.md](./docs/ios/INSTALL.md)；設計與進度見 [docs/ios/](./docs/ios)。
 
 ## 從原始碼建置
 

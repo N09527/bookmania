@@ -4,6 +4,23 @@ Bookmania 的版本從 1.0.0 開始。分出來之前的變更，見 Yōkai 在�
 
 格式參考 [Keep a Changelog](https://keepachangelog.com/zh-TW/1.1.0/)，版本號依 [語意化版本](https://semver.org/lang/zh-TW/)。
 
+## [1.3.0] - 2026-11-28
+
+Android 版與 iPhone／iPad 版可以透過你自己的 WebDAV 伺服器（只限 HTTPS）同步書櫃、閱讀進度、設定與書檔。使用方式見 [docs/extensions-and-sync/sync-guide.md](./docs/extensions-and-sync/sync-guide.md)，驗證結果見 [docs/extensions-and-sync/sync-report.md](./docs/extensions-and-sync/sync-report.md)。Android 版在模擬器上測試過；iPhone／iPad 版**只確認了編譯，還沒有執行過**。
+
+### 新增
+
+- WebDAV 同步（Android：「設定 > WebDAV 同步」；iPhone／iPad：「更多 > WebDAV 同步」）：
+  - **同步的內容**：書櫃與分類、已讀、頁數、書籤、文字書的閱讀位置、閱讀記錄；排版、閱讀器與書櫃的設定（不含無痕模式）；書櫃中本機來源作品的書檔（可以關閉，預設只在 Wi-Fi 下傳送）。
+  - **同步的時機**：開始閱讀前取得其他裝置的進度（最多等 5 秒）；離開閱讀與 App 切到背景時送出進度；App 開啟、回到前景，以及書櫃或設定改變之後同步書櫃。
+  - **連不上伺服器時**：進度記為待同步，之後再送出。
+  - **安全措施**：不會刪除或覆蓋任何檔案；同名而大小不同的書檔，兩邊都保持原樣，並顯示在同步畫面。
+  - **密碼**：Android 以系統金鑰加密保存，iOS 存在鑰匙圈。
+
+### 變更
+
+- 版本 1.3.0（內部編號 203）。
+
 ## [1.2.0] - 2026-11-26
 
 iPhone／iPad 版完成設計說明列的全部階段（iOS-2～iOS-6），仍是測試版，**還沒有在實機上測試過**；報告見 [docs/ios/stage2-6-report.md](./docs/ios/stage2-6-report.md)。Android 版沒有變更，APK 只有版本號不同。

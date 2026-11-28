@@ -29,6 +29,12 @@ An ebook reader for Android, made for Chinese text in vertical and horizontal wr
 - Table of contents, a progress slider for the whole book, a chapter panel for the other files of the work; tap zones and volume keys turn pages.
 - The reading position of each book is kept and updates the progress, read state and history in the library. Backups include reading positions.
 
+### WebDAV sync
+
+- Through your own WebDAV server (HTTPS only), the library, reading progress, settings and book files are kept in sync between Android and iPhone/iPad.
+- A book takes the newest progress when it opens and sends its progress when it is left.
+- Data goes only to the server you set. See the [guide](./docs/extensions-and-sync/sync-guide.md) (Chinese).
+
 ### Security and privacy
 
 - Only books without DRM can be read. A book protected by DRM shows an explanation; Bookmania does not try to decrypt it, and it does not and will not offer any way to remove DRM.
@@ -50,7 +56,7 @@ Yōkai's online source extensions and trackers are still in the App, but Bookman
 
 ### iOS version (test builds)
 
-The iPhone and iPad version is in [ios/](./ios) and needs iOS/iPadOS 26 or later. From 1.2.0 on it has everything its design lists: the text reader and its typesetting settings, reading positions, the library and categories, the image reader, and backups that move between it and the Android version; it has not been tested on a device yet. From 1.1.0 on, every release on [Releases](https://github.com/N09527/bookmania/releases) also carries an iOS test build, `bookmania-v<version>-ios-unsigned.ipa`. It is not signed: sideload it with your own Apple ID, see [docs/ios/INSTALL.md](./docs/ios/INSTALL.md) (Chinese); design and progress are in [docs/ios/](./docs/ios).
+The iPhone and iPad version is in [ios/](./ios) and needs iOS/iPadOS 26 or later. From 1.2.0 on it has everything its design lists: the text reader and its typesetting settings, reading positions, the library and categories, the image reader, and backups that move between it and the Android version; it has not been tested on a device yet. 1.3.0 adds the WebDAV sync, which has only been built, not run. From 1.1.0 on, every release on [Releases](https://github.com/N09527/bookmania/releases) also carries an iOS test build, `bookmania-v<version>-ios-unsigned.ipa`. It is not signed: sideload it with your own Apple ID, see [docs/ios/INSTALL.md](./docs/ios/INSTALL.md) (Chinese); design and progress are in [docs/ios/](./docs/ios).
 
 ## Building from source
 
