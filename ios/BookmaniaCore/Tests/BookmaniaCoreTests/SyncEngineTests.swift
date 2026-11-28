@@ -225,6 +225,38 @@ import Testing
         #expect(Set(library?.progress.keys.map { $0 } ?? []) == Set(books))
     }
 
+    let androidLocator = "{\"spine\":0,\"href\":\"c.xhtml\",\"location\":[12,0],\"text\":\"第一段\",\"progression\":0.0,\"total\":0.25,\"chapterPage\":2,\"updatedAt\":5000}"
+    let iosLocator = "{\"chapterPage\":2,\"href\":\"c.xhtml\",\"location\":[12,0],\"progression\":0,\"spine\":0,\"text\":\"第一段\",\"total\":0.25,\"updatedAt\":5000}"
+
+    @Test func positionsAreComparedByContentNotByHowEachVersionWritesThem() {
+        #expect(SyncMerge.sameLocator(androidLocator, iosLocator))
+        #expect(SyncMerge.sameLocator(#"{"a":1,"b":null}"#, #"{"a":1.0}"#))
+        #expect(!SyncMerge.sameLocator(androidLocator, iosLocator.replacingOccurrences(of: "[12,0]", with: "[13,0]")))
+        #expect(!SyncMerge.sameLocator(#"{"a":"1"}"#, #"{"a":1}"#))
+        #expect(!SyncMerge.sameLocator(#"{"a":true}"#, #"{"a":1}"#))
+        #expect(!SyncMerge.sameLocator(androidLocator, nil))
+        #expect(!SyncMerge.sameLocator("not json", "not json "))
+        #expect(SyncMerge.sameLocator(nil, nil))
+    }
+
+    @Test func aPositionTakenFromAnotherVersionIsNotSentBackAsAChange() async throws {
+        phone.works[book] = Sync.WorkValue(favorite: true, added: 1)
+        phone.setChapter(book, ch1, Sync.ChapterValue(page: 3, locator: androidLocator, lastRead: 5000))
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        tick()
+        pad.setChapter(book, ch1, Sync.ChapterValue())
+        _ = try await padSync.syncLibrary()
+        #expect(pad.chapter(book, ch1)?.locator == androidLocator)
+        var c = try #require(pad.chapter(book, ch1))
+        c.locator = iosLocator
+        pad.setChapter(book, ch1, c)
+        tick()
+        let before = server.requests.count
+        _ = try await padSync.syncLibrary(libraryWorks: [book])
+        #expect(!server.requests.dropFirst(before).contains { $0.hasPrefix("PUT") && $0.contains("/progress/") })
+        #expect(!padSync.hasLocalChanges(book))
+    }
+
     @Test func progressThatCouldNotBeSentIsSentLater() async throws {
         phone.works[book] = Sync.WorkValue(favorite: true, added: 1)
         phone.setChapter(book, ch1, Sync.ChapterValue())

@@ -39,6 +39,53 @@ public enum SyncMerge {
         Sync.SettingEntry(type: v.type, value: v.value, t: t, d: d)
     }
 
+    /// Whether two reading positions are the same one. Each version writes a position's JSON its own way (the order
+    /// of the keys, 0 or 0.0), so they are compared by content: objects key by key (a null value counts as no value),
+    /// numbers by value. Text that is not JSON is compared as it is.
+    public static func sameLocator(_ a: String?, _ b: String?) -> Bool {
+        if a == b { return true }
+        guard let a, let b,
+              let x = try? JSONDecoder().decode(JSONTree.self, from: Data(a.utf8)),
+              let y = try? JSONDecoder().decode(JSONTree.self, from: Data(b.utf8)) else { return false }
+        return x.withoutNulls == y.withoutNulls
+    }
+
+    /// A JSON value as written, for comparing positions (numbers as values: 0 and 0.0 are the same).
+    private indirect enum JSONTree: Decodable, Equatable {
+        case null
+        case bool(Bool)
+        case number(Double)
+        case string(String)
+        case array([JSONTree])
+        case object([String: JSONTree])
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.singleValueContainer()
+            if c.decodeNil() {
+                self = .null
+            } else if let b = try? c.decode(Bool.self) {
+                self = .bool(b)
+            } else if let n = try? c.decode(Double.self) {
+                self = .number(n)
+            } else if let s = try? c.decode(String.self) {
+                self = .string(s)
+            } else if let a = try? c.decode([JSONTree].self) {
+                self = .array(a)
+            } else {
+                self = .object(try c.decode([String: JSONTree].self))
+            }
+        }
+
+        /// Object members with a null value left out (no value).
+        var withoutNulls: JSONTree {
+            switch self {
+            case let .array(a): return .array(a.map(\.withoutNulls))
+            case let .object(o): return .object(o.filter { $0.value != .null }.mapValues(\.withoutNulls))
+            default: return self
+            }
+        }
+    }
+
     /// The `updatedAt` a position records, or 0.
     public static func locatorTime(_ locator: String?) -> Int64 {
         guard let locator, let data = locator.data(using: .utf8),
@@ -197,7 +244,7 @@ public enum SyncMerge {
             }
             var position = base.position
             if applied.contains("\(key)|position") {
-                if position == nil || position!.locator != local.locator {
+                if position == nil || !sameLocator(position!.locator, local.locator) {
                     let recorded = locatorTime(local.locator)
                     position = Sync.PositionPart(locator: local.locator, t: recorded > (position?.t ?? 0) ? recorded : now, d: device)
                 }
@@ -266,7 +313,7 @@ public enum SyncMerge {
                 }
             }
             if let p = e.position {
-                if let local, local.locator == p.locator {
+                if let local, sameLocator(local.locator, p.locator) {
                     equal.insert("\(key)|position")
                 } else if !(local == nil && p.locator == nil) {
                     change.position = Sync.PositionChange(locator: p.locator)

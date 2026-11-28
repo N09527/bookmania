@@ -1,6 +1,11 @@
 package yokai.core.sync
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
@@ -40,6 +45,38 @@ object SyncMerge {
     private val ProgressPart.value get() = ProgressChange(read, page, left)
     private val ChapterValue.progress get() = ProgressChange(read, page, left)
     private val ProgressChange.isDefault get() = !read && page == 0
+
+    /**
+     * Whether two reading positions are the same one. Each version writes a position's JSON its own way (the order of
+     * the keys, 0 or 0.0), so they are compared by content: objects key by key (a null value counts as no value),
+     * numbers by value. Text that is not JSON is compared as it is.
+     */
+    fun sameLocator(a: String?, b: String?): Boolean {
+        if (a == b) return true
+        if (a == null || b == null) return false
+        val x = runCatching { Json.parseToJsonElement(a) }.getOrNull() ?: return false
+        val y = runCatching { Json.parseToJsonElement(b) }.getOrNull() ?: return false
+        return sameJson(x, y)
+    }
+
+    private fun sameJson(a: JsonElement, b: JsonElement): Boolean = when {
+        a is JsonObject && b is JsonObject -> {
+            val x = a.filterValues { it !is JsonNull }
+            val y = b.filterValues { it !is JsonNull }
+            x.keys == y.keys && x.all { (k, v) -> sameJson(v, y.getValue(k)) }
+        }
+        a is JsonArray && b is JsonArray -> a.size == b.size && a.indices.all { sameJson(a[it], b[it]) }
+        a is JsonNull || b is JsonNull -> a is JsonNull && b is JsonNull
+        a is JsonPrimitive && b is JsonPrimitive -> when {
+            a.isString || b.isString -> a.isString && b.isString && a.content == b.content
+            else -> {
+                val x = a.content.toDoubleOrNull()
+                val y = b.content.toDoubleOrNull()
+                if (x != null && y != null) x == y else a.content == b.content
+            }
+        }
+        else -> false
+    }
 
     /** The `updatedAt` a position records, or 0. */
     fun locatorTime(locator: String?): Long {
@@ -191,7 +228,7 @@ object SyncMerge {
             }
             var position = base.position
             if ("$key|position" in applied) {
-                if (position == null || position.locator != local.locator) {
+                if (position == null || !sameLocator(position.locator, local.locator)) {
                     val recorded = locatorTime(local.locator)
                     position = PositionPart(local.locator, if (recorded > (position?.t ?: 0)) recorded else now, device)
                 }
@@ -267,7 +304,7 @@ object SyncMerge {
             }
             e.position?.let { p ->
                 when {
-                    local != null && local.locator == p.locator -> equal += "$key|position"
+                    local != null && sameLocator(local.locator, p.locator) -> equal += "$key|position"
                     local == null && p.locator == null -> Unit
                     else -> position = PositionChange(p.locator)
                 }

@@ -115,7 +115,7 @@ import Testing
 
     @Test func theSharedMergeScenarios() throws {
         let scenarios = try JSONDecoder().decode([Scenario].self, from: try Fixtures.syncData("scenarios.json"))
-        #expect(scenarios.count == 12)
+        #expect(scenarios.count == 13)
         for s in scenarios {
             if let c = s.library {
                 let local = SyncMerge.annotate(c.snapshot, c.baseline, now: s.now, device: s.device)

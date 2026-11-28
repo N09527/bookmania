@@ -1137,5 +1137,110 @@
                 "equal": []
             }
         }
+    },
+    {
+        "name": "a position written by the other version is the same position",
+        "device": "b",
+        "now": 200000,
+        "progress": {
+            "snapshot": {
+                "chapters": {
+                    "W/c1": {
+                        "read": false,
+                        "page": 3,
+                        "left": 10,
+                        "bookmark": false,
+                        "locator": "{\"chapterPage\":2,\"href\":\"c.xhtml\",\"location\":[12,0],\"progression\":0,\"spine\":0,\"text\":\"第一段\",\"total\":0.25,\"updatedAt\":5000}",
+                        "lastRead": 5000,
+                        "duration": 1000
+                    }
+                }
+            },
+            "baseline": {
+                "chapters": {
+                    "W/c1": {
+                        "progress": {
+                            "read": false,
+                            "page": 3,
+                            "left": 10,
+                            "t": 5000,
+                            "d": "a"
+                        },
+                        "position": {
+                            "locator": "{\"spine\":0,\"href\":\"c.xhtml\",\"location\":[12,0],\"text\":\"第一段\",\"progression\":0.0,\"total\":0.25,\"chapterPage\":2,\"updatedAt\":5000}",
+                            "t": 5000,
+                            "d": "a"
+                        },
+                        "history": {
+                            "lastRead": 5000,
+                            "duration": 1000
+                        }
+                    }
+                },
+                "applied": [
+                    "W/c1|position",
+                    "W/c1|progress"
+                ]
+            },
+            "remotes": [
+                {
+                    "format": 1,
+                    "device": "a",
+                    "written": 5000,
+                    "work": "0:W",
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 3,
+                                "left": 10,
+                                "t": 5000,
+                                "d": "a"
+                            },
+                            "position": {
+                                "locator": "{\"spine\":0,\"href\":\"c.xhtml\",\"location\":[12,0],\"text\":\"第一段\",\"progression\":0.0,\"total\":0.25,\"chapterPage\":2,\"updatedAt\":5000}",
+                                "t": 5000,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 5000,
+                                "duration": 1000
+                            }
+                        }
+                    }
+                }
+            ],
+            "expected": {
+                "merged": {
+                    "chapters": {
+                        "W/c1": {
+                            "progress": {
+                                "read": false,
+                                "page": 3,
+                                "left": 10,
+                                "t": 5000,
+                                "d": "a"
+                            },
+                            "position": {
+                                "locator": "{\"spine\":0,\"href\":\"c.xhtml\",\"location\":[12,0],\"text\":\"第一段\",\"progression\":0.0,\"total\":0.25,\"chapterPage\":2,\"updatedAt\":5000}",
+                                "t": 5000,
+                                "d": "a"
+                            },
+                            "history": {
+                                "lastRead": 5000,
+                                "duration": 1000
+                            }
+                        }
+                    }
+                },
+                "changes": {
+                    "chapters": {}
+                },
+                "equal": [
+                    "W/c1|position",
+                    "W/c1|progress"
+                ]
+            }
+        }
     }
 ]

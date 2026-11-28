@@ -163,6 +163,39 @@ class SyncEngineTest {
         assertEquals(books.toSet(), library.progress.keys)
     }
 
+    private val androidLocator = "{\"spine\":0,\"href\":\"c.xhtml\",\"location\":[12,0],\"text\":\"第一段\",\"progression\":0.0,\"total\":0.25,\"chapterPage\":2,\"updatedAt\":5000}"
+    private val iosLocator = "{\"chapterPage\":2,\"href\":\"c.xhtml\",\"location\":[12,0],\"progression\":0,\"spine\":0,\"text\":\"第一段\",\"total\":0.25,\"updatedAt\":5000}"
+
+    @Test
+    fun `positions are compared by content, not by how each version writes them`() {
+        assertTrue(SyncMerge.sameLocator(androidLocator, iosLocator))
+        assertTrue(SyncMerge.sameLocator("""{"a":1,"b":null}""", """{"a":1.0}"""))
+        assertFalse(SyncMerge.sameLocator(androidLocator, iosLocator.replace("[12,0]", "[13,0]")))
+        assertFalse(SyncMerge.sameLocator("""{"a":"1"}""", """{"a":1}"""))
+        assertFalse(SyncMerge.sameLocator("""{"a":true}""", """{"a":1}"""))
+        assertFalse(SyncMerge.sameLocator(androidLocator, null))
+        assertFalse(SyncMerge.sameLocator("not json", "not json "))
+        assertTrue(SyncMerge.sameLocator(null, null))
+    }
+
+    @Test
+    fun `a position taken from another version is not sent back as a change`() {
+        phone.works[book] = WorkValue(favorite = true, added = 1)
+        phone.setChapter(book, ch1, ChapterValue(page = 3, locator = androidLocator, lastRead = 5000))
+        phoneSync.syncLibrary(listOf(book))
+        tick()
+        pad.setChapter(book, ch1, ChapterValue())
+        padSync.syncLibrary()
+        assertEquals(androidLocator, pad.chapter(book, ch1)!!.locator)
+        // The iPad keeps positions as structures and writes them back its own way.
+        pad.setChapter(book, ch1, pad.chapter(book, ch1)!!.copy(locator = iosLocator))
+        tick()
+        val before = server.requests.size
+        padSync.syncLibrary(listOf(book))
+        assertTrue(server.requests.drop(before).none { it.startsWith("PUT") && it.contains("/progress/") })
+        assertFalse(padSync.hasLocalChanges(book))
+    }
+
     @Test
     fun `progress that could not be sent is sent later`() {
         phone.works[book] = WorkValue(favorite = true, added = 1)
