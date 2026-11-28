@@ -82,11 +82,6 @@ object SettingsSyncScreen : ComposableSettings() {
                 pref = prefs.enabled(),
                 title = stringResource(MR.strings.sync_enable),
                 enabled = url.isNotBlank(),
-                onValueChanged = { on ->
-                    // The job checks the setting when it runs, after this change is saved.
-                    if (on) SyncWorker.library(context)
-                    true
-                },
             ),
             Preference.PreferenceItem.SwitchPreference(
                 pref = prefs.syncFiles(),

@@ -106,11 +106,15 @@ class SyncManager(private val app: Application) {
         }
     }
 
-    /** Syncs the library, the settings and the progress other devices changed. */
+    /**
+     * Syncs the library and the settings, the progress other devices changed, and the progress of library works that
+     * changed here outside the reader (marked as read in the library, say) or before the sync was turned on.
+     */
     suspend fun syncLibrary(): SyncEngine.LibraryResult? = withContext(Dispatchers.IO) {
         mutex.withLock {
             val engine = engine() ?: return@withLock null
-            record { applying { engine.syncLibrary() } }
+            val works = Injekt.get<MangaRepository>().getFavorites().map { SyncIds.workKey(it.source, it.url) }
+            record { applying { engine.syncLibrary(works) } }
         }
     }
 
@@ -198,6 +202,8 @@ class SyncManager(private val app: Application) {
             Injekt.get<MangaRepository>().getLibraryMangaAsFlow().drop(1).map { },
             Injekt.get<CategoryRepository>().getAllAsFlow().drop(1).map { },
         )
+        // Turning the sync on starts one (the switch saves the setting after its handler runs).
+        prefs.enabled().changes().drop(1).filter { it }.onEach { requestLibrarySync() }.launchIn(scope)
         libraryChanges
             .filter { System.currentTimeMillis() > applyingUntil }
             .debounce(LIBRARY_DEBOUNCE_MS)

@@ -2,10 +2,8 @@ package yokai.sync
 
 import android.content.Context
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -20,6 +18,10 @@ import yokai.core.sync.SyncIds
 /**
  * The WebDAV sync's background jobs: sending a work's progress after reading, syncing the library (then the book
  * files), and the book files on their own (only on networks that are not metered, unless the user allows any).
+ *
+ * The jobs have no network constraint: the system's constraint waits for a network it validated (one with internet
+ * access), which a home server on a local network may never give. Without a connection a job fails and is tried
+ * again later (exponential backoff).
  */
 class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
@@ -29,7 +31,7 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         return try {
             when (inputData.getString(KEY_KIND)) {
                 KIND_WORK -> inputData.getString(KEY_WORK)?.let { manager.syncWork(it, push = true) }
-                KIND_FILES -> manager.syncFiles()
+                KIND_FILES -> if (allowedForFiles(applicationContext)) manager.syncFiles()
                 else -> {
                     manager.syncLibrary()
                     files(applicationContext)
@@ -54,11 +56,15 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         private const val NAME_LIBRARY = "bookmania-sync-library"
         private const val NAME_FILES = "bookmania-sync-files"
 
-        private val connected = Constraints(requiredNetworkType = NetworkType.CONNECTED)
+        /** Book files only on a network that is not metered, unless the user allows any. */
+        private fun allowedForFiles(context: Context): Boolean {
+            if (!Injekt.get<SyncPreferences>().filesUnmeteredOnly().get()) return true
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
+            return !cm.isActiveNetworkMetered
+        }
 
         fun library(context: Context, delaySeconds: Long = 0) {
             val request = OneTimeWorkRequestBuilder<SyncWorker>()
-                .setConstraints(connected)
                 .setInitialDelay(delaySeconds, TimeUnit.SECONDS)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
                 .setInputData(workDataOf(KEY_KIND to KIND_LIBRARY))
@@ -69,7 +75,6 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
 
         fun push(context: Context, work: String) {
             val request = OneTimeWorkRequestBuilder<SyncWorker>()
-                .setConstraints(connected)
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
                 .setInputData(workDataOf(KEY_KIND to KIND_WORK, KEY_WORK to work))
                 .build()
@@ -78,11 +83,8 @@ class SyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         }
 
         fun files(context: Context) {
-            val prefs = Injekt.get<SyncPreferences>()
-            if (!prefs.syncFiles().get()) return
-            val network = if (prefs.filesUnmeteredOnly().get()) NetworkType.UNMETERED else NetworkType.CONNECTED
+            if (!Injekt.get<SyncPreferences>().syncFiles().get()) return
             val request = OneTimeWorkRequestBuilder<SyncWorker>()
-                .setConstraints(Constraints(requiredNetworkType = network))
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 60, TimeUnit.SECONDS)
                 .setInputData(workDataOf(KEY_KIND to KIND_FILES))
                 .build()
