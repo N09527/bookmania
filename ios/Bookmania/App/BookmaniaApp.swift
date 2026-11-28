@@ -15,8 +15,11 @@ struct BookmaniaApp: App {
                 .environmentObject(library)
                 .environmentObject(reader)
                 .preferredColorScheme(theme == 1 ? .light : theme == 2 ? .dark : nil)
-                .task { library.refresh() }
-                .fullScreenCover(item: $reader.chapter) { chapter in
+                .task {
+                    library.refresh()
+                    SyncService.shared.start()
+                }
+                .fullScreenCover(item: $reader.chapter, onDismiss: { reader.closed() }) { chapter in
                     ReaderScreen(chapter: chapter) { reader.chapter = nil }
                         .ignoresSafeArea()
                 }
@@ -35,8 +38,18 @@ struct BookmaniaApp: App {
 @MainActor
 final class ReaderPresenter: ObservableObject {
     @Published var chapter: LocalChapter?
+    private var opened: LocalChapter?
 
-    func open(_ chapter: LocalChapter) { self.chapter = chapter }
+    func open(_ chapter: LocalChapter) {
+        opened = chapter
+        self.chapter = chapter
+    }
+
+    /// The reader is gone (it saved its position as it closed): the work's progress goes to the WebDAV sync.
+    func closed() {
+        if let opened { SyncService.shared.pushAfterReading(opened) }
+        opened = nil
+    }
 }
 
 /// Keys of the iOS version's own settings (no Android counterpart).

@@ -236,3 +236,29 @@
 "backup_restored_settings" = "設定：%lld 項。";
 "backup_skipped_sources" = "略過 %lld 部其他來源（線上來源）的作品。";
 "backup_invalid" = "這不是可以讀取的備份檔。";
+
+/* WebDAV 同步（更多 › WebDAV 同步）。 */
+"WebDAV sync" = "WebDAV 同步";
+"WebDAV server" = "WebDAV 伺服器";
+"Address (https://…)" = "網址（https://…）";
+"Account" = "帳號";
+"Password" = "密碼";
+"Test" = "測試連線";
+"Save" = "儲存";
+"Saved." = "已儲存。";
+"Sync with this server" = "使用這個伺服器同步";
+"Sync book files" = "同步書檔";
+"Book files only on Wi-Fi" = "只在 Wi-Fi 下傳送書檔";
+"Sync now" = "立即同步";
+"sync_account_help" = "只接受 https 網址。更換伺服器或帳號時，這台裝置的同步會重新開始。密碼存在這台裝置的鑰匙圈中。";
+"sync_files_help" = "書櫃中本機來源作品的檔案。不會刪除或覆蓋伺服器上的檔案。";
+"sync_info" = "同步的內容：書櫃與分類、已讀、書籤、閱讀位置、閱讀記錄，以及閱讀與書櫃的設定。開始閱讀時取得最新進度，離開閱讀時送出進度。";
+"sync_https_only" = "網址必須以 https:// 開頭";
+"sync_test_ok" = "可以使用這個伺服器。";
+"sync_test_failed" = "無法使用這個伺服器：%@";
+"sync_last" = "上次同步：%@";
+"sync_last_error" = "上次同步失敗：%@";
+"sync_never" = "尚未同步。";
+"sync_conflicts" = "與伺服器上的檔案不同、沒有覆蓋：%@";
+"sync_file_problems" = "沒有傳送的書檔：%1$lld 個（%2$@）";
+"sync_keychain_failed" = "無法把密碼存進鑰匙圈。";

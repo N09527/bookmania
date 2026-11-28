@@ -1,7 +1,7 @@
 import BookmaniaCore
 import SwiftUI
 
-/// More (Android's "more" tab): incognito mode, settings, statistics, backup, about.
+/// More (Android's "more" tab): incognito mode, settings, statistics, backup, the WebDAV sync, about.
 struct MoreView: View {
     @EnvironmentObject private var library: LibraryModel
     @State private var incognito = AppEnvironment.shared.readerPreferences.incognitoMode
@@ -46,6 +46,11 @@ struct MoreView: View {
                         BackupView()
                     } label: {
                         Label("Backup and restore", systemImage: "arrow.up.arrow.down.circle")
+                    }
+                    NavigationLink {
+                        SyncSettingsView()
+                    } label: {
+                        Label("WebDAV sync", systemImage: "arrow.triangle.2.circlepath.icloud")
                     }
                 }
                 Section("About") {

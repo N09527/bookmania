@@ -38,3 +38,17 @@
 "backup_restored_settings" = "Settings: %lld.";
 "backup_skipped_sources" = "Skipped %lld works of other (online) sources.";
 "backup_invalid" = "This is not a backup file that can be read.";
+
+/* WebDAV sync (More › WebDAV sync). */
+"sync_account_help" = "Only https addresses. Changing the server or account starts the sync over on this device. The password is kept in this device's keychain.";
+"sync_files_help" = "Files of the local source works in the library. Files on the server are never deleted or overwritten.";
+"sync_info" = "Synced: the library and its categories, read state, bookmarks, reading positions, history, and the reading and library settings. A book takes the newest progress when it opens and sends its progress when it is left.";
+"sync_https_only" = "The address must start with https://";
+"sync_test_ok" = "The server works.";
+"sync_test_failed" = "The server cannot be used: %@";
+"sync_last" = "Last sync: %@";
+"sync_last_error" = "The last sync failed: %@";
+"sync_never" = "Not synced yet.";
+"sync_conflicts" = "Different from the file on the server (left as they are): %@";
+"sync_file_problems" = "Book files not moved: %1$lld (%2$@)";
+"sync_keychain_failed" = "The password could not be saved in the keychain.";

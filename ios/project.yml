@@ -48,6 +48,8 @@ targets:
         UIFileSharingEnabled: true
         LSSupportsOpeningDocumentsInPlace: true
         ITSAppUsesNonExemptEncryption: false
+        # The WebDAV sync's server can be on the local network (InfoPlist.strings has the translations).
+        NSLocalNetworkUsageDescription: Bookmania connects to the WebDAV server you set up for sync, which can be on your local network.
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations:

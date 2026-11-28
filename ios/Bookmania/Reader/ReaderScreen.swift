@@ -32,7 +32,26 @@ final class ReaderContainerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        show(firstChapter, switchedFromImages: false)
+        let sync = SyncService.shared
+        guard sync.isConfigured else {
+            show(firstChapter, switchedFromImages: false)
+            return
+        }
+        // The other devices' progress of the work first (at most 5 seconds; the WebDAV sync).
+        let spinner = UIActivityIndicatorView(style: .large)
+        spinner.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(spinner)
+        NSLayoutConstraint.activate([
+            spinner.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            spinner.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        ])
+        spinner.startAnimating()
+        let chapter = firstChapter
+        Task { [weak self] in
+            await sync.pullBeforeReading(chapter)
+            spinner.removeFromSuperview()
+            self?.show(chapter, switchedFromImages: false)
+        }
     }
 
     override var childForStatusBarHidden: UIViewController? { current }

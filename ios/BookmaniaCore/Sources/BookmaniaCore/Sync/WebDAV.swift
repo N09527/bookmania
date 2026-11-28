@@ -73,12 +73,30 @@ public protocol HTTPTransport: Sendable {
 public final class URLSessionTransport: HTTPTransport, @unchecked Sendable {
     private let session: URLSession
 
-    public init(session: URLSession = .shared) { self.session = session }
+    public init(session: URLSession = URLSessionTransport.makeSession()) { self.session = session }
+
+    /// A session for WebDAV: nothing is cached (a sync has to see the files as they are on the server now; a cached
+    /// library.json would hide another device's changes) and no cookies are kept. Without `expensive`, requests use
+    /// only networks that are neither expensive (cellular, a personal hotspot) nor constrained (Low Data Mode).
+    public static func makeSession(expensive: Bool = true) -> URLSession {
+        let c = URLSessionConfiguration.ephemeral
+        c.urlCache = nil
+        c.requestCachePolicy = .reloadIgnoringLocalCacheData
+        c.httpCookieStorage = nil
+        c.httpShouldSetCookies = false
+        #if canImport(Darwin)
+        c.allowsExpensiveNetworkAccess = expensive
+        c.allowsConstrainedNetworkAccess = expensive
+        c.waitsForConnectivity = false
+        #endif
+        return URLSession(configuration: c)
+    }
 
     private func urlRequest(_ r: HTTPRequest) throws -> URLRequest {
         guard let url = URL(string: r.url) else { throw SyncError(.config, "not a URL: \(r.url)") }
         var request = URLRequest(url: url)
         request.httpMethod = r.method
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         request.timeoutInterval = 60
         for (k, v) in r.headers { request.setValue(v, forHTTPHeaderField: k) }
         switch r.body {

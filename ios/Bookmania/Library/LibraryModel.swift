@@ -15,12 +15,17 @@ final class LibraryModel: ObservableObject {
     let env = AppEnvironment.shared
     let preferences: LibraryPreferences
     private var observer: NSObjectProtocol?
+    private var filesObserver: NSObjectProtocol?
 
     init() {
         preferences = LibraryPreferences(env.preferences)
         state = env.library.snapshot
         observer = NotificationCenter.default.addObserver(forName: .libraryChanged, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.state = AppEnvironment.shared.library.snapshot }
+        }
+        // Book files the WebDAV sync downloaded.
+        filesObserver = NotificationCenter.default.addObserver(forName: .syncDownloadedFiles, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.refresh() }
         }
     }
 
