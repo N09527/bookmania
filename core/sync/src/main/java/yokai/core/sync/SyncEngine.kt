@@ -77,7 +77,7 @@ class SyncEngine(
         for (n in 1..path.size) {
             val p = path.subList(0, n).toList()
             if (p in madeCollections) continue
-            dav.mkcol(p)
+            if (dav.mkcol(p) && p == ownDir) forgetUploads()
             madeCollections += p
         }
     }
@@ -85,6 +85,29 @@ class SyncEngine(
     private fun ensureFolders() {
         ensure(ownDir + "progress")
         ensure(filesDir)
+    }
+
+    /**
+     * This device's folder had to be created: the server has nothing of this device (its first sync, or the files
+     * on the server were removed). What this device uploaded is sent again (sync-format.md section 5.1): library.json
+     * and device.json, the progress of the works it had sent (now pending), and its book files.
+     */
+    private fun forgetUploads() {
+        val b = adapter.loadBaseline()
+        for (work in b.ownProgress.keys) {
+            val wb = adapter.loadWorkBaseline(work)
+            if (wb.uploaded != null) adapter.saveWorkBaseline(work, wb.copy(uploaded = null))
+        }
+        if (b.ownProgress.isEmpty() && b.uploadedLibrary == null && b.uploadedDevice == null && b.uploadedFiles.isEmpty()) return
+        adapter.saveBaseline(
+            b.copy(
+                ownProgress = emptyMap(),
+                uploadedLibrary = null,
+                uploadedDevice = null,
+                uploadedFiles = emptyList(),
+                pending = b.pending + b.ownProgress.keys,
+            ),
+        )
     }
 
     /** The other devices' ids: listed again with [refresh], else the last listing (if there is one). */
@@ -110,6 +133,8 @@ class SyncEngine(
      * the library); finding that needs no network.
      */
     fun syncLibrary(libraryWorks: Collection<String> = emptyList()): LibraryResult {
+        // Each library sync checks the folders again, so a server that lost them is noticed (forgetUploads).
+        madeCollections.clear()
         ensureFolders()
         val newer = mutableListOf<String>()
         val remotes = mutableListOf<LibraryFile>()

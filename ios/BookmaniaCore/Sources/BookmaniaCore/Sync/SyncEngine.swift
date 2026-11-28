@@ -88,9 +88,30 @@ public final class SyncEngine {
         for n in 0 ..< path.count {
             let p = Array(path[0 ... n])
             if madeCollections.contains(p) { continue }
-            try await dav.mkcol(p)
+            if try await dav.mkcol(p), p == ownDir { forgetUploads() }
             madeCollections.insert(p)
         }
+    }
+
+    /// This device's folder had to be created: the server has nothing of this device (its first sync, or the files
+    /// on the server were removed). What this device uploaded is sent again (sync-format.md section 5.1):
+    /// library.json and device.json, the progress of the works it had sent (now pending), and its book files.
+    private func forgetUploads() {
+        var b = adapter.loadBaseline()
+        for work in b.ownProgress.keys {
+            var wb = adapter.loadWorkBaseline(work)
+            if wb.uploaded != nil {
+                wb.uploaded = nil
+                adapter.saveWorkBaseline(work, wb)
+            }
+        }
+        if b.ownProgress.isEmpty && b.uploadedLibrary == nil && b.uploadedDevice == nil && b.uploadedFiles.isEmpty { return }
+        b.pending.formUnion(b.ownProgress.keys)
+        b.ownProgress = [:]
+        b.uploadedLibrary = nil
+        b.uploadedDevice = nil
+        b.uploadedFiles = []
+        adapter.saveBaseline(b)
     }
 
     private func ensureFolders() async throws {
@@ -115,6 +136,8 @@ public final class SyncEngine {
     /// could not send, and of `libraryWorks` whose progress changed here (in the reader or not); finding that needs
     /// no network.
     public func syncLibrary(libraryWorks: Set<String> = []) async throws -> LibraryResult {
+        // Each library sync checks the folders again, so a server that lost them is noticed (forgetUploads).
+        madeCollections.removeAll()
         try await ensureFolders()
         var newer: [String] = []
         var remotes: [Sync.LibraryFile] = []

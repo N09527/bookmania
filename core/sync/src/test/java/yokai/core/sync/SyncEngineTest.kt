@@ -244,6 +244,43 @@ class SyncEngineTest {
     }
 
     @Test
+    fun `a server that lost everything gets this device's library, progress and files again`() {
+        val folder = "直排測試書"
+        phone.works[book] = WorkValue(favorite = true, added = 1)
+        phone.setChapter(book, ch1, ChapterValue(page = 4, lastRead = now))
+        phone.files["$folder/第1冊.epub"] = ByteArray(100) { 1 }
+        phoneSync.syncLibrary(listOf(book))
+        phoneSync.syncFiles(phone, listOf(folder))
+        val own = "Bookmania/sync-v1/devices/${phone.id}"
+        assertTrue(server.files.containsKey("$own/library.json"))
+
+        // A new server at the same address, say: nothing of the phone is there now.
+        server.files.clear()
+        server.collections.retainAll(setOf(""))
+        tick()
+        phoneSync.syncLibrary(listOf(book))
+        phoneSync.syncFiles(phone, listOf(folder))
+        assertTrue(server.files.containsKey("$own/device.json"))
+        val library = SyncJson.decodeFromString<LibraryFile>(server.text("$own/library.json")!!)
+        assertEquals(setOf(book), library.progress.keys)
+        val progress = SyncJson.decodeFromString<ProgressFile>(server.text("$own/progress/${SyncIds.progressFileName(book)}")!!)
+        assertEquals(4, progress.chapters.getValue(ch1).progress!!.page)
+        assertEquals(100, server.files.getValue("Bookmania/sync-v1/files/$folder/第1冊.epub").size)
+        assertTrue(server.files.containsKey("$own/files.json"))
+
+        // The iPad can take all of it.
+        pad.setChapter(book, ch1, ChapterValue())
+        padSync.syncLibrary()
+        assertEquals(4, pad.chapter(book, ch1)!!.page)
+
+        // With the server as it was, nothing is sent again.
+        tick()
+        val before = server.requests.size
+        phoneSync.syncLibrary(listOf(book))
+        assertTrue(server.requests.drop(before).none { it.startsWith("PUT") })
+    }
+
+    @Test
     fun `names that could escape the folder are not downloaded`() {
         // Another device's list, written by hand as a broken or hostile client could.
         server.collections += listOf("Bookmania", "Bookmania/sync-v1", "Bookmania/sync-v1/devices", "Bookmania/sync-v1/devices/c0000000-0000-4000-8000-000000000003")

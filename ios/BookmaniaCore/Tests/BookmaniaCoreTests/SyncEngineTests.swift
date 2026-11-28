@@ -275,6 +275,39 @@ import Testing
         #expect(file.chapters[ch1]?.progress?.page == 5)
     }
 
+    @Test func aServerThatLostEverythingGetsThisDevicesLibraryProgressAndFilesAgain() async throws {
+        let folder = "直排測試書"
+        phone.works[book] = Sync.WorkValue(favorite: true, added: 1)
+        phone.setChapter(book, ch1, Sync.ChapterValue(page: 4, lastRead: clock.now))
+        phone.files["\(folder)/第1冊.epub"] = Data(repeating: 1, count: 100)
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        _ = try await phoneSync.syncFiles(phone, libraryWorks: [folder])
+        let own = "Bookmania/sync-v1/devices/\(phone.id)"
+        #expect(server.files["\(own)/library.json"] != nil)
+
+        server.files = [:]
+        server.collections = [""]
+        tick()
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        _ = try await phoneSync.syncFiles(phone, libraryWorks: [folder])
+        #expect(server.files["\(own)/device.json"] != nil)
+        let library = Sync.decode(Sync.LibraryFile.self, server.files["\(own)/library.json"])
+        #expect(Set(library?.progress.keys.map { $0 } ?? []) == [book])
+        let progress = Sync.decode(Sync.ProgressFile.self, server.files["\(own)/progress/\(SyncIds.progressFileName(book))"])
+        #expect(progress?.chapters[ch1]?.progress?.page == 4)
+        #expect(server.files["Bookmania/sync-v1/files/\(folder)/第1冊.epub"]?.count == 100)
+        #expect(server.files["\(own)/files.json"] != nil)
+
+        pad.setChapter(book, ch1, Sync.ChapterValue())
+        _ = try await padSync.syncLibrary()
+        #expect(pad.chapter(book, ch1)?.page == 4)
+
+        tick()
+        let before = server.requests.count
+        _ = try await phoneSync.syncLibrary(libraryWorks: [book])
+        #expect(!server.requests.dropFirst(before).contains { $0.hasPrefix("PUT") })
+    }
+
     @Test func bookFilesAreUploadedAndDownloadedNeverOverwritten() async throws {
         let folder = "直排測試書"
         phone.works[book] = Sync.WorkValue(favorite: true, added: 1)

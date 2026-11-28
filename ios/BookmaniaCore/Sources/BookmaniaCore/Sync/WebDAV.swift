@@ -223,9 +223,12 @@ public struct WebDAVClient: Sendable {
     }
 
     /// Creates the collection; one that exists already is fine (405).
-    public func mkcol(_ path: [String]) async throws {
+    /// Creates the collection `path`: true when it was created now, false when it existed already (405).
+    @discardableResult
+    public func mkcol(_ path: [String]) async throws -> Bool {
         let r = try await send("MKCOL", path, collection: true)
         if !(200 ..< 300).contains(r.status) && r.status != 405 { throw fail("MKCOL", path, r) }
+        return (200 ..< 300).contains(r.status)
     }
 
     /// Creates every collection of `path`, from the top.

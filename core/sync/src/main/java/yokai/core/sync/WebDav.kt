@@ -149,9 +149,11 @@ class WebDavClient(
         throw SyncException(SyncException.Kind.Http, "$method ${path.joinToString("/")}: ${response.status}", response.status)
 
     /** Creates the collection; one that exists already is fine (405). */
-    fun mkcol(path: List<String>) {
+    /** Creates the collection [path]: true when it was created now, false when it existed already (405). */
+    fun mkcol(path: List<String>): Boolean {
         val r = send("MKCOL", path, collection = true)
         if (r.status !in 200..299 && r.status != 405) fail("MKCOL", path, r)
+        return r.status in 200..299
     }
 
     /** Creates every collection of [path], from the top. */
