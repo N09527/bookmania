@@ -1,0 +1,3 @@
+[submodule "ios/Vendor/oneechan-runtime"]
+	path = ios/Vendor/oneechan-runtime
+	url = https://github.com/leros1337/oneechan-runtime
